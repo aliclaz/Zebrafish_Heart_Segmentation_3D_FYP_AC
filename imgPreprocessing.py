@@ -3,14 +3,14 @@ import numpy as np
 from patchify import patchify
 from sklearn.model_selection import train_test_split
 
-def load_process_imgs(path):
+def load_process_imgs(img_path, mask_path):
 
     # Load input images and masks
 
-    image = io.imread(path)
+    image = io.imread(img_path)
     img_patches = patchify(image, (64, 64, 64), step=64)
 
-    mask = io.imread(path)
+    mask = io.imread(mask_path)
     mask_patches = patchify(mask, (64, 64, 64), step=64)
 
     # Reshape each array to have shape (n_patches, height, width, depth)
@@ -29,3 +29,5 @@ def load_process_imgs(path):
     # Split dataset into training and validation sets
 
     x_train, x_val, y_train, y_val = train_test_split(train_imgs, train_masks, test_size=0.1, random_state=0)
+
+    return x_train, x_val, y_train, y_val
