@@ -86,8 +86,8 @@ def set_framework(name):
     # wrap segmentation models with framework modules
     from .backbones.backbones_factory import Backbones
     from .models.unet import Unet as _Unet
-    from .models.attention_unet import AttentionUnet as _AttentionUnet
-    from .models.attention_res_unet import AttentionResUnet as _AttentionResUnet
+    from .models.atten_unet import AttentionUnet as _AttentionUnet
+    from .models.atten_res_unet import AttentionResUnet as _AttentionResUnet
 
     Unet = inject_global_submodules(_Unet)
     AttentionUnet = inject_global_submodules(_AttentionUnet)
