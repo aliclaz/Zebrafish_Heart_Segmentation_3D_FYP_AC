@@ -36,13 +36,19 @@ def predict(model, backbone, in_path, out_path):
     # Read each image in the directory, convert it into patches and add the patches to an array
 
     img_files = sorted(os.listdir(in_path))
-    imgs = []
+    imgs = imgs_full_size = []
 
     for file in img_files:
         img = io.imread(in_path+file)
+        imgs_full_size.append(img)
         patches = patchify(img, (64, 64, 64), step=64)
         imgs.append(patches)
+    imgs_full_size = np.array(imgs_full_size)
     imgs = np.array(imgs)
+
+    # Convert full sized image to have 3 channels for display purposes
+
+    imgs_full_size_3ch = np.stack((imgs_full_size,)*3, axis=-1).astype(np.uint8)
 
     # Use model to predict mask for each 3D patch and add the patches to an array of shape 
     # (n_images, n_patches, height, width, depth, classes)
@@ -92,4 +98,4 @@ def predict(model, backbone, in_path, out_path):
     for i in reconstructed_imgs:
         imsave(out_path+'{}_mask.tif'.format(img_files[i]), reconstructed_imgs[i])
 
-    return reconstructed_imgs
+    return imgs_full_size_3ch, reconstructed_imgs
