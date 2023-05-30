@@ -77,8 +77,7 @@ def f_score(gt, pr, beta=1, class_weights=1, class_indexes=None, smooth=SMOOTH, 
     fp = backend.sum(pr, axis=axes) - tp
     fn = backend.sum(gt, axis=axes) - tp
 
-    score = ((1 + beta ** 2) * tp + smooth) \
-            / ((1 + beta ** 2) * tp + beta ** 2 * fn + fp + smooth)
+    score = ((1 + beta ** 2) * tp + smooth) / ((1 + beta ** 2) * tp + beta ** 2 * fn + fp + smooth)
     score = average(score, per_image, class_weights, **kwargs)
 
     return score
