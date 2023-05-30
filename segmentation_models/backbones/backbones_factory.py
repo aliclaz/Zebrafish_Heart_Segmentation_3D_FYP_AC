@@ -27,7 +27,7 @@ class BackbonesFactory(ModelsFactory):
     def get_feature_layers(self, name, n=5):
         return self._default_feature_layers[name][:n]
     
-    def get_preprocessing(self, name);
+    def get_preprocessing(self, name):
         return self.get(name)[1]
     
 Backbones = BackbonesFactory()
