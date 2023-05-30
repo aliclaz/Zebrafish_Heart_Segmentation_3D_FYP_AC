@@ -182,3 +182,10 @@ def ResNet34(input_shape=None, input_tensor=None, weights=None, classes=1000, st
              repetitions=(3, 4, 6, 3), **kwargs):
     return ResNet(MODEL_PARAMS['resnet50'], input_shape=input_shape, input_tensor=input_tensor, weights=weights, classes=classes, 
                   stride_size=stride_size, init_filters=init_filters, include_top=include_top, repetitions=repetitions, **kwargs)
+
+def preprocess_input(x, **kwargs):
+    return x
+
+setattr(ResNet18, '__doc__', ResNet.__doc__)
+setattr(ResNet34, '__doc__', ResNet.__doc__)
+setattr(ResNet50, '__doc__', ResNet.__doc__)
