@@ -84,19 +84,6 @@ def f_score(gt, pr, beta=1, class_weights=1, class_indexes=None, smooth=SMOOTH, 
     return score
 
 def categorical_focal_loss(gt, pr, gamma=2.0, alpha=0.25, class_indexes=None, **kwargs):
-    r"""Implementation of Focal Loss from the paper in multiclass classification
-
-    Formula:
-        loss = - gt * alpha * ((1 - pr)^gamma) * log(pr)
-
-    Args:
-        gt: ground truth 4D keras tensor (B, H, W, C) or (B, C, H, W)
-        pr: prediction 4D keras tensor (B, H, W, C) or (B, C, H, W)
-        alpha: the same as weighting factor in balanced cross entropy, default 0.25
-        gamma: focusing parameter for modulating factor (1-p), default 2.0
-        class_indexes: Optional integer or list of integers, classes to consider, if ``None`` all classes are used.
-
-    """
 
     backend = kwargs['backend']
     gt, pr = gather_channels(gt, pr, indexes=class_indexes, **kwargs)
