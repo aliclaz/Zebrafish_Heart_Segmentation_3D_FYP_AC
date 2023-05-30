@@ -1,0 +1,181 @@
+from keras_applications import get_submodules_from_kwargs
+
+def Conv3DBn(filters, kernel_size, strides=(1, 1, 1), padding='valid', data_format=None, dilation_rate=(1, 1, 1), activation=None,
+             kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None,
+             activity_regularizer=None, kernel_constraint=None, bias_constraint=None, use_batchnorm=False, **kwargs):
+    conv_name, act_name, bn_name = None, None, None
+    block_name = kwargs.pop('name', None)
+    backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
+
+    if block_name is not None:
+        conv_name = block_name + '_conv'
+
+    if block_name is not None and activation is not None:
+        act_str = activation.__name__ if callable(activation) else str(activation)
+        act_name = block_name + '_' + act_str
+
+    if block_name is not None and use_batchnorm:
+        bn_name = block_name +'_bn'
+    
+    def wrapper(input_tensor):
+        x = layers.Conv3D(filters=filters, kernel_size=kernel_size, strides=strides, padding=padding, data_format=data_format,
+                          dilation_rate=dilation_rate, activation=None, use_bias=not (use_batchnorm), 
+                          kernel_initializer=kernel_initializer, bias_initializer=bias_initializer, 
+                          kernel_regularizer=kernel_regularizer, bias_regularizer=bias_regularizer,
+                          activity_regularizer=activity_regularizer, kernel_constraint=kernel_constraint, 
+                          bias_constraint=bias_constraint, name=conv_name)(input_tensor)
+        
+        if use_batchnorm:
+            x = layers.BatchNormalization(axis=4, name=bn_name)(x)
+
+        if activation:
+            x = layers.Activation(activation, name=act_name)(x)
+
+        return x
+    
+    return wrapper
+
+def Conv3DTrans(filters, kernel_size, strides=(1, 1, 1), padding='valid', data_format=None, dilation_rate=(1, 1, 1), activation=None,
+                kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None,
+                activity_regularizer=None, kernel_constraint=None, bias_constraint=None, **kwargs):
+    conv_trans_name, act_name, bn_name = None, None, None
+    block_name = kwargs.pop('name', None)
+    backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
+
+    if block_name is not None:
+        conv_trans_name = block_name + '_conv_trans'
+
+    if block_name is not None and activation is not None:
+        act_str = activation.__name__ if callable(activation) else str(activation)
+        act_name = block_name + '_' + act_str
+
+    if block_name is not None and use_batchnorm:
+        bn_name = block_name +'_bn'
+
+    def wrapper(input_tensor):
+        x = layers.Conv3DTranspose(filters=filters, kernel_size=kernel_size, strides=strides, padding=padding, data_format=data_format,
+                          dilation_rate=dilation_rate, activation=None, kernel_initializer=kernel_initializer, 
+                          bias_initializer=bias_initializer, kernel_regularizer=kernel_regularizer, bias_regularizer=bias_regularizer,
+                          activity_regularizer=activity_regularizer, kernel_constraint=kernel_constraint, 
+                          bias_constraint=bias_constraint, name=conv_trans_name)(input_tensor)
+
+        if activation:
+            x = layers.Activation(activation, name=act_name)(x)
+
+        return x
+    
+    return wrapper
+
+def UpSamp3D(size=(2, 2, 2), data_format=None, **kwargs):
+    up_samp_name = None
+    block_name = kwargs.pop('name', None)
+    backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
+
+    if block_name is not None:
+        up_samp_name = block_name + '_up_samp'
+
+    def wrapper(input_tensor):
+        x = layers.UpSampling3D(size=size, data_format=data_format, name=up_samp_name)
+
+        return x
+    
+    return wrapper
+
+def AddAct(activation=None, **kwargs):
+    add_name, act_name = None, None
+    block_name = kwargs.pop('name', None)
+    backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
+
+    if block_name is not None:
+        add_name = block_name + '_add'
+
+    if block_name is not None and activation is not None:
+        act_str = activation.__name__ if callable(activation) else str(activation)
+        act_name = block_name + '_' + act_str
+
+    def wrapper(inputs):
+        x = layers.add(inputs)
+        x = layers.activation(activation)
+
+        return x
+    
+    return wrapper
+
+def Mult(**kwargs):
+    mult_name = None
+    block_name = kwargs.pop('name', None)
+    backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
+
+    if block_name is not None:
+        mult_name = block_name + '_multiply'
+
+    def wrapper(inputs):
+        x = layers.multiply(inputs)
+
+        return x
+    
+    return wrapper
+
+def get_submodules():
+    return {'backend': backend, 'models': models, 'layers': layers, 'utils':keras_utils}
+
+def Conv3x3BnReLU(filters, use_batchnorm, name=None):
+    kwargs = get_submodules()
+
+    def wrapper(input_tensor):
+        return Conv3DBn(filters, kernel_size=(3, 3, 3), activation='relu', kernel_initializer='he_uniform', padding='same',
+                        use_batchnorm=use_batchnorm, name=name, **kwargs)(input_tensor)
+    
+    return wrapper
+
+def RepeatElement(tensor, rep, name=None):
+    kwargs = get_submodules()
+
+    return layers.Lambda(lambda x, repnum: backend.repeat_elements(x, repnum, axis=4), arguments={'repnum': rep},
+                         name=name)(tensor)
+
+def GatingSignal(filters, use_batchnorm, name=None):
+    kwargs = get_submodules()
+    
+    def wrapper(input_tensor):
+        return Conv3DBn(filters, kernel_size=(1, 1, 1), activation='relu', padding='same', kernel_initializer='he_uniform', 
+                        use_batchnorm=use_batchnorm, name=name, **kwargs)(input_tensor)
+    
+    return wrapper
+        
+
+def AttentionBlock(inter_shape, use_batchnorm, name=None):
+    kwargs = get_submodules()
+
+    def wrapper(skip_connection, gating):
+        shape_x = backend.int_shape(x)
+        shape_g = backend.int_shape(gating)
+
+        theta_x = Conv3DBn(inter_shape, kernel_size=(2, 2, 2), strides=(2, 2, 2), padding='same', kernel_initalizer='he_normal',
+                           padding='same', use_batchnorm=use_batchnorm, name=name, **kwargs)(skip_connection)
+        shape_theta_x = backend.int_shape(theta_x)
+
+        phi_g = Conv3DBn(inter_shape, kernel_size=(1, 1, 1), padding='same', kernel_initalizer='he_normal',
+                         padding='same', use_batchnorm=use_batchnorm, name=name, **kwargs)(gating)
+        upsample_g = Conv3DTrans(inter_shape, (3, 3, 3), padding='same', strides=(shape_theta_x[1] // shape_g[1],
+                                                                                 shape_theta_x[2] // shape_g[2],
+                                                                                 shape_theta_x[3] // shape_g[3]),
+                                                                                 name=name, **kwargs)(phi_g)
+        
+        act_xg = AddAct('relu', name=name, **kwargs)([upsample_g, theta_x])
+        sigmoid_xg = Conv3DBn(1, kernel_size=(1, 1, 1), activation='softmax', kernel_initializer='he_normal', padding='same',
+                              use_batchnorm=use_batchnorm, name=name, **kwargs)(act_xg)
+        shape_sigmoid = backend.int_shape(sigmoid_xg)
+        upsample_psi = UpSamp3D(size=(shape_x[1] // shape_sigmoid[1], 
+                                       shape_x[2] // shape_sigmoid[2], 
+                                       shape_x[3] // shape_sigmoid[3]), name=name, **kwargs)(sigmoid_xg)
+        upsample_psi = RepeatElement(upsample_psi, shape_x[4])
+
+        y = Mult([upsample_psi, skip_connection])
+
+        result = Conv3DBn(shape_x[4], (1, 1, 1), kernel_intializer='he_normal', padding='same', use_batchnorm=True, name=name, 
+                          **kwargs)(y)
+        
+        return result
+    
+    return wrapper
