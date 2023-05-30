@@ -97,6 +97,29 @@ def ResNet(model_params, input_shape=None, input_tensor=None, include_top=False,
     global backend, layers, models, keras_utils
     backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
 
+    if type(stride_size) not in (tuple, list):
+        stride_size = [
+            (stride_size, stride_size, stride_size,),
+            (stride_size, stride_size, stride_size,),
+            (stride_size, stride_size, stride_size,),
+            (stride_size, stride_size, stride_size,),
+            (stride_size, stride_size, stride_size,),
+        ]
+    else:
+        stride_size = list(stride_size)
+
+    if len(stride_size) < 3:
+        print('Error: stride_size length must be 3 or more')
+        return None
+
+    if len(stride_size) - 1 != len(repetitions):
+        print('Error: stride_size length must be equal to repetitions length - 1')
+        return None
+
+    for i in range(len(stride_size)):
+        if type(stride_size[i]) not in (tuple, list):
+            stride_size[i] = (stride_size[i], stride_size[i], stride_size[i])
+
     if input_tensor is None:
         img_input = layers.Input(shape=input_shape, name='data')
     else:
