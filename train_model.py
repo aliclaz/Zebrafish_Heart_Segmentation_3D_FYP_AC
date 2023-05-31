@@ -247,3 +247,6 @@ def main():
     # Put these into a dataframe, display it and then save it as a CSV for access from the main program
 
     healthy_df_calcs(healthy_masks, classes, healthy_scales, HPF, OUT_PATH)
+
+if __name__ == '__main__':
+    main()
