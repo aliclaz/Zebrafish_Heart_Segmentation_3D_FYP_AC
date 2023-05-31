@@ -10,6 +10,7 @@ Original file is located at
 import pandas as pd
 import numpy as np
 from statistics import fmean, stdev
+from scipy.stats import t
 import math
 
 __all__ = ['get_class_volumes', 'get_class_volume_msd', 'get_CIs', 'stat_sig_diff_test']
@@ -43,10 +44,11 @@ def get_class_volume_msd(masks, classes, scales, hpf, GM):
 
 def get_CIs(sds, n_samples, classes, hpf, GM):
     CIs = []
+    t_crit = t.ppf(q=0.95, df=n_samples - 1)
     column = ['Confidence Interval of Mean {} Volume (\u03bcm\u00b2) at {}HPF'.format(GM, hpf)]
     CI_df = pd.DataFrame(index=classes, columns=column, dtype=float)
     for sd in sds:
-        CI = (2.776*sd)/(math.sqrt(n_samples))
+        CI = (t_crit*sd)/(math.sqrt(n_samples))
         CIs.append(CI)
     
     CI_df[column[0]] = CIs
