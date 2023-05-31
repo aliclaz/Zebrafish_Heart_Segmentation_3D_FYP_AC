@@ -112,7 +112,7 @@ def show_test_masks(model_names, imgs, preds, out_path):
 
 def show_pred_masks(imgs, preds, out_path):
     
-    # Plot images from the test set and their predicted masks from each model at 3 random slices
+    # Plot images from the test set and their predicted masks at 3 random slices
     # Here preds is an array of predicted masks for each image, only 1 model used
 
     slices = np
