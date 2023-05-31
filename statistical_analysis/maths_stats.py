@@ -42,6 +42,29 @@ def get_class_volume_msd(masks, classes, scales, hpf, GM):
 
     return msd_class_vols_df
 
+def add_vols_msd(n_og, mean_class_vols, masks, classes, scales, hpf, gm):
+    new_class_vols_df = pd.DataFrame(index=classes, dtype=float)
+    mean_column = ['Mean {} Volume (\u03bcm\u00b2) at {}HPF'.format(gm, hpf)]
+    new_mean_class_vols_df = pd.DataFrame(index=classes, columns=mean_column, dtype=float)
+    sd_column = ['Standard Deviation of {} Volume (\u03bcm\u00b2) at {}HPF'.format(gm, hpf)]
+    new_sd_class_vols_df = pd.DataFrame(index=classes, columns=sd_column, dtype=float)
+
+    for i in range(len(masks)):
+        fish = i + 1
+        new_class_vols = get_class_volumes(masks[i], scales[i])
+        new_class_vols_df['{}HPF Fish {} {} Volume (\u03bcm\u00b2)'.format(hpf, fish, gm)] = new_class_vols
+    
+    for c in classes:
+        for n in n_og:
+            new_class_vols = new_class_vols_df.loc[c,:].values.tolist()
+            tot_class_vols = new_class_vols.append(mean_class_vols[n]/(n + 1))
+        new_mean_class_vols_df.loc[c, mean_column] = fmean(tot_class_vols)
+        new_sd_class_vols_df.loc[c, sd_column] = stdev(tot_class_vols)
+
+    new_msd_class_vols_df = pd.concat([new_mean_class_vols_df, new_sd_class_vols_df], axis=1)
+
+    return new_msd_class_vols_df
+
 def get_CIs(sds, n_samples, classes, hpf, GM):
     CIs = []
     t_crit = t.ppf(q=0.95, df=n_samples - 1)
