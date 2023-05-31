@@ -243,7 +243,7 @@ def add_df_calcs(new_masks, classes, hpf, gm, scales, in_path, out_path):
 
     n_samples.to_csv(out_path+'n_samples.csv')
 
-def add_healthy_df_calcs(new_healthy_masks, classes, hpf, gm, scales, in_path, out_path):
+def add_healthy_df_calcs(new_healthy_masks, classes, hpf, scales, in_path, out_path):
 
     # Get one of the three default hpf values based on which is closest to to the entered hpf
 
@@ -274,14 +274,14 @@ def add_healthy_df_calcs(new_healthy_masks, classes, hpf, gm, scales, in_path, o
 
     # Calculate the new healthy mean and standard deviations of each class volume
 
-    new_healthy_msd = add_vols_msd(n, og_healthy_means, new_healthy_masks, classes, scales, hpf, gm)
+    new_healthy_msd = add_vols_msd(n, og_healthy_means, new_healthy_masks, classes, scales, hpf, 'Healthy')
 
     new_healthy_sds = new_healthy_msd['Standard Deviation of Healthy Volume (\u03bcm\u00b2) at {}HPF'.format(hpf)].tolist()
     new_healthy_means = new_healthy_msd['Mean Healthy Volume (\u03bcm\u00b2) at {}HPF'.format(hpf)].tolist()
 
     # Calculate the new confidence intervals
 
-    new_healthy_CIs = get_CIs(new_healthy_sds, n, classes, hpf, gm)
+    new_healthy_CIs = get_CIs(new_healthy_sds, n, classes, hpf, 'Healthy')
 
     # Create lists of all the gm and hpf values that have already been used
 
