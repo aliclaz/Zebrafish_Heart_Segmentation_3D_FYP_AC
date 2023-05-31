@@ -1,4 +1,4 @@
-from .backbones import get_submodules_from_kwargs
+from . import get_submodules_from_kwargs
 
 __all__ = ['load_model_weights']
 
