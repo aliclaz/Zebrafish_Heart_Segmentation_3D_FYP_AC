@@ -69,30 +69,30 @@ def set_framework(name):
     base.KerasObject.set_submodules(backend=keras.backend, layers=keras.layers, models=keras.models, utils=keras.utils,
     )
 
-    _framework = os.environ.get('SM_FRAMEWORK', _DEFAULT_KERAS_FRAMEWORK)
-    try:
-        set_framework(_framework)
-    except ImportError:
-        other = _TF_KERAS_FRAMEWORK_NAME if _framework == _KERAS_FRAMEWORK_NAME else _KERAS_FRAMEWORK_NAME
-        set_framework(other)
+_framework = os.environ.get('SM_FRAMEWORK', _DEFAULT_KERAS_FRAMEWORK)
+try:
+    set_framework(_framework)
+except ImportError:
+    other = _TF_KERAS_FRAMEWORK_NAME if _framework == _KERAS_FRAMEWORK_NAME else _KERAS_FRAMEWORK_NAME
+    set_framework(other)
 
-    print('Segmentation Models: using `{}` framework.'.format(_KERAS_FRAMEWORK))
+print('Segmentation Models: using `{}` framework.'.format(_KERAS_FRAMEWORK))
 
-    # import helper modules
-    from . import losses
-    from . import metrics
-    from . import utils
+# import helper modules
+from . import losses
+from . import metrics
+from . import utils
 
-    # wrap segmentation models with framework modules
-    from .backbones.backbones_factory import Backbones
-    from .models.unet import Unet as _Unet
-    from .models.atten_unet import AttentionUnet as _AttentionUnet
-    from .models.atten_res_unet import AttentionResUnet as _AttentionResUnet
+# wrap segmentation models with framework modules
+from .backbones.backbones_factory import Backbones
+from .models.unet import Unet as _Unet
+from .models.atten_unet import AttentionUnet as _AttentionUnet
+from .models.atten_res_unet import AttentionResUnet as _AttentionResUnet
 
-    Unet = inject_global_submodules(_Unet)
-    AttentionUnet = inject_global_submodules(_AttentionUnet)
-    AttentionResUnet = inject_global_submodules(_AttentionResUnet)
-    get_available_backbone_names = Backbones.models_names
+Unet = inject_global_submodules(_Unet)
+AttentionUnet = inject_global_submodules(_AttentionUnet)
+AttentionResUnet = inject_global_submodules(_AttentionResUnet)
+get_available_backbone_names = Backbones.models_names
 
 def get_preprocessing(name):
     preprocess_input = Backbones.get_preprocessing(name)
