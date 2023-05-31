@@ -3,6 +3,18 @@ import numpy as np
 from patchify import patchify
 from sklearn.model_selection import train_test_split
 
+def get_hpf(hpf):
+    # If the hpf entered is not equal to one of the hpfs the models were trained on, find which it is closest
+    # to and use that model to train it
+
+    abs_diff = [abs(hpf - 30), abs(hpf - 36), abs(hpf - 48)]
+    all_hpf = [30, 36, 48]
+    closest = min(abs_diff)
+    hpf_index = abs_diff.index(closest)
+    mod_hpf = all_hpf[hpf_index]
+
+    return mod_hpf
+
 def load_process_imgs(img_path, mask_path):
 
     # Load input images and masks
