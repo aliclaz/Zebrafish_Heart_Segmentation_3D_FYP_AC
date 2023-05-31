@@ -1,3 +1,5 @@
+import argparse
+
 # coding: utf-8
 
 if __name__ == '__main__':
@@ -14,28 +16,16 @@ from predict_module import predict
 from display import show_pred_masks
 from statistical_analysis.df_manipulation import gm_df_calcs, healthy_df_calcs, add_df_calcs, add_healthy_df_calcs
 
-IN_PATH = input('What is the directory path to the image(s) you would like to analyse?\n')
-OUT_PATH = input('What is the directory path you would like to save the results in?\n')
-REUSE = input('Are you adding more images from the same experiment?\n')
+# Define the input paths for the trained model and the csv files containing the data from previous statistical analysis
+
 STAT_PATH = '.Data/Stats/'
 MOD_PATH = '.Data/Models/'
-ENTERED_HPF = input('What stage of development were the provided images taken in?\n')
-GM = input('What genetic modification has been applied to the embryo in the image(s)?\n')
-SCALES = []
-while SCALE != 'Done':
-    SCALE = input('What is the height/width of the image in micrometres?\nIf all images have the same value, only enter it once.\n Enter Done when this has been completed for all images entered\n')
-    SCALES.append(SCALES)
-
-# Get one of the default hpf values (30, 36, 48) based on which the entered value is closest to
-
-mod_hpf = get_hpf(ENTERED_HPF)
 
 # Define the required size parameters of the image for the model and the backbone used in the model
 
 HEIGHT = 512
 WIDTH = 512
 DEPTH = 512
-CHANNELS = 3
 BACKBONE = 'resnet34'
 
 def main(args):
@@ -46,11 +36,20 @@ def main(args):
 
     # Import images, preprocess, make predictions and save the predicted masks
 
-    imgs, preds = predict(model, BACKBONE, IN_PATH, OUT_PATH)
+    imgs, preds = predict(model, BACKBONE, args.args.args.in_path, args.out_path)
 
     # Plot the test images and their predicted masks at 3 random slice
     
-    show_pred_masks(imgs, preds, OUT_PATH)
+    show_pred_masks(imgs, preds, args.out_path)
+
+    
+    # Get one of the default hpf values (30, 36, 48) based on which the entered value is closest to
+
+    mod_hpf = get_hpf(args.entered_hpf)
+
+
+    scales = args.scale.split(' ')
+    scales = [int(scale) for scale in scales]
 
     # Find volume of each class in the image
     # Get the class labels for each stage of development
@@ -67,14 +66,28 @@ def main(args):
 
     # The results will be displayed in the terminal and saved as a CSV file in the user chose output path for access at a later date
 
-    if REUSE == 'yes' or 'Yes' or 'YES' or 'y':
-        if GM == 'healthy' or 'Healthy' or 'HEALTHY' or 'None' or 'none' or 'NONE':
-            add_healthy_df_calcs(preds, classes, ENTERED_HPF, SCALES, STAT_PATH, OUT_PATH)
+    if args.reuse == 'yes' or 'Yes' or 'YES' or 'y':
+        if args.gm == 'healthy' or 'Healthy' or 'HEALTHY' or 'None' or 'none' or 'NONE':
+            add_healthy_df_calcs(preds, classes, args.entered_hpf, scales, STAT_PATH, args.out_path)
         else:
-            add_df_calcs(preds, classes, ENTERED_HPF, GM, SCALES, STAT_PATH, OUT_PATH)
+            add_df_calcs(preds, classes, args.entered_hpf, args.gm, scales, STAT_PATH, args.out_path)
 
     else:
-        if GM == 'healthy' or 'Healthy' or 'HEALTHY' or 'None' or 'none' or 'NONE':
-            add_healthy_df_calcs(preds, classes, ENTERED_HPF, SCALES, STAT_PATH, OUT_PATH)
+        if args.gm == 'healthy' or 'Healthy' or 'HEALTHY' or 'None' or 'none' or 'NONE':
+            add_healthy_df_calcs(preds, classes, args.entered_hpf, scales, STAT_PATH, args.out_path)
         else:
-            gm_df_calcs(preds, classes, ENTERED_HPF, GM, SCALES, STAT_PATH, OUT_PATH)
+            gm_df_calcs(preds, classes, args.entered_hpf, args.gm, scales, STAT_PATH, args.out_path)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--in_path', type=str, help='What is the directory path to the image(s) you would like to analyse?', required=True)
+    parser.add_argument('--out_path', type=str, help='What is the directory path you would like to save the results in?', required=True)
+    parser.add_argument('--reuse', type=str, help='Are you adding more images from the same experiment? (Yes or No)', required=True)
+    parser.add_argument('--entered_hpf', type=int, help='What stage of development, in hours post-fertilisation (hpf), were the provided images taken in?', required=True)
+    parser.add_argument('--gm', type=int, help='What genetic modification was applied to the zebrafish embryo prior to the image being taken?', required=True)
+    parser.add_argument('--scale', type=str, help='Enter the width dimension of each image in \u03bcm separated by a single space. Press ENTER when done.', required=True)
+
+    args = parser.parse_args()
+
+    main(args)
