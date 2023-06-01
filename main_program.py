@@ -47,6 +47,8 @@ def main(args):
 
     mod_hpf = get_hpf(args.entered_hpf)
 
+    # When setting the length scale variable in the bash script, each scale is separated by a space
+    # This adds each scale to a list in the form float
 
     scales = args.scale.split(' ')
     scales = [float(scale) for scale in scales]
