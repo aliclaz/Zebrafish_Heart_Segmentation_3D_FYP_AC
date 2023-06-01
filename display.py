@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 import matplotlib.patches as mpatches
-import matplotlib as mpl
+from mpl_toolkits.mplot3d import Axes3D
 
 def show_history(history, model_name, backbone, out_path):
 
@@ -154,67 +154,71 @@ def show_pred_masks(imgs, preds, out_path, classes):
     plt.savefig(out_path+'pred_imgs_and_masks.jpg')
     plt.show()
 
-def disp_3D_val(val_masks, all_val_preds, model_names, classes, out_path):
-    # Plot the validation images, their actual masks and their predicted masks for each patch in the validation set, predictions from all models
+def disp_3D_val(val_imgs, val_masks, all_val_preds, model_names, classes, out_path):
+    # Plot the validation actual masks and their predicted masks for each patch in the validation set, predictions from all models
 
     fig = plt.figure(figsize=(8, 4*len(val_masks)))
-    c = []
-    values = np.unique(val_masks.ravel())
+    fig.patch.set_facecolor('darkblue')
+    cube_size = 1
 
     for i in range(len(val_masks)):
         ax = fig.add_subplot(len(val_masks), 4, (4*i)+1, projection='3d')
         ax.set_title('Actual Mask')
         val_mask = val_masks[i].reshape(val_masks[i].shape[0], val_masks[i].shape[1], val_masks[i].shape[2])
-        pixel_pos = np.nonzero(val_mask != 0)
-        fc = pixel_pos
-        fc[fc == 0] = None
-        ec = fc
-        ax.voxel(val_mask, facecolors=fc, edgecolors=ec)
+        y, x, z = np.where(val_mask != 0)
+        colours = val_mask[x, y, z]
+        colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
+        greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
+        ax.scatter(x, y, z, c=greyscale_colours, marker='s', s=cube_size**2)
+        c = np.unique(greyscale_colours.ravel())
+        patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
+        ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
-        c = []
         for j in all_val_preds:
             ax = fig.add_subplot(len(val_masks), 4, (4*i)+j+2, projection='3d')
             ax.set_title('Predicted Mask by {}'.format(model_names[j]))
             val_pred = all_val_preds[j,i].reshape(all_val_preds[j,i].shape[0], all_val_preds[j,i].shape[1], all_val_preds[j,i].shape[2])
-            pixel_pos = np.nonzero(val_pred != 0)
-            fc = pixel_pos
-            fc[fc == 0] = None
-            ec = fc
-            ax.voxel(val_pred, facecolors=fc, edgecolors=ec)
-            c = [ax.cmap(ax.norm(value)) for value in values]
+            y, x, z = np.where(val_pred != 0)
+            colours = val_pred[x, y, z]
+            colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
+            greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
+            ax.scatter(x, y, z, c=greyscale_colours, markers='s', s=cube_size**2)
+            c = np.unique(greyscale_colours.ravel())
             patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
             ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.savefig(out_path+'val_imgs_and_masks.jpg')
     plt.show()
 
-def disp_3D_test(test_masks, all_test_preds, model_names, out_path, classes):
-    # Plot the actual and predicted masks for each patch in the validation set, predictions from all models
+def disp_3D_test(test_masks, test_preds, model_names, out_path, classes):
+    # Plot the predicted masks for each patch in the validation set, predictions from all models
 
     fig = plt.figure(figsize=(8, 4*len(test_masks)))
-    c = []
-    values = np.unique(test_masks.ravel())
+    fig.patch.set_facecolor('darkblue')
+    cube_size = 1
 
     for i in range(len(test_masks)):
         ax = fig.add_subplot(len(test_masks), 4, (4*i)+1, projection='3d')
         ax.set_title('Actual Mask')
-        val_mask = test_masks[i].reshape(test_masks[i].shape[0], test_masks[i].shape[1], test_masks[i].shape[2])
-        pixel_pos = np.nonzero(val_mask != 0)
-        fc = pixel_pos
-        fc[fc == 0] = None
-        ec = fc
-        ax.voxel(val_mask, facecolors=fc, edgecolors=ec)
-
-        c = []
-        ax = fig.add_subplot(len(test_masks), 4, (4*i)+j+2, projection='3d')
-        ax.set_title('Predicted Mask by {}'.format(model_names[j]))
-        val_pred = all_test_preds[j,i].reshape(all_test_preds[j,i].shape[0], all_test_preds[j,i].shape[1], all_test_preds[j,i].shape[2])
-        pixel_pos = np.nonzero(val_pred != 0)
-        fc = pixel_pos
-        fc[fc == 0] = None
-        ec = fc
-        ax.voxel(val_pred, facecolors=fc, edgecolors=ec)
-        c = [ax.cmap(ax.norm(value)) for value in values]
+        test_mask = test_masks[i].reshape(test_masks[i].shape[0], test_masks[i].shape[1], test_masks[i].shape[2])
+        y, x, z = np.where(test_mask != 0)
+        colours = test_mask[x, y, z]
+        colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
+        greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
+        ax.scatter(x, y, z, c=greyscale_colours, markers='s', s=cube_size**2)
+        c = np.unique(greyscale_colours.ravel())
         patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
         ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    plt.savefig(out_path+'val_imgs_and_masks.jpg')
+
+        ax = fig.add_subplot(len(test_masks), 4, (4*i)+2, projection='3d')
+        ax.set_title('Predicted Mask by')
+        test_pred = test_preds[i].reshape(test_preds[i].shape[0], test_preds[i].shape[1], test_preds[i].shape[2])
+        y, x, z = np.where(test_pred != 0)
+        colours = test_pred[x, y, z]
+        colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
+        greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
+        ax.scatter(x, y, z, c=greyscale_colours, markers='s', s=cube_size**2)
+        c = np.unique(greyscale_colours.ravel())
+        patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
+        ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.savefig(out_path+'test_imgs_and_masks.jpg')
     plt.show()
