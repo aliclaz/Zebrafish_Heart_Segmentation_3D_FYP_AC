@@ -11,13 +11,6 @@ def gm_df_calcs(masks, classes, hpf, gm, scales, in_path, out_path):
 
     mod_hpf = get_hpf(hpf)
 
-    # If multiple images entered with same length scale, the same value is added to all elements of the scales array so it is the same length as
-    # the number of images entered
-
-    if len(scales) != len(masks):
-        for i in range(len(masks)):
-            scales.append(scales[i])
-
     # If only one image was entered, calculate its volume
 
     if len(masks) == 1:
@@ -149,13 +142,6 @@ def add_df_calcs(new_masks, classes, hpf, gm, scales, in_path, out_path):
 
     mod_hpf = get_hpf(hpf)
 
-    # If multiple images entered with same length scale, the same value is added to all elements of the scales array so it is the same length as
-    # the number of images entered
-
-    if len(scales) != len(new_masks):
-        for i in range(len(new_masks)):
-            scales.append(scales[i])
-
     # Load dataframe containing all sample numbers
 
     n_samples = pd.read_csv(in_path+'n_samples.csv')
@@ -244,17 +230,6 @@ def add_df_calcs(new_masks, classes, hpf, gm, scales, in_path, out_path):
     n_samples.to_csv(out_path+'n_samples.csv')
 
 def add_healthy_df_calcs(new_healthy_masks, classes, hpf, scales, in_path, out_path):
-
-    # Get one of the three default hpf values based on which is closest to to the entered hpf
-
-    mod_hpf = get_hpf(hpf)
-
-    # If multiple images entered with same length scale, the same value is added to all elements of the scales array so it is the same length as
-    # the number of images entered
-
-    if len(scales) != len(new_healthy_masks):
-        for i in range(len(new_healthy_masks)):
-            scales.append(scales[i])
 
     # Load dataframe containing all sample numbers
 
