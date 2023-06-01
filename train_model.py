@@ -8,7 +8,7 @@ if __name__ == '__main__':
     os.environ['KERAS_BACKEND'] = 'tensorflow'
     os.environ['CUDA_VISIBLE_DEVICES'] = '{}'.format(gpu_use)
 
-import numpy as npN_CLASSES
+import numpy as np
 from keras.optimizers import Adam
 from sklearn.utils import compute_class_weight
 import pandas as pd
