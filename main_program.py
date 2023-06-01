@@ -49,7 +49,7 @@ def main(args):
 
 
     scales = args.scale.split(' ')
-    scales = [int(scale) for scale in scales]
+    scales = [float(scale) for scale in scales]
 
     # Find volume of each class in the image
     # Get the class labels for each stage of development
@@ -83,9 +83,9 @@ if __name__ == '__main__':
 
     parser.add_argument('--in_path', type=str, help='What is the directory path to the image(s) you would like to analyse?', required=True)
     parser.add_argument('--out_path', type=str, help='What is the directory path you would like to save the results in?', required=True)
-    parser.add_argument('--reuse', type=str, help='Are you adding more images from the same experiment? (Yes or No)', required=True)
+    parser.add_argument('--reuse', action='store_true', default=False)
     parser.add_argument('--entered_hpf', type=int, help='What stage of development, in hours post-fertilisation (hpf), were the provided images taken in?', required=True)
-    parser.add_argument('--gm', type=int, help='What genetic modification was applied to the zebrafish embryo prior to the image being taken?', required=True)
+    parser.add_argument('--gm', type=str, help='What genetic modification was applied to the zebrafish embryo prior to the image being taken?', default='Healthy')
     parser.add_argument('--scale', type=str, help='Enter the width dimension of each image in \u03bcm separated by a single space. Press ENTER when done.', required=True)
 
     args = parser.parse_args()
