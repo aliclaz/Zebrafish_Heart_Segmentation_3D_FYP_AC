@@ -58,7 +58,7 @@ def AttentionBlock(inter_shape, use_batchnorm, name=None):
         shape_theta_x = backend.int_shape(theta_x)
 
         phi_g = Conv3DBn(inter_shape, kernel_size=(1, 1, 1), padding='same', kernel_initalizer='he_normal',
-                         padding='same', use_batchnorm=use_batchnorm, name=name, **kwargs)(gating)
+                         use_batchnorm=use_batchnorm, name=name, **kwargs)(gating)
         upsample_g = Conv3DTrans(inter_shape, (3, 3, 3), padding='same', strides=(shape_theta_x[1] // shape_g[1],
                                                                                  shape_theta_x[2] // shape_g[2],
                                                                                  shape_theta_x[3] // shape_g[3]),
@@ -112,11 +112,11 @@ def AttentionBlock(inter_shape, use_batchnorm, name=None):
         shape_g = backend.int_shape(gating)
 
         theta_x = Conv3DBn(inter_shape, kernel_size=(2, 2, 2), strides=(2, 2, 2), padding='same', kernel_initalizer='he_normal',
-                           padding='same', use_batchnorm=use_batchnorm, name=name, **kwargs)(skip_connection)
+                           use_batchnorm=use_batchnorm, name=name, **kwargs)(skip_connection)
         shape_theta_x = backend.int_shape(theta_x)
 
         phi_g = Conv3DBn(inter_shape, kernel_size=(1, 1, 1), padding='same', kernel_initalizer='he_normal',
-                         padding='same', use_batchnorm=use_batchnorm, name=name, **kwargs)(gating)
+                         use_batchnorm=use_batchnorm, name=name, **kwargs)(gating)
         upsample_g = Conv3DTrans(inter_shape, (3, 3, 3), padding='same', strides=(shape_theta_x[1] // shape_g[1],
                                                                                  shape_theta_x[2] // shape_g[2],
                                                                                  shape_theta_x[3] // shape_g[3]),
