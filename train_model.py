@@ -26,13 +26,13 @@ def main(args):
 
     # Define paths for dateset and the number of classes in the dataset
 
-    img_path = Path('48_1_image.tif').parent.absolute() + '48_1_image.tif'
+    img_path = (Path('48_1_image.tif').parent.absolute()).resolve() + '48_1_image.tif'
     print(img_path)
-    mask_path = Path('48_1_mask.tif').parent.absolute() + '48_1_mask.tif'
-    test_path = Path('/Images').parent.absolute() + '/Images'
-    out_path = Path('/Results').parent.absolute() + '/Results'
-    mod_path = Path('/Models').parent.absolute() + '/Models'
-    stats_path = Path('/Stats').parent.absolute() + '/Stats'
+    mask_path = (Path('48_1_mask.tif').parent.absolute()).resolve() + '48_1_mask.tif'
+    test_path = (Path('/Images').parent.absolute()).resolve() + '/Images'
+    out_path = (Path('/Results').parent.absolute()).resolve() + '/Results'
+    mod_path = (Path('/Models').parent.absolute()).resolve() + '/Models'
+    stats_path = (Path('/Stats').parent.absolute()).resolve() + '/Stats'
     if args.hpf == 48:
         img_path = 6
     elif args.hpf == 36:
