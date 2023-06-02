@@ -1,3 +1,4 @@
+import argparse
 # coding: utf-8
 
 if __name__ == '__main__':
@@ -19,28 +20,28 @@ from display import show_history, show_all_historys, show_val_masks, show_test_m
 from predict_module import val_predict, predict
 from statistical_analysis.df_manipulation import healthy_df_calcs
 
-# Define paths for dateset and the number of classes in the dataset
+def main(args):
 
-HPF = 48
-IMG_PATH = './Data/Train{}/Images/'.format(HPF)
-MASK_PATH = './Data/Train{}/Masks/'.format(HPF)
-TEST_PATH = './Data/Test{}/'.format(HPF)
-OUT_PATH = './Results'
-MOD_PATH = './Models'
-STATS_PATH = './Stats'
-if HPF == 48:
-    IMG_PATH = 6
-elif HPF == 36:
-    N_CLASSES = 5
-elif HPF == 30:
-    N_CLASSES = 4
-else:
-    N_CLASSES = 1
+    # Define paths for dateset and the number of classes in the dataset
 
-def main():
+    img_path = './Data/Train{}/Images/'.format(args.hpf)
+    mask_path = './Data/Train{}/Masks/'.format(args.hpf)
+    test_path = './Data/Test{}/'.format(args.hpf)
+    out_path = './Results'
+    mod_path = './Models'
+    stats_path = './Stats'
+    if args.hpf == 48:
+        img_path = 6
+    elif args.hpf == 36:
+        n_classes = 5
+    elif args.hpf == 30:
+        n_classes = 4
+    else:
+        n_classes = 1
+
     # Load the training masks and images into the code and preprocess both datasets
 
-    x_train, x_val, y_train, y_val = load_process_imgs(IMG_PATH, MASK_PATH)
+    x_train, x_val, y_train, y_val = load_process_imgs(img_path, mask_path)
 
     # Define model parameters
 
@@ -88,7 +89,7 @@ def main():
     # Define model - using AttentionResUnet with a resnet34 backbone and 
     # pretrained weights
 
-    model1 = AttentionResUnet(backbone1, classes=N_CLASSES, 
+    model1 = AttentionResUnet(backbone1, classes=n_classes, 
                                 input_shape=(patch_size, patch_size, patch_size, channels), 
                                 encoder_weights=encoder_weights, activation=activation)
     model1.compile(optimizer=opt, loss=total_loss, metrics=metrics)
@@ -111,10 +112,10 @@ def main():
 
     # Plot the train and validation losses and IOU scores at each epoch for model 1
 
-    show_history(history1, model_name1, backbone1, OUT_PATH)
+    show_history(history1, model_name1, backbone1, out_path)
     # Save the model for use in the future
 
-    model1.save(MOD_PATH+'{}HPF_{}_{}_100epochs.h5'.format(HPF, backbone1, model_name1))
+    model1.save(mod_path+'{}HPF_{}_{}_100epochs.h5'.format(args.hpf, backbone1, model_name1))
 
     # Preprocess input data with vgg16 backbone
 
@@ -127,7 +128,7 @@ def main():
     # Define model - using AttentionUnet with a vgg16 backbone and 
     # pretrained weights
 
-    model2 = AttentionUnet(backbone2, classes=N_CLASSES, 
+    model2 = AttentionUnet(backbone2, classes=n_classes, 
                                 input_shape=(patch_size, patch_size, patch_size, channels), 
                                 encoder_weights=encoder_weights, activation=activation)
     model2.compile(optimizer=opt, loss=total_loss, metrics=metrics)
@@ -147,14 +148,14 @@ def main():
 
     # Plot train and validation losses and IOU scores for model 2
 
-    show_history(history2, model2, backbone2, OUT_PATH)
+    show_history(history2, model2, backbone2, out_path)
 
-    model2.save(MOD_PATH+'{}HPF_{}_{}_100epochs.h5'.format(HPF, backbone2, model_name2))
+    model2.save(mod_path+'{}HPF_{}_{}_100epochs.h5'.format(args.hpf, backbone2, model_name2))
 
     # Define model - using Unet with a vgg16 backbone and 
     # pretrained weights
 
-    model3 = Unet(backbone2, classes=N_CLASSES, 
+    model3 = Unet(backbone2, classes=n_classes, 
                                 input_shape=(patch_size, patch_size, patch_size, channels), 
                                 encoder_weights=encoder_weights, activation=activation)
     model3.compile(optimizer=opt, loss=total_loss, metrics=metrics)
@@ -175,19 +176,19 @@ def main():
 
     # Plot the train and validation losses and IOU scores at each epoch for model 3
 
-    show_history(history3, model_name3, backbone2, OUT_PATH)
+    show_history(history3, model_name3, backbone2, out_path)
 
     # Save model
 
-    model3.save(MOD_PATH+'{}HPF_{}_{}_100epochs.h5'.format(HPF, backbone2, model_name3))
+    model3.save(mod_path+'{}HPF_{}_{}_100epochs.h5'.format(args.hpf, backbone2, model_name3))
 
     # Display the historys of all models together for comparison
 
-    show_all_historys(historys, model_names, backbones, OUT_PATH)
+    show_all_historys(historys, model_names, backbones, out_path)
 
     # Display the historys of all models together for comparison
 
-    show_all_historys(historys, model_names, backbones, OUT_PATH)   
+    show_all_historys(historys, model_names, backbones, out_path)   
 
     # Use each model to predict masks for each validation image
 
@@ -199,45 +200,45 @@ def main():
 
     # Display the validation images, their actual masks and their masks predicted by each model at 3 slices
 
-    show_val_masks(model_names, x_val, y_val, val_preds_each_model, OUT_PATH)
+    show_val_masks(model_names, x_val, y_val, val_preds_each_model, out_path)
 
     # Use each model to predict masks for each test image
 
     test_preds_each_model = []
 
     for i in range(len(models)):
-        test_imgs, test_preds = predict(models[i], backbones[i], TEST_PATH, OUT_PATH)
+        test_imgs, test_preds = predict(models[i], backbones[i], test_path, out_path)
         test_preds_each_model.append(test_preds)
 
     # Display the validation images, their actual masks and their masks predicted by each model at 3 slices
 
-    show_val_masks(model_names, x_val, y_val, val_preds_each_model, OUT_PATH)
+    show_val_masks(model_names, x_val, y_val, val_preds_each_model, out_path)
 
     # Use each model to predict masks for each test image
 
     test_preds_each_model = []
 
     for i in range(len(models)):
-        test_imgs, test_preds = predict(models[i], backbones[i], TEST_PATH, OUT_PATH)
+        test_imgs, test_preds = predict(models[i], backbones[i], test_path, out_path)
         test_preds_each_model.append(test_preds)
 
     # Display test images, actual masks and predicted masks from each model
 
-    show_test_masks(model_names, test_imgs, test_preds_each_model, OUT_PATH)
+    show_test_masks(model_names, test_imgs, test_preds_each_model, out_path)
 
     # Define the class labels for each stage of development
 
-    if HPF == 48:
+    if args.hpf == 48:
         classes = ['Background', 'Noise', 'Endocardium', 'Atrium', 'AVC', 'Ventricle']
         train_masks = np.expand_dims(train_masks, axis=4)
         healthy_masks = np.concatenate((train_masks, test_imgs), axis=0)
         healthy_scales = [295.53, 233.31, 233.31, 246.27, 246.27]
-    elif HPF == 36:
+    elif args.hpf == 36:
         classes = ['Background', 'Noise', 'Endocardium', 'Atrium', 'Ventricle']
         train_masks = np.expand_dims(train_masks, axis=4)
         healthy_masks = np.concatenate((train_masks, test_imgs), axis=0)
         healthy_scales = [221.65, 221.65, 221.65, 221.65, 221.65, 221.65]
-    elif HPF == 30:
+    elif args.hpf == 30:
         classes = ['Background', 'Noise', 'Endocardium', 'Linear Heart Tube']
         train_masks = np.expand_dims(train_masks, axis=4)
         healthy_masks = np.concatenate((train_masks, test_imgs), axis=0)
@@ -246,7 +247,13 @@ def main():
     # Calculate the means, standard deviations and confidence intervals of the volume of each class
     # Put these into a dataframe, display it and then save it as a CSV for access from the main program
 
-    healthy_df_calcs(healthy_masks, classes, healthy_scales, HPF, OUT_PATH)
+    healthy_df_calcs(healthy_masks, classes, healthy_scales, args.hpf, out_path)
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--hpf', type=int, help='stage of development fish at in train images', required=True)
+
+    args = parser.parse_args()
+
+    main(args)
