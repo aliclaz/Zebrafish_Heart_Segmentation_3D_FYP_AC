@@ -25,8 +25,8 @@ def main(args):
 
     # Define paths for dateset and the number of classes in the dataset
 
-    img_path = os.path.abs_path('Data/Train/{}HPF_image.tif'.format(args.hpf))
-    mask_path =  os.path.abs_path('Data/Train/{}HPF_mask.tif'.format(args.hpf))
+    img_path = os.path.abspath('Data/Train/{}HPF_image.tif'.format(args.hpf))
+    mask_path =  os.path.abspath('Data/Train/{}HPF_mask.tif'.format(args.hpf))
     test_path = 'Data/Test/{}HPF/'.format(args.hpf)
     out_path = 'Data/Results/'
     mod_path = 'Data/Models/'
