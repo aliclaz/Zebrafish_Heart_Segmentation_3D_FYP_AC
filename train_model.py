@@ -9,7 +9,7 @@ if __name__ == '__main__':
     os.environ['KERAS_BACKEND'] = 'tensorflow'
     os.environ['CUDA_VISIBLE_DEVICES'] = '{}'.format(gpu_use)
 
-import glob
+import os
 import numpy as np
 from keras.optimizers import Adam
 from sklearn.utils import compute_class_weight
@@ -25,9 +25,9 @@ def main(args):
 
     # Define paths for dateset and the number of classes in the dataset
 
-    img_path = 'Data/Train/48HPF_image.tif'#.format(args.hpf)
-    mask_path =  'Data/Train/48HPF_mask.tif'#.format(args.hpf)
-    test_path = 'Data/Test/48HPF/'#.format(args.hpf)
+    img_path = os.path.abs_path('Data/Train/{}HPF_image.tif'.format(args.hpf))
+    mask_path =  os.path.abs_path('Data/Train/{}HPF_mask.tif'.format(args.hpf))
+    test_path = 'Data/Test/{}HPF/'.format(args.hpf)
     out_path = 'Data/Results/'
     mod_path = 'Data/Models/'
     stats_path = 'Data/Stats/'
