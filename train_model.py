@@ -26,13 +26,13 @@ def main(args):
 
     # Define paths for dateset and the number of classes in the dataset
 
-    img_path = (Path('48_1_image.tif').parent.absolute()).resolve() + '48_1_image.tif'
+    img_path = str((Path('48_1_image.tif').parent.absolute()).resolve()) + '48_1_image.tif'
     print(img_path)
-    mask_path = (Path('48_1_mask.tif').parent.absolute()).resolve() + '48_1_mask.tif'
-    test_path = (Path('/Images').parent.absolute()).resolve() + '/Images'
-    out_path = (Path('/Results').parent.absolute()).resolve() + '/Results'
-    mod_path = (Path('/Models').parent.absolute()).resolve() + '/Models'
-    stats_path = (Path('/Stats').parent.absolute()).resolve() + '/Stats'
+    mask_path = str((Path('48_1_mask.tif').parent.absolute()).resolve()) + '48_1_mask.tif'
+    test_path = str((Path('/Images').parent.absolute()).resolve()) + '/Images'
+    out_path = str((Path('/Results').parent.absolute()).resolve()) + '/Results'
+    mod_path = str((Path('/Models').parent.absolute()).resolve()) + '/Models'
+    stats_path = str((Path('/Stats').parent.absolute()).resolve()) + '/Stats'
     if args.hpf == 48:
         img_path = 6
     elif args.hpf == 36:
@@ -250,7 +250,7 @@ def main(args):
     # Calculate the means, standard deviations and confidence intervals of the volume of each class
     # Put these into a dataframe, display it and then save it as a CSV for access from the main program
 
-    healthy_df_calcs(healthy_masks, classes, healthy_scales, args.hpf, out_path)
+    healthy_df_calcs(healthy_masks, classes, healthy_scales, args.hpf, stats_path)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
