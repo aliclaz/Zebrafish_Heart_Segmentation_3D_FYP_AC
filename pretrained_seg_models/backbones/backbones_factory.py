@@ -1,5 +1,5 @@
 import copy
-from ...pretrained_class_models.models_factory import ModelsFactory
+from ..pretrained_class_models.models_factory import ModelsFactory
 
 class BackbonesFactory(ModelsFactory):
     _default_feature_layers = {
