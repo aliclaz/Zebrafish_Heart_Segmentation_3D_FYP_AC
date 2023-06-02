@@ -24,7 +24,7 @@ from statistical_analysis.df_manipulation import healthy_df_calcs
 def main(args):
 
     # Define paths for dateset and the number of classes in the dataset
-
+    print(os.getcwd())
     img_path = os.path.abspath('Data/Train/{}HPF_image.tif'.format(args.hpf))
     print(img_path)
     mask_path =  os.path.abspath('Data/Train/{}HPF_mask.tif'.format(args.hpf))
