@@ -25,7 +25,6 @@ def main(args):
 
     # Define paths for dateset and the number of classes in the dataset
 
-    print(glob.glob('48_1_image.tif'))
     img_path = 'Data/Train/{}HPF_image.tif'.format(args.hpf)
     mask_path =  'Data/Train/{}HPF_mask.tif'.format(args.hpf)
     test_path = 'Data/Test/{}HPF/'.format(args.hpf)
