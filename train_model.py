@@ -9,6 +9,8 @@ if __name__ == '__main__':
     os.environ['KERAS_BACKEND'] = 'tensorflow'
     os.environ['CUDA_VISIBLE_DEVICES'] = '{}'.format(gpu_use)
 
+from pathlib import Path
+import os
 import numpy as np
 from keras.optimizers import Adam
 from sklearn.utils import compute_class_weight
@@ -21,16 +23,16 @@ from predict_module import val_predict, predict
 from statistical_analysis.df_manipulation import healthy_df_calcs
 
 def main(args):
-    
+
     # Define paths for dateset and the number of classes in the dataset
 
-    img_path = './Data/Train{}/Images/'.format(args.hpf) + '48_1_image.tif'
+    img_path = Path('48_1_image.tif').parent.absolute() + '48_1_image.tif'
     print(img_path)
-    mask_path = './Data/Train{}/Masks/'.format(args.hpf) + '48_1_mask.tif'
-    test_path = './Data/Test{}/'.format(args.hpf)
-    out_path = './Results'
-    mod_path = './Models'
-    stats_path = './Stats'
+    mask_path = Path('48_1_mask.tif').parent.absolute() + '48_1_mask.tif'
+    test_path = Path('/Images').parent.absolute() + '/Images'
+    out_path = Path('/Results').parent.absolute() + '/Results'
+    mod_path = Path('/Models').parent.absolute() + '/Models'
+    stats_path = Path('/Stats').parent.absolute() + '/Stats'
     if args.hpf == 48:
         img_path = 6
     elif args.hpf == 36:
