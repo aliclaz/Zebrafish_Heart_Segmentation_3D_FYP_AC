@@ -26,9 +26,9 @@ def main(args):
     # Define paths for dateset and the number of classes in the dataset
 
     print(glob.glob('48_1_image.tif'))
-    img_path = glob.glob('48_1_image.tif')[0]
+    img_path = 'Data/Train48/Images/'
     print(img_path)
-    mask_path = glob.glob('48_1_mask.tif')[0]
+    mask_path = img_path + '48_1_mask.tif'
     test_path = glob.glob('Test/')[0]
     out_path = glob.glob('Results/')[0]
     mod_path = glob.glob('Models/')[0]
