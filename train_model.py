@@ -21,10 +21,11 @@ from predict_module import val_predict, predict
 from statistical_analysis.df_manipulation import healthy_df_calcs
 
 def main(args):
-    print(args.hpf)
+    
     # Define paths for dateset and the number of classes in the dataset
 
     img_path = './Data/Train{}/Images/'.format(args.hpf) + '48_1_image.tif'
+    print(img_path)
     mask_path = './Data/Train{}/Masks/'.format(args.hpf) + '48_1_mask.tif'
     test_path = './Data/Test{}/'.format(args.hpf)
     out_path = './Results'
