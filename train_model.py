@@ -21,7 +21,7 @@ from predict_module import val_predict, predict
 from statistical_analysis.df_manipulation import healthy_df_calcs
 
 def main(args):
-
+    print(args.hpf)
     # Define paths for dateset and the number of classes in the dataset
 
     img_path = './Data/Train{}/Images/'.format(args.hpf)
