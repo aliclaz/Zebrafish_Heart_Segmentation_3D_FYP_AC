@@ -10,6 +10,7 @@ if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '{}'.format(gpu_use)
 
 import os
+import glob
 import numpy as np
 from keras.optimizers import Adam
 from sklearn.utils import compute_class_weight
@@ -26,12 +27,12 @@ def main(args):
     print(os.getcwd())
     # Define paths for dateset and the number of classes in the dataset
 
-    img_path = './Zebrafish_Heart_Segmentation_3D_FYP_AC/Data/Train/{}HPF_image.tif'
-    mask_path =  './Zebrafish_Heart_Segmentation_3D_FYP_AC/Data/Train/{}HPF_mask.tif'.format(args.hpf)
-    test_path = './Zebrafish_Heart_Segmentation_3D_FYP_AC/Data/Test/{}HPF/'.format(args.hpf)
-    out_path = './Zebrafish_Heart_Segmentation_3D_FYP_AC/Data/Results/'
-    mod_path = './Zebrafish_Heart_Segmentation_3D_FYP_AC/Data/Models/'
-    stats_path = './Zebrafish_Heart_Segmentation_3D_FYP_AC/Data/Stats/'
+    img_path = glob.glob('{}HPF_image.tif')[0]
+    mask_path =  glob.glob('{}HPF_mask.tif')[0]
+    test_path = glob.glob('{}HPF/'.format(args.hpf))[0]
+    out_path = glob.glob('/Results/')[0]
+    mod_path = glob.glob('/Models/')[0]
+    stats_path = glob.glob('/Stats/')[0]
     if args.hpf == 48:
         img_path = 6
     elif args.hpf == 36:
