@@ -26,13 +26,12 @@ def main(args):
     # Define paths for dateset and the number of classes in the dataset
 
     print(glob.glob('48_1_image.tif'))
-    img_path = 'Data/Train48/Images/'
-    print(img_path)
-    mask_path = img_path + '48_1_mask.tif'
-    test_path = glob.glob('Test/')[0]
-    out_path = glob.glob('Results/')[0]
-    mod_path = glob.glob('Models/')[0]
-    stats_path = glob.glob('Stats/')[0]
+    img_path = 'Data/Train/{}HPF_image.tif'.format(args.hpf)
+    mask_path =  'Data/Train/{}HPF_mask.tif'.format(args.hpf)
+    test_path = 'Data/Test/{}HPF/'.format(args.hpf)
+    out_path = 'Data/Results/'
+    mod_path = 'Data/Models/'
+    stats_path = 'Data/Stats/'
     if args.hpf == 48:
         img_path = 6
     elif args.hpf == 36:
