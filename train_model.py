@@ -25,6 +25,7 @@ def main(args):
 
     # Define paths for dateset and the number of classes in the dataset
 
+    print(glob.glob('48_1_image.tif'))
     img_path = glob.glob('48_1_image.tif')[0]
     print(img_path)
     mask_path = glob.glob('48_1_mask.tif')[0]
