@@ -232,17 +232,17 @@ def main(args):
     # Define the class labels for each stage of development
 
     if args.hpf == 48:
-        classes = sorted(['Background', 'Noise', 'Endocardium', 'Atrium', 'AVC', 'Ventricle'])
+        classes = ['Background', 'Noise', 'Endocardium', 'Atrium', 'AVC', 'Ventricle']
         train_masks = np.expand_dims(train_masks, axis=4)
         healthy_masks = np.concatenate((train_masks, test_imgs), axis=0)
         healthy_scales = [295.53, 233.31, 233.31, 246.27, 246.27]
     elif args.hpf == 36:
-        classes = sorted(['Background', 'Noise', 'Endocardium', 'Atrium', 'Ventricle'])
+        classes = ['Background', 'Endocardium', 'Noise', 'Atrium', 'Ventricle']
         train_masks = np.expand_dims(train_masks, axis=4)
         healthy_masks = np.concatenate((train_masks, test_imgs), axis=0)
         healthy_scales = [221.65, 221.65, 221.65, 221.65, 221.65, 221.65]
     elif args.hpf == 30:
-        classes = sorted(['Background', 'Noise', 'Endocardium', 'Linear Heart Tube'])
+        classes = ['Background','Endocardium', 'Linear Heart Tube', 'Noise']
         train_masks = np.expand_dims(train_masks, axis=4)
         healthy_masks = np.concatenate((train_masks, test_imgs), axis=0)
         healthy_scales = [221.65, 221.65]
