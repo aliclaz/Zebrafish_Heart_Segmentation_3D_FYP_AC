@@ -23,14 +23,15 @@ from statistical_analysis.df_manipulation import healthy_df_calcs
 
 def main(args):
 
+    print(os.getcwd())
     # Define paths for dateset and the number of classes in the dataset
 
-    img_path = 'Data/Train/{}HPF_image.tif'
-    mask_path =  'Data/Train/{}HPF_mask.tif'.format(args.hpf)
-    test_path = 'Data/Test/{}HPF/'.format(args.hpf)
-    out_path = 'Data/Results/'
-    mod_path = 'Data/Models/'
-    stats_path = 'Data/Stats/'
+    img_path = './Train/{}HPF_image.tif'
+    mask_path =  './Train/{}HPF_mask.tif'.format(args.hpf)
+    test_path = './Test/{}HPF/'.format(args.hpf)
+    out_path = './Results/'
+    mod_path = './Models/'
+    stats_path = './Stats/'
     if args.hpf == 48:
         img_path = 6
     elif args.hpf == 36:
@@ -230,17 +231,17 @@ def main(args):
     # Define the class labels for each stage of development
 
     if args.hpf == 48:
-        classes = ['Background', 'Noise', 'Endocardium', 'Atrium', 'AVC', 'Ventricle']
+        classes = sorted(['Background', 'Noise', 'Endocardium', 'Atrium', 'AVC', 'Ventricle'])
         train_masks = np.expand_dims(train_masks, axis=4)
         healthy_masks = np.concatenate((train_masks, test_imgs), axis=0)
         healthy_scales = [295.53, 233.31, 233.31, 246.27, 246.27]
     elif args.hpf == 36:
-        classes = ['Background', 'Noise', 'Endocardium', 'Atrium', 'Ventricle']
+        classes = sorted(['Background', 'Noise', 'Endocardium', 'Atrium', 'Ventricle'])
         train_masks = np.expand_dims(train_masks, axis=4)
         healthy_masks = np.concatenate((train_masks, test_imgs), axis=0)
         healthy_scales = [221.65, 221.65, 221.65, 221.65, 221.65, 221.65]
     elif args.hpf == 30:
-        classes = ['Background', 'Noise', 'Endocardium', 'Linear Heart Tube']
+        classes = sorted(['Background', 'Noise', 'Endocardium', 'Linear Heart Tube'])
         train_masks = np.expand_dims(train_masks, axis=4)
         healthy_masks = np.concatenate((train_masks, test_imgs), axis=0)
         healthy_scales = [221.65, 221.65]
