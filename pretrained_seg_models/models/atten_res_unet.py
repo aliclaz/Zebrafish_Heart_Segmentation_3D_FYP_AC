@@ -34,8 +34,14 @@ def ResConvBlock(filters, use_batchnorm, name=None):
     return wrapper
 
 def RepeatElement(tensor, rep, name=None):
+    kwargs = get_submodules()
+    rep_name = None
+    block_name = kwargs.pop('name', None)
+    if block_name is not None:
+        rep_name = block_name + '_rep'
+
     return layers.Lambda(lambda x, repnum: backend.repeat_elements(x, repnum, axis=4), arguments={'repnum': rep},
-                         name=name)(tensor)     
+                         name=rep_name)(tensor)     
 
 def GatingSignal(filters, use_batchnorm, name=None):
     kwargs = get_submodules()
@@ -72,7 +78,7 @@ def AttentionBlock(inter_shape, use_batchnorm, name=None):
                                 name=name, **kwargs)(sigmoid_xg)
         upsample_psi = RepeatElement(upsample_psi, shape_x[4], name=name)
 
-        y = Mult(**kwargs)(upsample_psi, skip_connection)
+        y = Mult(**kwargs)(upsample_psi, skip_connection, name=name)
 
         result = Conv3DBn(shape_x[4], (1, 1, 1), kernel_initializer='he_normal', padding='same', use_batchnorm=True, name=name, **kwargs)(y)
         
