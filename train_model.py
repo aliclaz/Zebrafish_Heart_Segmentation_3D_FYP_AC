@@ -3,7 +3,7 @@ import argparse
 
 if __name__ == '__main__':
     import os
-
+    tf.config.list_physical_devices('GPU')
     gpu_use = 0
     print('GPU use: {}'.format(gpu_use))
     os.environ['KERAS_BACKEND'] = 'tensorflow'

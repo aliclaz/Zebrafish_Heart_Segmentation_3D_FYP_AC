@@ -42,9 +42,9 @@ def residual_conv_block(filters, stage, block, strides=(1, 1, 1), cut='pre'):
         x = layers.Activation('relu', name=relu_name + '1')(x)
 
         if cut == 'pre':
-            shorcut = input_tensor
+            shortcut = input_tensor
         elif cut == 'post':
-            shortcut = layers.Conv3D(filters, (1, 1, 1), names=sc_name, strides=strides, **conv_params)(x)
+            shortcut = layers.Conv3D(filters, (1, 1, 1), name=sc_name, strides=strides, **conv_params)(x)
         else:
             raise ValueError('Cut type not in ["pre", "post"]')
         
