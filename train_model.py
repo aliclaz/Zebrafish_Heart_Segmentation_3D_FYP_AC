@@ -23,17 +23,16 @@ from predict_module import val_predict, predict
 from statistical_analysis.df_manipulation import healthy_df_calcs
 
 def main(args):
-
-    print(os.getcwd())
-    print(os.listdir())
+    
     # Define paths for dateset and the number of classes in the dataset
 
-    img_path = './Train/{}HPF_image.tif'.format(args.hpf)
-    mask_path =  './Train/{}HPF_mask.tif'.format(args.hpf)
-    test_path = './Test/{}HPF/'.format(args.hpf)
-    out_path = './Results/'
-    mod_path = './Models/'
-    stats_path = './Stats/'
+    path = os.getcwd()
+    img_path = path + '/Train/{}HPF_image.tif'.format(args.hpf)
+    mask_path =  path + '/Train/{}HPF_mask.tif'.format(args.hpf)
+    test_path = path + '/Test/{}HPF/'.format(args.hpf)
+    out_path = path + '/Results/'
+    mod_path = path + '/Models/'
+    stats_path = path + '/Stats/'
     if args.hpf == 48:
         img_path = 6
     elif args.hpf == 36:
