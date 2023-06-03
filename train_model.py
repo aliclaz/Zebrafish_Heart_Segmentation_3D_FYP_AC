@@ -10,7 +10,6 @@ if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '{}'.format(gpu_use)
 
 import os
-
 import numpy as np
 from keras.optimizers import Adam
 from sklearn.utils import compute_class_weight
