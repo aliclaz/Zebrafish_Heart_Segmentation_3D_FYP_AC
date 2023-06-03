@@ -28,6 +28,8 @@ def main(args):
 
     path = os.getcwd()
     img_path = path + '/Train/{}HPF_image.tif'.format(args.hpf)
+    print(img_path)
+    print(os.listdir(path+'/Train'))
     mask_path =  path + '/Train/{}HPF_mask.tif'.format(args.hpf)
     test_path = path + '/Test/{}HPF/'.format(args.hpf)
     out_path = path + '/Results/'
