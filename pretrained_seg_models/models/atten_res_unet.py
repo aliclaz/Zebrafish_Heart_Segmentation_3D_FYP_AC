@@ -72,6 +72,7 @@ def AttentionBlock(inter_shape, use_batchnorm, name=None):
         upsample_psi = UpSamp3D(size=(shape_x[1] // shape_sigmoid[1], 
                                        shape_x[2] // shape_sigmoid[2], 
                                        shape_x[3] // shape_sigmoid[3]), name=name, **kwargs)(sigmoid_xg)
+        print(upsample_psi.shape[0])
         upsample_psi = RepeatElement(upsample_psi, shape_x[4], name=name)
 
         y = Mult([upsample_psi, skip_connection])
