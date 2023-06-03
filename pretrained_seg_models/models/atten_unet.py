@@ -37,16 +37,21 @@ def GatingSignal(filters, use_batchnorm, name=None):
 def AttentionBlock(inter_shape, use_batchnorm, name=None):
     kwargs = get_submodules()
 
+    conv1_name = name + '_theta_x'
+    conv2_name = name + '_phi_g'
+    conv3_name = name + '_sigmoid_xg'
+    conv4_name = name + '_out'
+
     def wrapper(skip_connection, gating):
         shape_x = backend.int_shape(skip_connection)
         shape_g = backend.int_shape(gating)
 
         theta_x = Conv3DBn(inter_shape, kernel_size=(2, 2, 2), strides=(2, 2, 2), padding='same', kernel_initalizer='he_normal',
-                           use_batchnorm=use_batchnorm, name=name, **kwargs)(skip_connection)
+                           use_batchnorm=use_batchnorm, name=conv1_name, **kwargs)(skip_connection)
         shape_theta_x = backend.int_shape(theta_x)
 
         phi_g = Conv3DBn(inter_shape, kernel_size=(1, 1, 1), padding='same', kernel_initializer='he_normal',
-                         use_batchnorm=use_batchnorm, name=name, **kwargs)(gating)
+                         use_batchnorm=use_batchnorm, name=conv2_name, **kwargs)(gating)
         upsample_g = Conv3DTrans(inter_shape, (3, 3, 3), padding='same', strides=(shape_theta_x[1] // shape_g[1],
                                                                                  shape_theta_x[2] // shape_g[2],
                                                                                  shape_theta_x[3] // shape_g[3]),
@@ -54,7 +59,7 @@ def AttentionBlock(inter_shape, use_batchnorm, name=None):
         
         act_xg = AddAct('relu', name=name, **kwargs)([upsample_g, theta_x])
         sigmoid_xg = Conv3DBn(1, kernel_size=(1, 1, 1), activation='softmax', kernel_initializer='he_normal', padding='same',
-                              use_batchnorm=use_batchnorm, name=name, **kwargs)(act_xg)
+                              use_batchnorm=use_batchnorm, name=conv3_name, **kwargs)(act_xg)
         shape_sigmoid = backend.int_shape(sigmoid_xg)
         upsample_psi = UpSamp3D(size=(shape_x[1] // shape_sigmoid[1], 
                                        shape_x[2] // shape_sigmoid[2], 
@@ -63,7 +68,8 @@ def AttentionBlock(inter_shape, use_batchnorm, name=None):
 
         y = Mult(**kwargs, name=name)([upsample_psi, skip_connection])
 
-        result = Conv3DBn(shape_x[4], (1, 1, 1), kernel_intitializer='he_normal', padding='same', use_batchnorm=True, name=name, **kwargs)(y)
+        result = Conv3DBn(shape_x[4], (1, 1, 1), kernel_intitializer='he_normal', padding='same', use_batchnorm=True, 
+                          name=conv3_name, **kwargs)(y)
         
         return result
     
