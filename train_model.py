@@ -19,7 +19,7 @@ import pandas as pd
 from imgPreprocessing import load_process_imgs
 from pretrained_seg_models import Unet, AttentionUnet, AttentionResUnet, get_preprocessing, losses, metrics
 from display import show_history, show_all_historys, show_val_masks, show_test_masks
-from predict_module import val_predict, predict
+from predict_module import val_predict, test_predict
 from statistical_analysis.df_manipulation import healthy_df_calcs
 
 def main(args):
@@ -28,11 +28,7 @@ def main(args):
 
     path = os.getcwd()
     img_path = 'https://raw.githubusercontent.com/aliclaz/Zebrafish_Heart_Segmentation_3D_FYP_AC/main/Data/Train/{}HPF_image.tif'.format(args.hpf)
-    #img_path = path + '/Train/{}HPF_image.tif'.format(args.hpf)
-    print(img_path)
-    print(os.listdir(path+'/Train'))
     mask_path = 'https://raw.githubusercontent.com/aliclaz/Zebrafish_Heart_Segmentation_3D_FYP_AC/main/Data/Train/{}HPF_mask.tif'.format(args.hpf)
-    #mask_path =  path + '/Train/{}HPF_mask.tif'.format(args.hpf)
     out_path = path + '/Results/'
     mod_path = path + '/Models/'
     stats_path = path + '/Stats/'
@@ -218,19 +214,7 @@ def main(args):
     test_preds_each_model = []
 
     for i in range(len(models)):
-        test_imgs, test_preds = predict(models[i], backbones[i], test_path, out_path)
-        test_preds_each_model.append(test_preds)
-
-    # Display the validation images, their actual masks and their masks predicted by each model at 3 slices
-
-    show_val_masks(model_names, x_val, y_val, val_preds_each_model, out_path)
-
-    # Use each model to predict masks for each test image
-
-    test_preds_each_model = []
-
-    for i in range(len(models)):
-        test_imgs, test_preds = predict(models[i], backbones[i], test_paths, out_path)
+        test_imgs, test_preds = test_predict(models[i], backbones[i], test_paths, out_path)
         test_preds_each_model.append(test_preds)
 
     # Display test images, actual masks and predicted masks from each model

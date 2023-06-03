@@ -27,7 +27,7 @@ def val_predict(model, imgs, patch_size):
 
     return val_preds
 
-def predict(model, backbone, in_path, out_path):
+def test_predict(model, backbone, in_paths, out_path):
 
     """ 
     Loading of images and preprocessing followed by predictions of the masks by the entered model for each image
@@ -35,11 +35,10 @@ def predict(model, backbone, in_path, out_path):
     """
     # Read each image in the directory, convert it into patches and add the patches to an array
 
-    img_files = sorted(os.listdir(in_path))
     imgs = imgs_full_size = []
 
-    for file in img_files:
-        img = io.imread(in_path+file)
+    for in_path in in_paths:
+        img = io.imread(in_path)
         imgs_full_size.append(img)
         patches = patchify(img, (64, 64, 64), step=64)
         imgs.append(patches)
