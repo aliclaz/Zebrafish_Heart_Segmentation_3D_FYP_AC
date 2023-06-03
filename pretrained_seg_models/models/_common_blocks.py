@@ -38,7 +38,7 @@ def Conv3DBn(filters, kernel_size, strides=(1, 1, 1), padding='valid', data_form
 def Conv3DTrans(filters, kernel_size, strides=(1, 1, 1), padding='valid', data_format=None, dilation_rate=(1, 1, 1), activation=None,
                 kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None,
                 activity_regularizer=None, kernel_constraint=None, bias_constraint=None, use_batchnorm=False, **kwargs):
-    conv_trans_name, act_name, bn_name = None, None, None
+    transp_name, act_name, bn_name = None, None, None
     block_name = kwargs.pop('name', None)
     backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
 
