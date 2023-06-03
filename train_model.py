@@ -25,6 +25,7 @@ from statistical_analysis.df_manipulation import healthy_df_calcs
 def main(args):
 
     print(os.getcwd())
+    print(os.listdir())
     # Define paths for dateset and the number of classes in the dataset
 
     img_path = './Train/{}HPF_image.tif'.format(args.hpf)
