@@ -78,7 +78,7 @@ def UpSamp3D(size=(2, 2, 2), data_format=None, **kwargs):
         up_samp_name = block_name + '_up_samp'
 
     def wrapper(input_tensor):
-        x = layers.UpSampling3D(size=size, data_format=data_format, name=up_samp_name)
+        x = layers.UpSampling3D(size=size, data_format=data_format, name=up_samp_name)(input_tensor)
 
         return x
     
