@@ -45,7 +45,7 @@ def AttentionBlock(inter_shape, use_batchnorm, name=None):
                            use_batchnorm=use_batchnorm, name=name, **kwargs)(skip_connection)
         shape_theta_x = backend.int_shape(theta_x)
 
-        phi_g = Conv3DBn(inter_shape, kernel_size=(1, 1, 1), padding='same', kernel_initalizer='he_normal',
+        phi_g = Conv3DBn(inter_shape, kernel_size=(1, 1, 1), padding='same', kernel_initializer='he_normal',
                          use_batchnorm=use_batchnorm, name=name, **kwargs)(gating)
         upsample_g = Conv3DTrans(inter_shape, (3, 3, 3), padding='same', strides=(shape_theta_x[1] // shape_g[1],
                                                                                  shape_theta_x[2] // shape_g[2],
@@ -61,9 +61,9 @@ def AttentionBlock(inter_shape, use_batchnorm, name=None):
                                        shape_x[3] // shape_sigmoid[3]), name=name, **kwargs)(sigmoid_xg)
         upsample_psi = RepeatElement(upsample_psi, shape_x[4])
 
-        y = Mult([upsample_psi, skip_connection])
+        y = Mult(**kwargs)([upsample_psi, skip_connection])
 
-        result = Conv3DBn(shape_x[4], (1, 1, 1), kernel_intializer='he_normal', padding='same', use_batchnorm=True, name=name, **kwargs)(y)
+        result = Conv3DBn(shape_x[4], (1, 1, 1), kernel_intitializer='he_normal', padding='same', use_batchnorm=True, name=name, **kwargs)(y)
         
         return result
     
@@ -83,7 +83,7 @@ def DecoderBlock(filters, stage, use_batchnorm=False):
         x = GatingSignal(filters, use_batchnorm, name=gate_name)(input_tensor)
         if skip is not None:
             atten = AttentionBlock(filters, use_batchnorm, name=gate_name)(skip, x)
-        x = UpSamp3D(size=(), name=up_name, **kwargs)(input_tensor)
+        x = UpSamp3D(size=(2, 2, 2), name=up_name, **kwargs)(input_tensor)
         if skip is not None:
             x = layers.Concatenate(axis=4, name=concat_name)([x, atten])
         
