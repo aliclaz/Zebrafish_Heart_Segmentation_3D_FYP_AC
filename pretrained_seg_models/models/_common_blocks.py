@@ -98,7 +98,7 @@ def AddAct(activation=None, **kwargs):
 
     def wrapper(inputs):
         x = layers.add(inputs)
-        x = layers.activation(activation)
+        x = layers.activation(activation)(x)
 
         return x
     
