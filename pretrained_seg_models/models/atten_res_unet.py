@@ -130,14 +130,7 @@ def build_atten_res_unet(backbone, skip_connection_layers, decoder_filters=(256,
         x = layers.SpatialDropout3D(dropout, name='pyramid_dropout')(x)
 
     # model head (define number of output classes)
-    x = layers.Conv3D(
-        filters=classes,
-        kernel_size=(3, 3, 3),
-        padding='same',
-        use_bias=True,
-        kernel_initializer='glorot_uniform',
-        name='final_conv',
-    )(x)
+    x = layers.Conv3D(filters=classes, kernel_size=(3, 3, 3), padding='same', use_bias=True, kernel_initializer='glorot_uniform', name='final_conv',)(x)
     x = layers.Activation(activation, name=activation)(x)
 
     # create keras model instance
