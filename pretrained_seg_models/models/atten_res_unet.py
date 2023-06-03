@@ -51,6 +51,7 @@ def AttentionBlock(inter_shape, use_batchnorm, name=None):
 
     def wrapper(skip_connection, gating):
         shape_x = backend.int_shape(skip_connection)
+        print(shape_x[4])
         shape_g = backend.int_shape(gating)
 
         theta_x = Conv3DBn(inter_shape, kernel_size=(2, 2, 2), strides=(2, 2, 2), padding='same', kernel_initializer='he_normal',
