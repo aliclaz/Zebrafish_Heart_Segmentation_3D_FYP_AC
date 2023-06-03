@@ -2,7 +2,9 @@ import numpy as np
 import os
 from skimage import io
 from skimage.transform import resize
+from skimage.exposure import rescale_intensity
 from patchify import patchify, unpatchify
+from imgPreprocessing import get_hpf
 from pretrained_seg_models import get_preprocessing
 from tifffile import imsave
 
@@ -28,12 +30,13 @@ def val_predict(model, imgs, patch_size):
 
     return val_preds
 
-def test_predict(model, backbone, in_paths, out_path):
+def test_predict(model, backbone, in_paths, out_path, hpf):
 
     """ 
     Loading of images and preprocessing followed by predictions of the masks by the entered model for each image
     
     """
+
     # Read each image in the directory, convert it into patches and add the patches to an array
 
     imgs = imgs_full_size = []
@@ -82,47 +85,52 @@ def test_predict(model, backbone, in_paths, out_path):
 
     # Repatch the patches to the volume of the original images
 
-    reconstructed_imgs = []
+    reconstructed_preds = []
 
     for i in range(len(preds_reshaped)):
-        reconstructed_img = unpatchify(preds_reshaped[i], test_imgs.shape)
-        reconstructed_imgs.append(reconstructed_img)
-    reconstructed_imgs = np.array(reconstructed_imgs)
+        reconstructed_pred = unpatchify(preds_reshaped[i], imgs_full_size.shape)
+        reconstructed_preds.append(reconstructed_pred)
+    reconstructed_preds = np.array(reconstructed_preds)
 
     # Convert to uint8 for opening in image viewing software
 
-    recounstructed_imgs = reconstructed_imgs.astype(np.uint8)
+    reconstructed_preds = reconstructed_preds.astype(np.uint8)
 
     # Save masks as segmented volumes
 
-    for i in reconstructed_imgs:
-        imsave(out_path+'{}_mask.tif'.format(img_files[i]), reconstructed_imgs[i])
+    for i in reconstructed_preds:
+        imsave(out_path+'{}HPF_test_mask.tif'.format(hpf), reconstructed_preds[i])
 
-    return imgs_full_size_3ch, reconstructed_imgs
+    return imgs_full_size_3ch, reconstructed_preds
 
-def predict(model, backbone, in_paths, out_path):
+def predict(model, backbone, in_paths, out_path, hpf):
 
     """ 
     Loading of images and preprocessing followed by predictions of the masks by the entered model for each image
     
     """
+
+    mod_hpf = get_hpf(hpf)
+
     # Read each image in the directory, convert it into patches and add the patches to an array
 
     height = width = depth = 256
     imgs = imgs_256x256x256 = []
+    lower = 1 if mod_hpf == 30 else 2
 
     for in_path in in_paths:
-        img = io.imread(in_path)
-        img = resize(img, (height, width, depth), order=1, mode='mean')
-        imgs_full_size.append(img)
-        patches = patchify(img, (64, 64, 64), step=64)
+        img_full_size = io.imread(in_path)
+        img_256x256x256 = resize(img_full_size, (height, width, depth), order=1, mode='mean')
+        img_256x256x256 = rescale_intensity(img_256x256x256, in_range=(lower, 4))
+        imgs_256x256x256.append(img_256x256x256)
+        patches = patchify(img_256x256x256, (64, 64, 64), step=64)
         imgs.append(patches)
-    imgs_full_size = np.array(imgs_full_size)
+    imgs_256x256x256 = np.array(imgs_256x256x256)
     imgs = np.array(imgs)
 
     # Convert full sized image to have 3 channels for display purposes
 
-    imgs_full_size_3ch = np.stack((imgs_full_size,)*3, axis=-1).astype(np.uint8)
+    imgs_256x256x256_3ch = np.stack((imgs_256x256x256,)*3, axis=-1).astype(np.uint8)
 
     # Use model to predict mask for each 3D patch and add the patches to an array of shape 
     # (n_images, n_patches, height, width, depth, classes)
@@ -156,20 +164,20 @@ def predict(model, backbone, in_paths, out_path):
 
     # Repatch the patches to the volume of the original images
 
-    reconstructed_imgs = []
+    reconstructed_preds = []
 
     for i in range(len(preds_reshaped)):
-        reconstructed_img = unpatchify(preds_reshaped[i], test_imgs.shape)
-        reconstructed_imgs.append(reconstructed_img)
-    reconstructed_imgs = np.array(reconstructed_imgs)
+        reconstructed_pred = unpatchify(preds_reshaped[i], imgs_256x256x256.shape)
+        reconstructed_preds.append(reconstructed_pred)
+    reconstructed_preds = np.array(reconstructed_preds)
 
     # Convert to uint8 for opening in image viewing software
 
-    recounstructed_imgs = reconstructed_imgs.astype(np.uint8)
+    recounstructed_imgs = reconstructed_preds.astype(np.uint8)
 
     # Save masks as segmented volumes
 
-    for i in reconstructed_imgs:
-        imsave(out_path+'{}_mask.tif'.format(img_files[i]), reconstructed_imgs[i])
+    for i in reconstructed_preds:
+        imsave(out_path+'{}HPF_predicted_mask.tif'.format(hpf), reconstructed_preds[i])
 
-    return imgs_full_size_3ch, reconstructed_imgs
+    return imgs_256x256x256_3ch, reconstructed_preds
