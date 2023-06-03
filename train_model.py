@@ -25,7 +25,7 @@ from statistical_analysis.df_manipulation import healthy_df_calcs
 def main(args):
     
     # Define paths for dateset and the number of classes in the dataset
-    
+
     path = os.getcwd()
     img_path = 'https://raw.githubusercontent.com/aliclaz/Zebrafish_Heart_Segmentation_3D_FYP_AC/main/Data/Train/{}HPF_image.tif'.format(args.hpf)
     #img_path = path + '/Train/{}HPF_image.tif'.format(args.hpf)
@@ -33,18 +33,22 @@ def main(args):
     print(os.listdir(path+'/Train'))
     mask_path = 'https://raw.githubusercontent.com/aliclaz/Zebrafish_Heart_Segmentation_3D_FYP_AC/main/Data/Train/{}HPF_mask.tif'.format(args.hpf)
     #mask_path =  path + '/Train/{}HPF_mask.tif'.format(args.hpf)
-    test_path = path + '/Test/{}HPF/'.format(args.hpf)
     out_path = path + '/Results/'
     mod_path = path + '/Models/'
     stats_path = path + '/Stats/'
     if args.hpf == 48:
-        img_path = 6
+        n_classes = 6
+        n_imgs = 5
     elif args.hpf == 36:
         n_classes = 5
+        n_imgs = 6
     elif args.hpf == 30:
         n_classes = 4
+        n_imgs = 2
     else:
-        n_classes = 1
+        n_classes = None
+        n_imgs = None
+    test_paths = ['https://raw.githubusercontent.com/aliclaz/Zebrafish_Heart_Segmentation_3D_FYP_AC/main/Data/Test/{}HPF_image{}.tif'.format(args.hpf, i) for i in range(2, n_imgs + 1)]
 
     # Load the training masks and images into the code and preprocess both datasets
 
@@ -226,7 +230,7 @@ def main(args):
     test_preds_each_model = []
 
     for i in range(len(models)):
-        test_imgs, test_preds = predict(models[i], backbones[i], test_path, out_path)
+        test_imgs, test_preds = predict(models[i], backbones[i], test_paths, out_path)
         test_preds_each_model.append(test_preds)
 
     # Display test images, actual masks and predicted masks from each model
