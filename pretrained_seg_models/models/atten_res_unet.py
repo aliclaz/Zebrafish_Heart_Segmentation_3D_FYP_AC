@@ -51,7 +51,7 @@ def AttentionBlock(inter_shape, use_batchnorm, name=None):
 
     def wrapper(skip_connection, gating):
         shape_x = backend.int_shape(skip_connection)
-        print(shape_x[4])
+        print(shape_x)
         shape_g = backend.int_shape(gating)
 
         theta_x = Conv3DBn(inter_shape, kernel_size=(2, 2, 2), strides=(2, 2, 2), padding='same', kernel_initializer='he_normal',
@@ -72,7 +72,7 @@ def AttentionBlock(inter_shape, use_batchnorm, name=None):
         upsample_psi = UpSamp3D(size=(shape_x[1] // shape_sigmoid[1], 
                                        shape_x[2] // shape_sigmoid[2], 
                                        shape_x[3] // shape_sigmoid[3]), name=name, **kwargs)(sigmoid_xg)
-        upsample_psi = RepeatElement(upsample_psi, shape_x[4])
+        upsample_psi = RepeatElement(upsample_psi, shape_x[4], name=name)
 
         y = Mult([upsample_psi, skip_connection])
 
