@@ -1,7 +1,6 @@
 import pandas as pd
 from imgPreprocessing import get_hpf
 from .maths_stats import get_class_volumes, get_class_volume_msd, add_vols_msd, get_CIs, stat_sig_diff_test
-import shelve
 
 __all__ = ['gm_df_calcs', 'healthy_df_calcs']
 
