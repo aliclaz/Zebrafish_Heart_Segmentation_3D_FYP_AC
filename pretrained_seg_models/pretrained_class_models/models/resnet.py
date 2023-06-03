@@ -51,6 +51,11 @@ def residual_conv_block(filters, stage, block, strides=(1, 1, 1), cut='pre'):
         x = layers.ZeroPadding3D(padding=(1, 1, 1))(x)
         x = layers.Conv3D(filters, (3, 3, 3), strides=strides, name=conv_name + '1', **conv_params)(x)
 
+        x = layers.BatchNormalization(name=bn_name + '2', **bn_params)(x)
+        x = layers.Activation('relu', name=relu_name + '2')(x)
+        x = layers.ZeroPadding3D(padding=(1, 1, 1))(x)
+        x = layers.Conv3D(filters, (3, 3, 3), name=conv_name + '2', **conv_params)(x)
+
         x = layers.add([x, shortcut])
 
         return x
