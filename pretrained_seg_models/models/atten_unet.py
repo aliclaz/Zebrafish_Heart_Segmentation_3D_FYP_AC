@@ -61,7 +61,7 @@ def AttentionBlock(inter_shape, use_batchnorm, name=None):
                                        shape_x[3] // shape_sigmoid[3]), name=name, **kwargs)(sigmoid_xg)
         upsample_psi = RepeatElement(upsample_psi, shape_x[4])
 
-        y = Mult(**kwargs)([upsample_psi, skip_connection])
+        y = Mult(**kwargs, name=name)([upsample_psi, skip_connection])
 
         result = Conv3DBn(shape_x[4], (1, 1, 1), kernel_intitializer='he_normal', padding='same', use_batchnorm=True, name=name, **kwargs)(y)
         
@@ -121,14 +121,7 @@ def build_atten_unet(backbone, skip_connection_layers, decoder_filters=(256, 128
         x = layers.SpatialDropout3D(dropout, name='pyramid_dropout')(x)
 
     # model head (define number of output classes)
-    x = layers.Conv3D(
-        filters=classes,
-        kernel_size=(3, 3, 3),
-        padding='same',
-        use_bias=True,
-        kernel_initializer='glorot_uniform',
-        name='final_conv',
-    )(x)
+    x = layers.Conv3D(filters=classes, kernel_size=(3, 3, 3), padding='same', use_bias=True, kernel_initializer='glorot_uniform', name='final_conv',)(x)
     x = layers.Activation(activation, name=activation)(x)
 
     # create keras model instance
