@@ -53,13 +53,11 @@ def main(args):
     # Define model parameters
 
     encoder_weights = 'imagenet'
-    backbone1 = 'resnet34'
     activation = 'softmax'
     patch_size = 64
     channels = 3
 
-    LR = 0.0001
-    opt = Adam(LR)
+    opt = Adam(args.learning_rate)
 
     train_masks = np.concatenate((y_train.astype(np.uint8), y_val.astype(np.uint8)), axis=0)
     flat_train_masks = train_masks.reshape(-1)
@@ -67,44 +65,26 @@ def main(args):
 
     total_loss = losses.DiceLoss(class_weights=class_weights) + losses.CategoricalFocalLoss()
 
-    metrics = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]
+    m = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]
 
-    # Define model parameters
-
-    encoder_weights = 'imagenet'
-    backbone1 = 'resnet34'
-    activation = 'softmax'
-    patch_size = 64
-    channels = 3
-
-    LR = 0.0001
-    opt = Adam(LR)
-
-    train_masks = np.concatenate(y_train, y_val)
-    flat_train_masks = train_masks.reshape(-1)
-    class_weights = compute_class_weight('balanced', classes=np.unique(flat_train_masks), y=flat_train_masks)
-
-    total_loss = losses.DiceLoss(class_weights=class_weights) + losses.CategoricalFocalLoss()
-
-    metrics = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]
     # Preprocess input data
 
-    preprocess_input1 = get_preprocessing(backbone1)
+    preprocess_input1 = get_preprocessing(args.backbone1)
     x_train_prep = preprocess_input1(x_train)
     x_val_prep = preprocess_input1(x_val)
 
     # Define model - using AttentionResUnet with a resnet34 backbone and 
     # pretrained weights
 
-    model1 = AttentionResUnet(backbone1, classes=n_classes, 
+    model1 = AttentionResUnet(args.backbone1, classes=n_classes, 
                                 input_shape=(patch_size, patch_size, patch_size, channels), 
                                 encoder_weights=encoder_weights, activation=activation)
-    model1.compile(optimizer=opt, loss=total_loss, metrics=metrics)
+    model1.compile(optimizer=opt, loss=total_loss, metrics=m)
     model1.summary()
 
     # Train the model
 
-    history1 = model1.fit(x_train_prep, y_train, batch_size=8, epochs=100, verbose=1,
+    history1 = model1.fit(x_train_prep, y_train, batch_size=args.batch_size, epochs=args.epochs, verbose=1,
                         validation_data=(x_val_prep, y_val))
     
     # Create a list of model names, historys and backbones used
@@ -115,35 +95,33 @@ def main(args):
     model_name1 = 'AttentionResUnet'
     model_names.append(model_name1)
     historys.append(history1)
-    backbones.append(backbone1)
+    backbones.append(args.backbone1)
 
     # Plot the train and validation losses and IOU scores at each epoch for model 1
 
-    show_history(history1, model_name1, backbone1, out_path)
+    show_history(history1, model_name1, args.backbone1, out_path)
     # Save the model for use in the future
 
-    model1.save(mod_path+'{}HPF_{}_{}_100epochs.h5'.format(args.hpf, backbone1, model_name1))
+    model1.save(mod_path+'{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone1, model_name1, args.epochs))
 
     # Preprocess input data with vgg16 backbone
 
-    backbone2 = 'vgg16'
-
-    preprocess_input2 = get_preprocessing(backbone2)
+    preprocess_input2 = get_preprocessing(args.backbone2)
     x_train_prep = preprocess_input2(x_train)
     x_val_prep = preprocess_input2(x_val)
 
     # Define model - using AttentionUnet with a vgg16 backbone and 
     # pretrained weights
 
-    model2 = AttentionUnet(backbone2, classes=n_classes, 
+    model2 = AttentionUnet(args.backbone2, classes=n_classes, 
                                 input_shape=(patch_size, patch_size, patch_size, channels), 
                                 encoder_weights=encoder_weights, activation=activation)
-    model2.compile(optimizer=opt, loss=total_loss, metrics=metrics)
+    model2.compile(optimizer=opt, loss=total_loss, metrics=m)
     model2.summary()
 
     # Train the model
 
-    history2 = model2.fit(x_train_prep, y_train, batch_size=8, epochs=100, verbose=1,
+    history2 = model2.fit(x_train_prep, y_train, batch_size=args.batch_size, epochs=args.epochs, verbose=1,
                         validation_data=(x_val_prep, y_val))
     # Create a list of model names, historys and backbones used
 
@@ -151,21 +129,21 @@ def main(args):
     model_name2 = 'AttentionUnet'
     model_names.append(model_name2)
     historys.append(history2)
-    backbones.append(backbone2)
+    backbones.append(args.backbone2)
 
     # Plot train and validation losses and IOU scores for model 2
 
-    show_history(history2, model2, backbone2, out_path)
+    show_history(history2, model2, args.backbone2, out_path)
 
-    model2.save(mod_path+'{}HPF_{}_{}_100epochs.h5'.format(args.hpf, backbone2, model_name2))
+    model2.save(mod_path+'{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone2, model_name2, args.epochs))
 
     # Define model - using Unet with a vgg16 backbone and 
     # pretrained weights
 
-    model3 = Unet(backbone2, classes=n_classes, 
+    model3 = Unet(args.backbone3, classes=n_classes, 
                                 input_shape=(patch_size, patch_size, patch_size, channels), 
                                 encoder_weights=encoder_weights, activation=activation)
-    model3.compile(optimizer=opt, loss=total_loss, metrics=metrics)
+    model3.compile(optimizer=opt, loss=total_loss, metrics=m)
     model3.summary()
 
     # Train the model
@@ -179,23 +157,19 @@ def main(args):
     model_name3 = 'Unet'
     model_names.append(model_name3)
     historys.append(history3)
-    backbones.append(backbone2)
+    backbones.append(args.backbone3)
 
     # Plot the train and validation losses and IOU scores at each epoch for model 3
 
-    show_history(history3, model_name3, backbone2, out_path)
+    show_history(history3, model_name3, args.backbone3, out_path)
 
     # Save model
 
-    model3.save(mod_path+'{}HPF_{}_{}_100epochs.h5'.format(args.hpf, backbone2, model_name3))
+    model3.save(mod_path+'{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone3, model_name3, args.epochs))
 
     # Display the historys of all models together for comparison
 
-    show_all_historys(historys, model_names, backbones, out_path)
-
-    # Display the historys of all models together for comparison
-
-    show_all_historys(historys, model_names, backbones, out_path)   
+    show_all_historys(historys, model_names, backbones, out_path)  
 
     # Use each model to predict masks for each validation image
 
@@ -248,6 +222,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--hpf', type=int, help='stage of development fish at in train images', required=True)
+    parser.add_argument('--learning_rate', type=float, help='learning rate used in training of models', required=True)
+    parser.add_argument('--batch_size', type=int, help='size of the batch used to train the model during an epoch', required=True)
+    parser.add_argument('--epochs', type=int, help='number of epochs used in training', required=True)
+    parser.add_argument('--backbone1', type=str, help='pretrained backbone for AttentionResUnet model', required=True)
+    parser.add_argument('--backbone2', type=str, help='pretrained backbone for AttentionUnet model', required=True)
+    parser.add_argument('--backbone3', type=str, help='pretrained backbone for Unet model', required=True)
 
     args = parser.parse_args()
 
