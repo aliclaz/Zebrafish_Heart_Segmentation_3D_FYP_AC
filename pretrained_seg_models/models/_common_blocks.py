@@ -8,14 +8,7 @@ def Conv3DBn(filters, kernel_size, strides=(1, 1, 1), padding='valid', data_form
     backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
 
     if block_name is not None:
-        if 'attention' in block_name:
-            split = block_name.split('_')
-            if 'a' in split[3]:
-                conv_name = split[0] + '_' + split[1] + '_' + split[2] + '_' + split[3].replace('a', '_conva')
-            elif 'b' in split[3]:
-                conv_name = split[0] + '_' + split[1] + '_' + split[2] + '_' + split[3].replace('b', '_convb')
-            else:
-                conv_name = block_name + '_conv'
+        conv_name = block_name + '_conv'
 
     if block_name is not None and activation is not None:
         act_str = activation.__name__ if callable(activation) else str(activation)
