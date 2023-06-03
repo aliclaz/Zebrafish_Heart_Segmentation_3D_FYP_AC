@@ -19,12 +19,12 @@ def load_process_imgs(img_path, mask_path):
 
     # Load input images and masks
 
-    print(img_path)
     image = imread(img_path)
+    print(image.shape)
     img_patches = patchify(image, (64, 64, 64), step=64)
 
-    print(mask_path)
     mask = imread(mask_path)
+    print(masks.shape)
     mask_patches = patchify(mask, (64, 64, 64), step=64)
 
     # Reshape each array to have shape (n_patches, height, width, depth)
