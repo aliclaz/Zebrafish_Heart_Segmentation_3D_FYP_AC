@@ -97,8 +97,8 @@ def AddAct(activation=None, **kwargs):
         act_name = block_name + '_' + act_str
 
     def wrapper(inputs):
-        x = layers.add(inputs)
-        x = layers.activation(activation)(x)
+        x = layers.add(inputs, name=add_name)
+        x = layers.Activation(activation, name=act_name)(x)
 
         return x
     
@@ -113,7 +113,7 @@ def Mult(**kwargs):
         mult_name = block_name + '_multiply'
 
     def wrapper(inputs):
-        x = layers.multiply(inputs)
+        x = layers.multiply(inputs, name=mult_name)
 
         return x
     
