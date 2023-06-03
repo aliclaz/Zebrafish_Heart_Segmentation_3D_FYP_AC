@@ -27,8 +27,8 @@ def main(args):
     print(os.getcwd())
     # Define paths for dateset and the number of classes in the dataset
 
-    img_path = glob.glob('{}HPF_image.tif')[0]
-    mask_path =  glob.glob('{}HPF_mask.tif')[0]
+    img_path = glob.glob('{}HPF_image.tif'.format(args.hpf))[0]
+    mask_path =  glob.glob('{}HPF_mask.tif'.format(args.hpf))[0]
     test_path = glob.glob('{}HPF/'.format(args.hpf))[0]
     out_path = glob.glob('/Results/')[0]
     mod_path = glob.glob('/Models/')[0]
