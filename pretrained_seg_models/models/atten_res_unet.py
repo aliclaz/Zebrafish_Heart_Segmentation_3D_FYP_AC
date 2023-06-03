@@ -93,7 +93,7 @@ def DecoderBlock(filters, stage, use_batchnorm=False):
         x = GatingSignal(filters, use_batchnorm, name=gate_name)(input_tensor)
         if skip is not None:
             atten = AttentionBlock(filters, use_batchnorm, name=atten_name)(skip, x)
-        x = UpSamp3D(size=(), name=up_name, **kwargs)(input_tensor)
+        x = UpSamp3D(size=(2, 2, 2), name=up_name, **kwargs)(input_tensor)
         if skip is not None:
             x = layers.Concatenate(axis=4, name=concat_name)([x, atten])
         
