@@ -9,7 +9,6 @@ if __name__ == '__main__':
     os.environ['KERAS_BACKEND'] = 'tensorflow'
     os.environ['CUDA_VISIBLE_DEVICES'] = '{}'.format(gpu_use)
 
-import tensorflow as tf
 import os
 import numpy as np
 from keras.optimizers import Adam
