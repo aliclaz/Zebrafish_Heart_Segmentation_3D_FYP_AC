@@ -1,4 +1,5 @@
 import argparse
+import tensorflow as tf
 # coding: utf-8
 
 if __name__ == '__main__':
