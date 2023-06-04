@@ -122,8 +122,6 @@ def build_atten_res_unet(backbone, skip_connection_layers, decoder_filters=(256,
     # extract skip connections
     skips = ([backbone.get_layer(name=i).output if isinstance(i, str)
               else backbone.get_layer(index=i).output for i in skip_connection_layers])
-    
-    print(skip_connection_layers)
 
     # add center block if previous operation was maxpooling (for vgg models)
     if isinstance(backbone.layers[-1], layers.MaxPooling3D):
@@ -160,6 +158,8 @@ def AttentionResUnet(backbone_name='vgg16', input_shape=(None, None, 3), classes
 
     if encoder_features == 'default':
         encoder_features = Backbones.get_feature_layers(backbone_name, n=4)
+
+    print(encoder_features)
 
     model = build_atten_res_unet(backbone=backbone, skip_connection_layers=encoder_features, decoder_filters=decoder_filters, n_upsample_blocks=len(decoder_filters), 
                                  classes=classes, activation=activation, use_batchnorm=decoder_use_batchnorm, dropout=dropout,)

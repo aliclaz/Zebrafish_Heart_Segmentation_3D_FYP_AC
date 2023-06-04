@@ -63,9 +63,7 @@ def main(args):
     train_masks = np.concatenate((y_train, y_val), axis=0)
     flat_train_masks = train_masks.reshape(-1)
     class_weights = compute_class_weight('balanced', classes=np.unique(flat_train_masks), y=flat_train_masks)
-    print(class_weights)
     class_weights = tf.convert_to_tensor(class_weights, dtype=tf.float32)
-    print(class_weights)
 
     dice_loss = losses.DiceLoss(class_weights=class_weights)
     cat_focal_loss = losses.CategoricalFocalLoss()
