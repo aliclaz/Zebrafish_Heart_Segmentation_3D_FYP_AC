@@ -30,9 +30,9 @@ def main(args):
     path = os.getcwd()
     img_path = '{}HPF_image.tif'.format(args.hpf)
     mask_path = '{}HPF_mask.tif'.format(args.hpf)
-    out_path = '/Results/'
-    mod_path = '/Models/'
-    stats_path = '/Stats/'
+    out_path = path + '/Results/'
+    mod_path = path + '/Models/'
+    stats_path = path + '/Stats/'
     if args.hpf == 48:
         n_classes = 6
         n_imgs = 5
@@ -79,12 +79,12 @@ def main(args):
     model_names.append(model_name1)
 
     cache_model_path = mod_path + '{}HPF_{}_{}_temp.h5'.format(args.hpf, args.backbone1, model_name1)
-    best_model_path = mod_path + '{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone1, model_name1, args.epochs)
+    best_model_path = mod_path + '{}HPF_{}_{}'.format(args.hpf, args.backbone1, model_name1) + '-{val_iou_score:.4f}-{epoch:02d}.h5'
     csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone1, model_name1, args.learning_rate)
 
     cbs = [
         ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
-        ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1),
+        ModelCheckpoint(best_model_path, monitor='val_loss', verbose=0, save_best_only=True),
         ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
         CSVLogger(csv_log_path, append=True),
         EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
@@ -129,12 +129,12 @@ def main(args):
     model_names.append(model_name2)
 
     cache_model_path = mod_path + '{}HPF_{}_{}_temp.h5'.format(args.hpf, args.backbone2, model_name2)
-    best_model_path = mod_path + '{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone2, model_name2, args.epochs)
+    best_model_path = mod_path + '{}HPF_{}_{}'.format(args.hpf, args.backbone2, model_name2) + '-{val_iou_score:.4f}-{epoch:02d}.h5'
     csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone2, model_name2, args.learning_rate)
 
     cbs = [
         ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
-        ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1),
+        ModelCheckpoint(best_model_path, monitor='val_loss', verbose=10, save_best_only=True),
         ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
         CSVLogger(csv_log_path, append=True),
         EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
@@ -175,13 +175,13 @@ def main(args):
     model_name3 = 'Unet'
     model_names.append(model_name3)
 
-    cache_model_path = mod_path + '{}HPF_{}_{}_temp.h5'.format(args.hpf, args.backbone2, model_name2)
-    best_model_path = mod_path + '{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone2, model_name2, args.epochs)
-    csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone2, model_name2, args.learning_rate)
+    cache_model_path = mod_path + '{}HPF_{}_{}_temp.h5'.format(args.hpf, args.backbone3, model_name3)
+    best_model_path = mod_path + '{}HPF_{}_{}'.format(args.hpf, args.backbone3, model_name3) + '-{val_iou_score:.4f}-{epoch:02d}.h5'
+    csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone3, model_name3, args.learning_rate)
 
     cbs = [
         ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
-        ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1),
+        ModelCheckpoint(best_model_path, monitor='val_loss', verbose=0, save_best_only=True),
         ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
         CSVLogger(csv_log_path, append=True),
         EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
