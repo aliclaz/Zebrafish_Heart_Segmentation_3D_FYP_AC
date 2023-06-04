@@ -4,8 +4,7 @@ import tensorflow as tf
 
 if __name__ == '__main__':
     import os
-    tf.config.list_physical_devices('GPU')
-    gpu_use = 0
+    gpu_use = tf.config.list_physical_devices('GPU')
     print('GPU use: {}'.format(gpu_use))
     os.environ['KERAS_BACKEND'] = 'tensorflow'
     os.environ['CUDA_VISIBLE_DEVICES'] = '{}'.format(gpu_use)
@@ -49,28 +48,50 @@ def main(args):
 
     # Load the training masks and images into the code and preprocess both datasets
 
-    x_train, x_val, y_train, y_val = load_process_imgs(img_path, mask_path)
-    print(np.unique(y_train))
+    x_train, x_val, y_train, y_val = load_process_imgs(img_path, mask_path, args.train_val_split)
 
-    # Define model parameters
+    strategy = tf.distribute.MirroredStrategy()
+    print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
 
-    encoder_weights = 'imagenet'
-    activation = 'softmax'
-    patch_size = 64
-    channels = 3
+    with strategy.scope():
 
-    opt = Adam(args.learning_rate)
+        # Define model parameters
 
-    train_masks = np.concatenate((y_train, y_val), axis=0)
-    flat_train_masks = train_masks.reshape(-1)
-    class_weights = compute_class_weight('balanced', classes=np.unique(flat_train_masks), y=flat_train_masks)
-    class_weights = tf.convert_to_tensor(class_weights, dtype=tf.float32)
+        encoder_weights = 'imagenet'
+        activation = 'softmax'
+        patch_size = 64
+        channels = 3
 
-    dice_loss = losses.DiceLoss(class_weights=class_weights)
-    cat_focal_loss = losses.CategoricalFocalLoss()
-    total_loss =  dice_loss + cat_focal_loss
+        opt = Adam(args.learning_rate)
 
-    m = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]
+        train_masks = np.concatenate((y_train, y_val), axis=0)
+        flat_train_masks = train_masks.reshape(-1)
+        class_weights = compute_class_weight('balanced', classes=np.unique(flat_train_masks), y=flat_train_masks)
+        class_weights = tf.convert_to_tensor(class_weights, dtype=tf.float32)
+
+        dice_loss = losses.DiceLoss(class_weights=class_weights)
+        cat_focal_loss = losses.CategoricalFocalLoss()
+        total_loss =  dice_loss + cat_focal_loss
+
+        m = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]
+
+        # Preprocess input data with defined backbone
+
+        preprocess_input1 = get_preprocessing(args.backbone1)
+        x_train_prep = preprocess_input1(x_train)
+        x_val_prep = preprocess_input1(x_val)
+
+        # Define model - using AttentionResUnet with a resnet34 backbone and 
+        # pretrained weights
+
+        model1 = AttentionResUnet(args.backbone1, classes=n_classes, 
+                                input_shape=(patch_size, patch_size, patch_size, channels), 
+                                encoder_weights=encoder_weights, activation=activation)
+        model1.compile(optimizer=opt, loss=total_loss, metrics=m)
+
+    # Summarise the model architecture
+
+    model1.summary()
 
     # Define callback parameters for model1
 
@@ -90,25 +111,10 @@ def main(args):
         EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
     ]
 
-    # Preprocess input data with defined backbone
-
-    preprocess_input1 = get_preprocessing(args.backbone1)
-    x_train_prep = preprocess_input1(x_train)
-    x_val_prep = preprocess_input1(x_val)
-
-    # Define model - using AttentionResUnet with a resnet34 backbone and 
-    # pretrained weights
-
-    model1 = AttentionResUnet(args.backbone1, classes=n_classes, 
-                              input_shape=(patch_size, patch_size, patch_size, channels), 
-                              encoder_weights=encoder_weights, activation=activation)
-    model1.compile(optimizer=opt, loss=total_loss, metrics=m)
-    model1.summary()
-
     # Train the model
 
     history1 = model1.fit(x_train_prep, y_train, batch_size=args.batch_size, epochs=args.epochs, verbose=1,
-                          validation_data=(x_val_prep, y_val), callbacks=cbs)
+                          steps_per_epoch=args.steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
     
     # Create lists of models, historys and backbones used
 
@@ -121,6 +127,26 @@ def main(args):
     # Plot the train and validation losses and IOU scores at each epoch for model 1
 
     show_history(history1, model_name1, args.backbone1, out_path)
+
+    with strategy.scope():
+
+        # Preprocess input data with defined backbone
+
+        preprocess_input2 = get_preprocessing(args.backbone2)
+        x_train_prep = preprocess_input2(x_train)
+        x_val_prep = preprocess_input2(x_val)
+
+        # Define model - using AttentionUnet with a vgg16 backbone and 
+        # pretrained weights
+
+        model2 = AttentionUnet(args.backbone2, classes=n_classes, 
+                               input_shape=(patch_size, patch_size, patch_size, channels), 
+                               encoder_weights=encoder_weights, activation=activation)
+        model2.compile(optimizer=opt, loss=total_loss, metrics=m)
+
+    # Summarise the model architecture
+
+    model2.summary()
 
     # Define callback parameters for model2
 
@@ -140,25 +166,11 @@ def main(args):
         EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
     ]
 
-    # Preprocess input data with defined backbone
-
-    preprocess_input2 = get_preprocessing(args.backbone2)
-    x_train_prep = preprocess_input2(x_train)
-    x_val_prep = preprocess_input2(x_val)
-
-    # Define model - using AttentionUnet with a vgg16 backbone and 
-    # pretrained weights
-
-    model2 = AttentionUnet(args.backbone2, classes=n_classes, 
-                                input_shape=(patch_size, patch_size, patch_size, channels), 
-                                encoder_weights=encoder_weights, activation=activation)
-    model2.compile(optimizer=opt, loss=total_loss, metrics=m)
-    model2.summary()
 
     # Train the model
 
     history2 = model2.fit(x_train_prep, y_train, batch_size=args.batch_size, epochs=args.epochs, verbose=1,
-                        validation_data=(x_val_prep, y_val), callbacks=cbs)
+                          steps_per_epoch=args.steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
     
     # Create lists of models, historys and backbones used
 
@@ -168,6 +180,26 @@ def main(args):
     # Plot train and validation losses and IOU scores for model 2
 
     show_history(history2, model2, args.backbone2, out_path)
+
+    with strategy.scope():
+
+        # Preprocess input data with defined backbone
+
+        preprocess_input2 = get_preprocessing(args.backbone2)
+        x_train_prep = preprocess_input2(x_train)
+        x_val_prep = preprocess_input2(x_val)
+
+        # Define model - using Unet with a vgg16 backbone and 
+        # pretrained weights
+
+        model3 = Unet(args.backbone3, classes=n_classes, 
+                                    input_shape=(patch_size, patch_size, patch_size, channels), 
+                                    encoder_weights=encoder_weights, activation=activation)
+        model3.compile(optimizer=opt, loss=total_loss, metrics=m)
+
+    # Summarise the model architecture
+
+    model3.summary()
 
     # Define callback parameters
 
@@ -187,25 +219,10 @@ def main(args):
         EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
     ]
 
-    # Preprocess input data with defined backbone
-
-    preprocess_input2 = get_preprocessing(args.backbone2)
-    x_train_prep = preprocess_input2(x_train)
-    x_val_prep = preprocess_input2(x_val)
-
-    # Define model - using Unet with a vgg16 backbone and 
-    # pretrained weights
-
-    model3 = Unet(args.backbone3, classes=n_classes, 
-                                input_shape=(patch_size, patch_size, patch_size, channels), 
-                                encoder_weights=encoder_weights, activation=activation)
-    model3.compile(optimizer=opt, loss=total_loss, metrics=m)
-    model3.summary()
-
     # Train the model
 
     history3 = model3.fit(x_train_prep, y_train, batch_size=8, epochs=100, verbose=1,
-                        validation_data=(x_val_prep, y_val), callbacks=cbs)
+                          steps_per_epoch=args.steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
     
     # Create lists of models, git historys and backbones used
 
@@ -275,8 +292,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--hpf', type=int, help='stage of development fish at in train images', required=True)
+    parser.add_argument('--train_val_split', type=float, help='determines size of validation set')
     parser.add_argument('--learning_rate', type=float, help='learning rate used in training of models', required=True)
     parser.add_argument('--batch_size', type=int, help='size of the batch used to train the model during an epoch', required=True)
+    parser.add_argument('--steps_per_epoch', type=int, help='number of times per epoch the batch is trained on', required=True)
     parser.add_argument('--epochs', type=int, help='number of epochs used in training', required=True)
     parser.add_argument('--backbone1', type=str, help='pretrained backbone for AttentionResUnet model', required=True)
     parser.add_argument('--backbone2', type=str, help='pretrained backbone for AttentionUnet model', required=True)

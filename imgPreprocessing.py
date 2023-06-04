@@ -15,7 +15,7 @@ def get_hpf(hpf):
 
     return mod_hpf
 
-def load_process_imgs(img_path, mask_path):
+def load_process_imgs(img_path, mask_path, split):
 
     # Load input images and masks
 
@@ -40,6 +40,6 @@ def load_process_imgs(img_path, mask_path):
 
     # Split dataset into training and validation sets
 
-    x_train, x_val, y_train, y_val = train_test_split(train_imgs, train_masks, test_size=0.1, random_state=0)
+    x_train, x_val, y_train, y_val = train_test_split(train_imgs, train_masks, test_size=split, random_state=0)
 
     return x_train, x_val, y_train, y_val
