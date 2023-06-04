@@ -17,7 +17,7 @@ from sklearn.utils import compute_class_weight
 import pandas as pd
 
 from imgPreprocessing import load_process_imgs
-from pretrained_seg_models import Unet, AttentionUnet, AttentionResUnet, get_preprocessing, losses, metrics
+from seg_models import Unet, AttentionUnet, AttentionResUnet, get_preprocessing, losses, metrics
 from display import show_history, show_all_historys, show_val_masks, show_test_masks
 from predict_module import val_predict, test_predict
 from statistical_analysis.df_manipulation import healthy_df_calcs
@@ -81,15 +81,15 @@ def main(args):
     # pretrained weights
 
     model1 = AttentionResUnet(args.backbone1, classes=n_classes, 
-                                input_shape=(patch_size, patch_size, patch_size, channels), 
-                                encoder_weights=encoder_weights, activation=activation)
+                              input_shape=(patch_size, patch_size, patch_size, channels), 
+                              encoder_weights=encoder_weights, activation=activation)
     model1.compile(optimizer=opt, loss=total_loss, metrics=m)
     model1.summary()
 
     # Train the model
 
     history1 = model1.fit(x_train_prep, y_train, batch_size=args.batch_size, epochs=args.epochs, verbose=1,
-                        validation_data=(x_val_prep, y_val))
+                          validation_data=(x_val_prep, y_val))
     
     # Create a list of model names, historys and backbones used
 

@@ -83,7 +83,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--in_path', type=str, help='Enter the download link of the zip file containing your input images', required=True)
+    parser.add_argument('--in_files', type=str, help='Enter filenames of the images being input (separated by space)', required=True)
     parser.add_argument('--out_path', type=str, help='What is the directory path you would like to save the results in?', required=True)
     parser.add_argument('--reuse', action='store_true', default=False)
     parser.add_argument('--entered_hpf', type=int, help='What stage of development, in hours post-fertilisation (hpf), were the provided images taken in?', required=True)

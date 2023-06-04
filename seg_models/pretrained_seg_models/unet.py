@@ -24,16 +24,14 @@ def Conv3x3BnReLU(filters, use_batchnorm, name=None):
 def DecoderBlock(filters, stage, use_batchnorm=False):
     kwargs = get_submodules()
 
-    transp_name = 'decoder_stage{}a_transpose'.format(stage)
-    bn_name = 'decoder_stage{}a_bn'.format(stage)
-    relu_name = 'decoder_stage{}a_relu'.format(stage)
+    transp_block_name = 'decoder_stage{}a'.format(stage)
     conv_block_name = 'decoder_stage{}b'.format(stage)
     concat_name = 'decoder_stage{}_concat'.format(stage)
 
     def layer(input_tensor, skip=None):
 
         x = Conv3DTrans(filters, kernel_size=(4, 4, 4), strides=(2, 2, 2), padding='same', use_batchnorm=use_batchnorm, 
-                        name=transp_name, **kwargs)(input_tensor)
+                        name=transp_block_name, **kwargs)(input_tensor)
 
         if skip is not None:
             x = layers.Concatenate(axis=4, name=concat_name)([x, skip])
