@@ -50,7 +50,7 @@ def main(args):
 
     x_train, x_val, y_train, y_val = load_process_imgs(img_path, mask_path, args.train_val_split)
 
-    strategy = tf.distribute.MirroredStrategy()
+    strategy = tf.distribute.MirroredStrategy(['GPU:0', 'GPU:1'])
     print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
 
     with strategy.scope():
