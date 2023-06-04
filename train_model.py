@@ -14,7 +14,7 @@ import os
 import numpy as np
 from keras.optimizers import Adam
 from sklearn.utils import compute_class_weight
-from keras import callbacks
+from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, CSVLogger, EarlyStopping
 import pandas as pd
 
 from imgPreprocessing import load_process_imgs
@@ -83,11 +83,11 @@ def main(args):
     csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone1, model_name1, args.learning_rate)
 
     cbs = [
-        callbacks.ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
-        callbacks.ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1),
-        callbacks.ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
-        callbacks.CSVLogger(csv_log_path, append=True),
-        callbacks.EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
+        ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
+        ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1),
+        ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
+        CSVLogger(csv_log_path, append=True),
+        EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
     ]
 
     # Preprocess input data with defined backbone
@@ -133,11 +133,11 @@ def main(args):
     csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone2, model_name2, args.learning_rate)
 
     cbs = [
-        callbacks.ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
-        callbacks.ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1),
-        callbacks.ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
-        callbacks.CSVLogger(csv_log_path, append=True),
-        callbacks.EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
+        ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
+        ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1),
+        ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
+        CSVLogger(csv_log_path, append=True),
+        EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
     ]
 
     # Preprocess input data with defined backbone
@@ -180,11 +180,11 @@ def main(args):
     csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone2, model_name2, args.learning_rate)
 
     cbs = [
-        callbacks.ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
-        callbacks.ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1),
-        callbacks.ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
-        callbacks.CSVLogger(csv_log_path, append=True),
-        callbacks.EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
+        ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
+        ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1),
+        ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
+        CSVLogger(csv_log_path, append=True),
+        EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
     ]
 
     # Preprocess input data with defined backbone
