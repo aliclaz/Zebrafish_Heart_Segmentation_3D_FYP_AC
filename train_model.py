@@ -4,7 +4,8 @@ import tensorflow as tf
 
 if __name__ == '__main__':
     import os
-    gpu_use = tf.config.list_physical_devices('GPU')
+    print(tf.config.list_physical_devices('GPU'))
+    gpu_use = 0
     print('GPU use: {}'.format(gpu_use))
     os.environ['KERAS_BACKEND'] = 'tensorflow'
     os.environ['CUDA_VISIBLE_DEVICES'] = '{}'.format(gpu_use)
@@ -53,41 +54,39 @@ def main(args):
     strategy = tf.distribute.MirroredStrategy(['GPU:0', 'GPU:1'])
     print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
 
-    with strategy.scope():
+    # Define model parameters
 
-        # Define model parameters
+    encoder_weights = 'imagenet'
+    activation = 'softmax'
+    patch_size = 64
+    channels = 3
 
-        encoder_weights = 'imagenet'
-        activation = 'softmax'
-        patch_size = 64
-        channels = 3
+    opt = Adam(args.learning_rate)
 
-        opt = Adam(args.learning_rate)
+    train_masks = np.concatenate((y_train, y_val), axis=0)
+    flat_train_masks = train_masks.reshape(-1)
+    class_weights = compute_class_weight('balanced', classes=np.unique(flat_train_masks), y=flat_train_masks)
+    class_weights = tf.convert_to_tensor(class_weights, dtype=tf.float32)
 
-        train_masks = np.concatenate((y_train, y_val), axis=0)
-        flat_train_masks = train_masks.reshape(-1)
-        class_weights = compute_class_weight('balanced', classes=np.unique(flat_train_masks), y=flat_train_masks)
-        class_weights = tf.convert_to_tensor(class_weights, dtype=tf.float32)
+    dice_loss = losses.DiceLoss(class_weights=class_weights)
+    cat_focal_loss = losses.CategoricalFocalLoss()
+    total_loss =  dice_loss + cat_focal_loss
 
-        dice_loss = losses.DiceLoss(class_weights=class_weights)
-        cat_focal_loss = losses.CategoricalFocalLoss()
-        total_loss =  dice_loss + cat_focal_loss
+    m = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]
 
-        m = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]
+    # Preprocess input data with defined backbone
 
-        # Preprocess input data with defined backbone
+    preprocess_input1 = get_preprocessing(args.backbone1)
+    x_train_prep = preprocess_input1(x_train)
+    x_val_prep = preprocess_input1(x_val)
 
-        preprocess_input1 = get_preprocessing(args.backbone1)
-        x_train_prep = preprocess_input1(x_train)
-        x_val_prep = preprocess_input1(x_val)
+    # Define model - using AttentionResUnet with a resnet34 backbone and 
+    # pretrained weights
 
-        # Define model - using AttentionResUnet with a resnet34 backbone and 
-        # pretrained weights
-
-        model1 = AttentionResUnet(args.backbone1, classes=n_classes, 
-                                input_shape=(patch_size, patch_size, patch_size, channels), 
-                                encoder_weights=encoder_weights, activation=activation)
-        model1.compile(optimizer=opt, loss=total_loss, metrics=m)
+    model1 = AttentionResUnet(args.backbone1, classes=n_classes, 
+                            input_shape=(patch_size, patch_size, patch_size, channels), 
+                            encoder_weights=encoder_weights, activation=activation)
+    model1.compile(optimizer=opt, loss=total_loss, metrics=m)
 
     # Summarise the model architecture
 
@@ -128,21 +127,19 @@ def main(args):
 
     show_history(history1, model_name1, args.backbone1, out_path)
 
-    with strategy.scope():
+    # Preprocess input data with defined backbone
 
-        # Preprocess input data with defined backbone
+    preprocess_input2 = get_preprocessing(args.backbone2)
+    x_train_prep = preprocess_input2(x_train)
+    x_val_prep = preprocess_input2(x_val)
 
-        preprocess_input2 = get_preprocessing(args.backbone2)
-        x_train_prep = preprocess_input2(x_train)
-        x_val_prep = preprocess_input2(x_val)
+    # Define model - using AttentionUnet with a vgg16 backbone and 
+    # pretrained weights
 
-        # Define model - using AttentionUnet with a vgg16 backbone and 
-        # pretrained weights
-
-        model2 = AttentionUnet(args.backbone2, classes=n_classes, 
-                               input_shape=(patch_size, patch_size, patch_size, channels), 
-                               encoder_weights=encoder_weights, activation=activation)
-        model2.compile(optimizer=opt, loss=total_loss, metrics=m)
+    model2 = AttentionUnet(args.backbone2, classes=n_classes, 
+                        input_shape=(patch_size, patch_size, patch_size, channels), 
+                        encoder_weights=encoder_weights, activation=activation)
+    model2.compile(optimizer=opt, loss=total_loss, metrics=m)
 
     # Summarise the model architecture
 
@@ -150,7 +147,6 @@ def main(args):
 
     # Define callback parameters for model2
 
-    models.append(model2)
     model_name2 = 'AttentionUnet'
     model_names.append(model_name2)
 
@@ -174,6 +170,7 @@ def main(args):
     
     # Create lists of models, historys and backbones used
 
+    models.append(model2)
     historys.append(history2)
     backbones.append(args.backbone2)
 
@@ -181,21 +178,19 @@ def main(args):
 
     show_history(history2, model2, args.backbone2, out_path)
 
-    with strategy.scope():
+    # Preprocess input data with defined backbone
 
-        # Preprocess input data with defined backbone
+    preprocess_input2 = get_preprocessing(args.backbone2)
+    x_train_prep = preprocess_input2(x_train)
+    x_val_prep = preprocess_input2(x_val)
 
-        preprocess_input2 = get_preprocessing(args.backbone2)
-        x_train_prep = preprocess_input2(x_train)
-        x_val_prep = preprocess_input2(x_val)
+    # Define model - using Unet with a vgg16 backbone and 
+    # pretrained weights
 
-        # Define model - using Unet with a vgg16 backbone and 
-        # pretrained weights
-
-        model3 = Unet(args.backbone3, classes=n_classes, 
-                                    input_shape=(patch_size, patch_size, patch_size, channels), 
-                                    encoder_weights=encoder_weights, activation=activation)
-        model3.compile(optimizer=opt, loss=total_loss, metrics=m)
+    model3 = Unet(args.backbone3, classes=n_classes, 
+                                input_shape=(patch_size, patch_size, patch_size, channels), 
+                                encoder_weights=encoder_weights, activation=activation)
+    model3.compile(optimizer=opt, loss=total_loss, metrics=m)
 
     # Summarise the model architecture
 
@@ -203,7 +198,6 @@ def main(args):
 
     # Define callback parameters
 
-    models.append(model3)
     model_name3 = 'Unet'
     model_names.append(model_name3)
 
@@ -226,6 +220,7 @@ def main(args):
     
     # Create lists of models, git historys and backbones used
 
+    models.append(model3)
     historys.append(history3)
     backbones.append(args.backbone3)
 

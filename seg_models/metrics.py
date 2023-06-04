@@ -1,4 +1,4 @@
-from . base import Metric
+from .base import Metric
 from .base import functional as F
 
 SMOOTH = 1e-5
