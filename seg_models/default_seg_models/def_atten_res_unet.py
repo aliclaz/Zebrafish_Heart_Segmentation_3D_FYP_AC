@@ -107,7 +107,7 @@ def DecoderBlock(filters, stage, use_batchnorm=False):
 
     return layer
 
-def defAttentionUnet(n_classes, input_shape=(None, None, None, 3), use_batchnorm=False, dropout=False, **kwargs):
+def defAttentionResUnet(n_classes, input_shape=(None, None, None, 3), use_batchnorm=False, dropout=False, **kwargs):
     global backend, layers, models, keras_utils
     backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
 
