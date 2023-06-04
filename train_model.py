@@ -27,11 +27,11 @@ def main(args):
     # Define paths for dateset and the number of classes in the dataset
 
     path = os.getcwd()
-    img_path = 'https://raw.githubusercontent.com/aliclaz/Zebrafish_Heart_Segmentation_3D_FYP_AC/main/Data/Train/{}HPF_image.tif'.format(args.hpf)
-    mask_path = 'https://raw.githubusercontent.com/aliclaz/Zebrafish_Heart_Segmentation_3D_FYP_AC/main/Data/Train/{}HPF_mask.tif'.format(args.hpf)
-    out_path = path + '/Results/'
-    mod_path = path + '/Models/'
-    stats_path = path + '/Stats/'
+    img_path = '{}HPF_image.tif'.format(args.hpf)
+    mask_path = '{}HPF_mask.tif'.format(args.hpf)
+    out_path = '/Results/'
+    mod_path = '/Models/'
+    stats_path = '/Stats/'
     if args.hpf == 48:
         n_classes = 6
         n_imgs = 5
@@ -44,7 +44,7 @@ def main(args):
     else:
         n_classes = None
         n_imgs = None
-    test_paths = ['https://raw.githubusercontent.com/aliclaz/Zebrafish_Heart_Segmentation_3D_FYP_AC/main/Data/Test/{}HPF_image{}.tif'.format(args.hpf, i) for i in range(2, n_imgs + 1)]
+    test_paths = ['{}HPF_image{}.tif'.format(args.hpf, i) for i in range(2, n_imgs + 1)]
 
     # Load the training masks and images into the code and preprocess both datasets
 
