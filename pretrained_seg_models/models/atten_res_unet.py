@@ -122,10 +122,13 @@ def build_atten_res_unet(backbone, skip_connection_layers, decoder_filters=(256,
     # extract skip connections
     skips = ([backbone.get_layer(name=i).output if isinstance(i, str)
               else backbone.get_layer(index=i).output for i in skip_connection_layers])
+    
+    print(skip_connection_layers)
 
     # add center block if previous operation was maxpooling (for vgg models)
     if isinstance(backbone.layers[-1], layers.MaxPooling3D):
         x = ResConvBlock(512, use_batchnorm, name='centre_block')(x)
+
         # building decoder blocks
     for i in range(n_upsample_blocks):
 
@@ -148,7 +151,7 @@ def build_atten_res_unet(backbone, skip_connection_layers, decoder_filters=(256,
 
     return model
 
-def AttentionResUnet(backbone_name='vgg16', input_shape=(None, None, None, 3), classes=1, activation='sigmoid', weights=None, encoder_weights='imagenet', 
+def AttentionResUnet(backbone_name='vgg16', input_shape=(None, None, 3), classes=1, activation='sigmoid', weights=None, encoder_weights='imagenet', 
                      encoder_freeze=False, encoder_features='default', decoder_filters=(256, 128, 64, 32, 16,), decoder_use_batchnorm=True, dropout=None, **kwargs):
     global backend, layers, models, keras_utils
     backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
