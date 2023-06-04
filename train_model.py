@@ -82,7 +82,7 @@ def main(args):
     best_model_path = mod_path + '{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone1, model_name1, args.epochs)
     csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone1, model_name1, args.learning_rate)
 
-    callbacks = [
+    cbs = [
         callbacks.ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
         callbacks.ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1),
         callbacks.ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
@@ -108,7 +108,7 @@ def main(args):
     # Train the model
 
     history1 = model1.fit(x_train_prep, y_train, batch_size=args.batch_size, epochs=args.epochs, verbose=1,
-                          validation_data=(x_val_prep, y_val), callbacks=callbacks)
+                          validation_data=(x_val_prep, y_val), callbacks=cbs)
     
     # Create lists of models, historys and backbones used
 
@@ -132,7 +132,7 @@ def main(args):
     best_model_path = mod_path + '{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone2, model_name2, args.epochs)
     csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone2, model_name2, args.learning_rate)
 
-    callbacks = [
+    cbs = [
         callbacks.ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
         callbacks.ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1),
         callbacks.ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
@@ -158,7 +158,7 @@ def main(args):
     # Train the model
 
     history2 = model2.fit(x_train_prep, y_train, batch_size=args.batch_size, epochs=args.epochs, verbose=1,
-                        validation_data=(x_val_prep, y_val), callbacks=callbacks)
+                        validation_data=(x_val_prep, y_val), callbacks=cbs)
     
     # Create lists of models, historys and backbones used
 
@@ -179,7 +179,7 @@ def main(args):
     best_model_path = mod_path + '{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone2, model_name2, args.epochs)
     csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone2, model_name2, args.learning_rate)
 
-    callbacks = [
+    cbs = [
         callbacks.ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
         callbacks.ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1),
         callbacks.ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
@@ -205,7 +205,7 @@ def main(args):
     # Train the model
 
     history3 = model3.fit(x_train_prep, y_train, batch_size=8, epochs=100, verbose=1,
-                        validation_data=(x_val_prep, y_val), callbacks=callbacks)
+                        validation_data=(x_val_prep, y_val), callbacks=cbs)
     
     # Create lists of models, git historys and backbones used
 
