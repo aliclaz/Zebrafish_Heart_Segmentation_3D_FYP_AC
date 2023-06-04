@@ -14,7 +14,7 @@ import os
 import numpy as np
 from keras.optimizers import Adam
 from sklearn.utils import compute_class_weight
-from tf.keras import callbacks
+from keras import callbacks
 import pandas as pd
 
 from imgPreprocessing import load_process_imgs
