@@ -14,6 +14,7 @@ import os
 import numpy as np
 from keras.optimizers import Adam
 from sklearn.utils import compute_class_weight
+from tf.keras import callbacks
 import pandas as pd
 
 from imgPreprocessing import load_process_imgs
@@ -71,7 +72,25 @@ def main(args):
 
     m = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]
 
-    # Preprocess input data
+    # Define callback parameters for model1
+
+    model_names = []
+    model_name1 = 'AttentionResUnet'
+    model_names.append(model_name1)
+
+    cache_model_path = mod_path + '{}HPF_{}_{}_temp.h5'.format(args.hpf, args.backbone1, model_name1)
+    best_model_path = mod_path + '{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone1, model_name1, args.epochs)
+    csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone1, model_name1, args.learning_rate)
+
+    callbacks = [
+        callbacks.ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
+        callbacks.ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1),
+        callbacks.ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
+        callbacks.CSVLogger(csv_log_path, append=True),
+        callbacks.EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
+    ]
+
+    # Preprocess input data with defined backbone
 
     preprocess_input1 = get_preprocessing(args.backbone1)
     x_train_prep = preprocess_input1(x_train)
@@ -89,26 +108,39 @@ def main(args):
     # Train the model
 
     history1 = model1.fit(x_train_prep, y_train, batch_size=args.batch_size, epochs=args.epochs, verbose=1,
-                          validation_data=(x_val_prep, y_val))
+                          validation_data=(x_val_prep, y_val), callbacks=callbacks)
     
-    # Create a list of model names, historys and backbones used
+    # Create lists of models, historys and backbones used
 
-    models = model_names = historys = backbones = []
+    models = historys = backbones = []
 
     models.append(model1)
-    model_name1 = 'AttentionResUnet'
-    model_names.append(model_name1)
     historys.append(history1)
     backbones.append(args.backbone1)
 
     # Plot the train and validation losses and IOU scores at each epoch for model 1
 
     show_history(history1, model_name1, args.backbone1, out_path)
-    # Save the model for use in the future
 
-    model1.save(mod_path+'{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone1, model_name1, args.epochs))
+    # Define callback parameters for model2
 
-    # Preprocess input data with vgg16 backbone
+    models.append(model2)
+    model_name2 = 'AttentionUnet'
+    model_names.append(model_name2)
+
+    cache_model_path = mod_path + '{}HPF_{}_{}_temp.h5'.format(args.hpf, args.backbone2, model_name2)
+    best_model_path = mod_path + '{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone2, model_name2, args.epochs)
+    csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone2, model_name2, args.learning_rate)
+
+    callbacks = [
+        callbacks.ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
+        callbacks.ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1),
+        callbacks.ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
+        callbacks.CSVLogger(csv_log_path, append=True),
+        callbacks.EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
+    ]
+
+    # Preprocess input data with defined backbone
 
     preprocess_input2 = get_preprocessing(args.backbone2)
     x_train_prep = preprocess_input2(x_train)
@@ -126,12 +158,10 @@ def main(args):
     # Train the model
 
     history2 = model2.fit(x_train_prep, y_train, batch_size=args.batch_size, epochs=args.epochs, verbose=1,
-                        validation_data=(x_val_prep, y_val))
-    # Create a list of model names, historys and backbones used
+                        validation_data=(x_val_prep, y_val), callbacks=callbacks)
+    
+    # Create lists of models, historys and backbones used
 
-    models.append(model2)
-    model_name2 = 'AttentionUnet'
-    model_names.append(model_name2)
     historys.append(history2)
     backbones.append(args.backbone2)
 
@@ -139,7 +169,29 @@ def main(args):
 
     show_history(history2, model2, args.backbone2, out_path)
 
-    model2.save(mod_path+'{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone2, model_name2, args.epochs))
+    # Define callback parameters
+
+    models.append(model3)
+    model_name3 = 'Unet'
+    model_names.append(model_name3)
+
+    cache_model_path = mod_path + '{}HPF_{}_{}_temp.h5'.format(args.hpf, args.backbone2, model_name2)
+    best_model_path = mod_path + '{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone2, model_name2, args.epochs)
+    csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone2, model_name2, args.learning_rate)
+
+    callbacks = [
+        callbacks.ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
+        callbacks.ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1),
+        callbacks.ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
+        callbacks.CSVLogger(csv_log_path, append=True),
+        callbacks.EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
+    ]
+
+    # Preprocess input data with defined backbone
+
+    preprocess_input2 = get_preprocessing(args.backbone2)
+    x_train_prep = preprocess_input2(x_train)
+    x_val_prep = preprocess_input2(x_val)
 
     # Define model - using Unet with a vgg16 backbone and 
     # pretrained weights
@@ -153,13 +205,10 @@ def main(args):
     # Train the model
 
     history3 = model3.fit(x_train_prep, y_train, batch_size=8, epochs=100, verbose=1,
-                        validation_data=(x_val_prep, y_val))
+                        validation_data=(x_val_prep, y_val), callbacks=callbacks)
     
-    # Create a list of model names, historys and backbones used
+    # Create lists of models, git historys and backbones used
 
-    models.append(model3)
-    model_name3 = 'Unet'
-    model_names.append(model_name3)
     historys.append(history3)
     backbones.append(args.backbone3)
 
