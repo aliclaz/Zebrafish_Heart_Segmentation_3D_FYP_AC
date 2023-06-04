@@ -5,7 +5,7 @@ from skimage.transform import resize
 from skimage.exposure import rescale_intensity
 from patchify import patchify, unpatchify
 from imgPreprocessing import get_hpf
-from pretrained_seg_models import get_preprocessing
+from seg_models import get_preprocessing
 from tifffile import imsave
 
 def val_predict(model, imgs, patch_size):
