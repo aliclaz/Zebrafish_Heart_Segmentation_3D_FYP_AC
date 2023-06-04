@@ -9,7 +9,7 @@ layers = None
 models = None
 keras_utils = None
 
-ModelParams = collections.namedtuple('ModelParams', ['model_name', 'repetitions', 'residual_block', 'attention'])
+ModelParams = collections.namedtuple('ModelParams', ['model_name', 'repetitions', 'residual_block'])
 
 def handle_block_names(stage, block):
     name_base = 'stage{}_unit{}_'.format(stage + 1, block + 1)
