@@ -19,7 +19,7 @@ def Conv3x3BnReLU(filters, use_batchnorm, name=None):
     
     return wrapper
 
-def encoder_block(filters, max_pooling=True, use_batchnorm=False, name=None):
+def EncoderBlock(filters, max_pooling=True, use_batchnorm=False, name=None):
     kwargs = get_submodules()
 
     conv1_name = name + 'a'
@@ -59,39 +59,44 @@ def DecoderBlock(filters, stage, use_batchnorm=False):
 
     return layer
 
-def defUnet(n_classes, input_shape=(None, None, None, 3), use_batchnorm=False, dropout=False):
-    
-    """ Define size of input layer """
-    inputs = Input(input_shape)
+def defUnet(n_classes, input_shape=(None, None, None, 3), use_batchnorm=False, dropout=False, **kwargs):
+    global backend, layers, models, keras_utils
+    backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
 
+    """ Define shape of input layer """
+    inputs = layers.Input(input_shape)
+    x = inputs
+
+    """ Define the number of steps and the number of filters in the first encoder block """
     steps = 4
     features = 64
-    drop_rate = 0.1
     skips = []
 
     """ Encoder """
     for i in range(steps):
-        if i > 1 and dropout:
-            drop_rate = 0.2
-        x, y = encoder_block(x, features, drop_rate, max_pooling=True)
+        x, y = EncoderBlock(features, max_pooling=True, use_batchnorm=use_batchnorm, name='encoder_block{}'.format(i))(x)
         skips.append(y)
         features *= 2
-    x, = encoder_block(x, features, drop_rate, max_pooling=False)
 
-    # Expansive path
+    """ Centre block """
+    x, _ = EncoderBlock(features, max_pooling=False, use_batchnorm=use_batchnorm, name='centre_block')(x)
+
+    """ Decoder """
     for i in reversed(range(steps)):
         features //= 2
-        if i < 2:
-            drop_rate = 0.1
-        x = decoder_block(x, skips[i], features, drop_rate)
+        x = DecoderBlock(features, i, use_batchnorm=use_batchnorm)(x, skips[i])
 
-    # Final convolution to produce channel for each filter
+    """ Add level of dropout defined in function call """
+    if dropout:
+        x = layers.SpatialDropout3D(dropout, name='pyramid_dropout')(x)
+
+    """ Final convolution to produce channel for each filter """
     if n_classes == 1:
         activation = 'sigmoid'
     elif n_classes > 1:
         activation = 'softmax'
-    outputs = Conv3D(n_classes, (1, 1, 1), activation=activation)(x)
+    outputs = Conv3DBn(n_classes, (1, 1, 1), activation=activation, kernel_initializer='he_normal', use_batchnorm=False, name='final')(x)
 
-    model = Model(inputs=[inputs], outputs=[outputs])
+    model = models.Model(inputs=[inputs], outputs=[outputs])
 
     return model

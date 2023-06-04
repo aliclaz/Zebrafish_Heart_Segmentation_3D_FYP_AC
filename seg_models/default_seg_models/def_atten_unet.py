@@ -1,118 +1,159 @@
-from keras.models import Model
-from keras.layers import Input, Conv3D, MaxPooling3D, concatenate, Conv3DTranspose, Dropout, BatchNormalization, Activation, \
-add, UpSampling3D, multiply, Lambda
-import keras.backend as K
+from keras_applications import get_submodules_from_kwargs
 
-def encoder_block(out_n_filters, drop_rate=None, max_pooling=True, use_batchnorm=False):
-    def wrapper(input_layer):
-        conv = Conv3D(out_n_filters, kernel_size=(3, 3, 3), padding='same', kernel_initializer='HeNormal')(input_layer)
-        if use_batchnorm:
-            conv = BatchNormalization()(conv)
-        conv = Activation('relu')(conv)
-        if drop_rate is not None:
-            conv = Dropout(drop_rate)(conv)
-        conv = Conv3D(out_n_filters, kernel_size=(3, 3, 3), padding='same', 
-                    kernel_initializer='HeNormal')(conv)
-        conv = BatchNormalization()(conv)
-        conv = Activation('relu')(conv)
+from ._common_blocks import Conv3DBn, Conv3DTrans, UpSamp3D, AddAct, Mult, MaxPool3D
+
+backend = None
+layers = None
+models = None
+keras_utils = None
+
+def get_submodules():
+    return {'backend': backend, 'models': models, 'layers': layers, 'utils': keras_utils}
+
+def Conv3x3BnReLU(filters, use_batchnorm, name=None):
+    kwargs = get_submodules()
+
+    def wrapper(input_tensor):
+        return Conv3DBn(filters, kernel_size=(3, 3, 3), activation='relu', kernel_initializer='he_uniform', padding='same',
+                        use_batchnorm=use_batchnorm, name=name, **kwargs)(input_tensor)
+    
+    return wrapper
+
+def EncoderBlock(filters, max_pooling=True, use_batchnorm=False, name=None):
+    kwargs = get_submodules()
+
+    conv1_name = name + 'a'
+    conv2_name = name + 'b'
+
+    def wrapper(input_tensor):
+        x = Conv3x3BnReLU(filters, use_batchnorm, name=conv1_name)(input_tensor)
+        x = Conv3x3BnReLU(filters, use_batchnorm, name=conv2_name)(x)
         if max_pooling:
-            next_layer = MaxPooling3D(pool_size=(2, 2, 2), strides=(2, 2, 2))(conv)
+            out_tensor = MaxPool3D(pool_size=(2, 2, 2), strides=(2, 2, 2), name=name, **kwargs)(x)
         else:
-            next_layer = conv
-        skip_connection = conv
+            out_tensor = x
+        skip = x
 
-        return next_layer, skip_connection
+        return out_tensor, skip
     
     return wrapper
 
 def RepeatElement(tensor, rep):
-    return Lambda(lambda x, repnum: K.repeat_elements(x, repnum, axis=4), arguments={'repnum': rep})(tensor)   
+    return layers.Lambda(lambda x, repnum: K.repeat_elements(x, repnum, axis=4), arguments={'repnum': rep})(tensor)   
 
-def GatingSignal(filters, use_batchnorm):
+def GatingSignal(filters, use_batchnorm, name=None):
+    kwargs = get_submodules()
+    
     def wrapper(input_tensor):
-        x = Conv3D(filters, kernel_size=(1, 1, 1), activation='relu', padding='same', kernel_initializer='he_uniform')(input_tensor)
-        if use_batchnorm:
-            x = BatchNormalization()(x)
-        
-        return x
+        return Conv3DBn(filters, kernel_size=(1, 1, 1), activation='relu', padding='same', kernel_initializer='he_uniform', 
+                        use_batchnorm=use_batchnorm, name=name, **kwargs)(input_tensor)
     
     return wrapper
 
-def AttentionBlock(inter_shape):
-    def wrapper(skip_connection, gating):
-        shape_x = K.int_shape(skip_connection)
-        shape_g = K.int_shape(gating)
+def AttentionBlock(inter_shape, use_batchnorm, name=None):
+    kwargs = get_submodules()
 
-        theta_x = Conv3D(inter_shape, kernel_size=(2, 2, 2), strides=(2, 2, 2), padding='same', kernel_initalizer='he_normal')(skip_connection)
-        shape_theta_x = K.int_shape(theta_x)
-        phi_g = Conv3D(inter_shape, kernel_size=(1, 1, 1), padding='same', kernel_initializer='he_normal')(gating)
-        upsample_g = Conv3DTranspose(inter_shape, (3, 3, 3), padding='same', strides=(shape_theta_x[1] // shape_g[1],
-                                                                                      shape_theta_x[2] // shape_g[2],
-                                                                                      shape_theta_x[3] // shape_g[3]))(phi_g)
+    conv1_name = name + '_theta_x'
+    conv2_name = name + '_phi_g'
+    conv3_name = name + '_sigmoid_xg'
+    conv4_name = name + '_out'
+
+    def wrapper(skip_connection, gating):
+        shape_x = backend.int_shape(skip_connection)
+        shape_g = backend.int_shape(gating)
+
+        theta_x = Conv3DBn(inter_shape, kernel_size=(2, 2, 2), strides=(2, 2, 2), padding='same', kernel_initalizer='he_normal',
+                           use_batchnorm=use_batchnorm, name=conv1_name, **kwargs)(skip_connection)
+        shape_theta_x = backend.int_shape(theta_x)
+
+        phi_g = Conv3DBn(inter_shape, kernel_size=(1, 1, 1), padding='same', kernel_initializer='he_normal',
+                         use_batchnorm=use_batchnorm, name=conv2_name, **kwargs)(gating)
+        upsample_g = Conv3DTrans(inter_shape, (3, 3, 3), padding='same', strides=(shape_theta_x[1] // shape_g[1],
+                                                                                 shape_theta_x[2] // shape_g[2],
+                                                                                 shape_theta_x[3] // shape_g[3]),
+                                                                                 name=name, **kwargs)(phi_g)
         
-        concat_xg = add([upsample_g, theta_x])
-        act_xg = Activation('relu')(concat_xg)
-        psi = Conv3D(1, kernel_size=(1, 1, 1), activation='softmax', kernel_initializer='he_normal', padding='same')(act_xg)
-        sigmoid_xg = Activation('softmax')(psi)
-        shape_sigmoid = K.int_shape(sigmoid_xg)
-        upsample_psi = UpSampling3D(size=(shape_x[1] // shape_sigmoid[1], shape_x[2] // shape_sigmoid[2], 
-                                          shape_x[3] // shape_sigmoid[3]))(sigmoid_xg)
+        act_xg = AddAct('relu', name=name, **kwargs)([upsample_g, theta_x])
+        sigmoid_xg = Conv3DBn(1, kernel_size=(1, 1, 1), activation='softmax', kernel_initializer='he_normal', padding='same',
+                              use_batchnorm=use_batchnorm, name=conv3_name, **kwargs)(act_xg)
+        shape_sigmoid = backend.int_shape(sigmoid_xg)
+        upsample_psi = UpSamp3D(size=(shape_x[1] // shape_sigmoid[1], 
+                                       shape_x[2] // shape_sigmoid[2], 
+                                       shape_x[3] // shape_sigmoid[3]), name=name, **kwargs)(sigmoid_xg)
         upsample_psi = RepeatElement(upsample_psi, shape_x[4])
 
-        y = multiply([upsample_psi, skip_connection])
+        y = Mult(**kwargs, name=name)([upsample_psi, skip_connection])
 
-        result = Conv3D(shape_x[4], (1, 1, 1), kernel_intitializer='he_normal', padding='same')(y)
+        result = Conv3DBn(shape_x[4], (1, 1, 1), kernel_intitializer='he_normal', padding='same', use_batchnorm=True, 
+                          name=conv4_name, **kwargs)(y)
         
         return result
     
     return wrapper
 
-def decoder_block(out_n_filters, drop_rate=None, use_batchnorm=False):
-    def wrapper(conv_layer, concat_layer):
-        x = GatingSignal(out_n_filters, use_batchnorm)(conv_layer)
-        atten = AttentionBlock(out_n_filters, use_batchnorm)(concat_layer, x)
-        x = concatenate([x, atten], axis=4)
-        x = Conv3D(out_n_filters, (3, 3, 3), kernel_intializer='he_normal', padding='same')
-        if use_batchnorm:
-            
+def DecoderBlock(filters, stage, use_batchnorm=False):
+    kwargs = get_submodules()
+
+    gate_name = 'decoder_stage{}_gating'.format(stage)
+    atten_name = 'decoder_stage{}_attention'.format(stage)
+    up_name = 'decoder_stage{}_upsampling'.format(stage)
+    conv1_name = 'decoder_stage{}a'.format(stage)
+    conv2_name = 'decoder_stage{}b'.format(stage)
+    concat_name = 'decoder_stage{}_concat'.format(stage)
+
+    def layer(input_tensor, skip=None):
+        x = GatingSignal(filters, use_batchnorm, name=gate_name)(input_tensor)
+        if skip is not None:
+            atten = AttentionBlock(filters, use_batchnorm, name=atten_name)(skip, x)
+        x = UpSamp3D(size=(2, 2, 2), name=up_name, **kwargs)(input_tensor)
+        if skip is not None:
+            x = layers.Concatenate(axis=4, name=concat_name)([x, atten])
+        
+        x = Conv3x3BnReLU(filters, use_batchnorm, name=conv1_name)(x)
+        x = Conv3x3BnReLU(filters, use_batchnorm, name=conv2_name)(x)
 
         return x
 
-    return wrapper
+    return layer
 
-def multi_unet_model(n_classes, input_shape=(None, None, None, 3), use_batchnorm=False, dropout=False):
-    
+def defAttentionUnet(n_classes, input_shape=(None, None, None, 3), use_batchnorm=False, dropout=False, **kwargs):
+    global backend, layers, models, keras_utils
+    backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
+
     """ Define size of input layer """
-    inputs = Input(input_shape)
+    inputs = layers.Input(input_shape)
+    x = inputs
 
+    """ Define the number of steps and the number of filters in the first encoder block """
     steps = 4
     features = 64
-    drop_rate = 0.1
     skips = []
 
     """ Encoder """
     for i in range(steps):
-        if i > 1 and dropout:
-            drop_rate = 0.2
-        x, y = encoder_block(x, features, drop_rate, max_pooling=True)
+        x, y = EncoderBlock(features, max_pooling=True, use_batchnorm=use_batchnorm, name='encoder_block{}'.format(i))(x)
         skips.append(y)
         features *= 2
-    x, = encoder_block(x, features, drop_rate, max_pooling=False)
 
-    # Expansive path
+    """ Centre block """
+    x, _ = EncoderBlock(features, max_pooling=False, use_batchnorm=use_batchnorm, name='centre_block')(x)
+
+    """ Decoder """
     for i in reversed(range(steps)):
         features //= 2
-        if i < 2:
-            drop_rate = 0.1
-        x = decoder_block(x, skips[i], features, drop_rate)
+        x = DecoderBlock(features, i, use_batchnorm=use_batchnorm)(x, skips[i])
 
-    # Final convolution to produce channel for each filter
+    """ Add level of dropout defined in function call """
+    if dropout:
+        x = layers.SpatialDropout3D(dropout, name='pyramid_dropout')(x)
+
+    """ Final convolution to produce channel for each filter """
     if n_classes == 1:
         activation = 'sigmoid'
     elif n_classes > 1:
         activation = 'softmax'
-    outputs = Conv3D(n_classes, (1, 1, 1), activation=activation)(x)
+    outputs = Conv3DBn(n_classes, (1, 1, 1), activation=activation, kernel_initializer='he_normal', use_batchnorm=False, name='final')(x)
 
-    model = Model(inputs=[inputs], outputs=[outputs])
+    model = models.Model(inputs=[inputs], outputs=[outputs])
 
     return model
