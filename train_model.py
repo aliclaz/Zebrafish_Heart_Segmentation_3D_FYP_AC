@@ -70,7 +70,7 @@ def main(args):
     steps_per_epoch = (len(x_train) // batch_size) // strategy.num_replicas_in_sync
 
     train_masks_flat = train_masks.reshape(-1,)
-    class_weights = compute_class_weight('balanced', class_weights=np.unique(train_masks_flat), y=train_masks_flat)
+    class_weights = compute_class_weight('balanced', classes=np.unique(train_masks_flat), y=train_masks_flat)
 
     with strategy.scope():
 
