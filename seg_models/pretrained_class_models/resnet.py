@@ -2,7 +2,7 @@ import os
 import collections
 
 from .. import get_submodules_from_kwargs
-from ..weights import load_model_weights
+from .weights import load_model_weights
 
 backend = None
 layers = None

@@ -1,8 +1,7 @@
 import functools
-import . as ka
 
-from .models import resnet as rn
-from .models import vgg16 as vgg16
+from . import resnet as rn
+from . import vgg16 as vgg16
 
 class ModelsFactory:
     _models = {

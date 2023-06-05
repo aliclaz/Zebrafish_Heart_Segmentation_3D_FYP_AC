@@ -1,7 +1,7 @@
 import os
 from .. import get_submodules_from_kwargs
-from . import imagenet_utils
-from ..weights import load_model_weights
+from .models import imagenet_utils
+from .weights import load_model_weights
 
 preprocess_input = imagenet_utils.preprocess_input
 

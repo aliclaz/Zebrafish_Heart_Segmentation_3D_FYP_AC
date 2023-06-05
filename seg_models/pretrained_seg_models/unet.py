@@ -1,4 +1,4 @@
-from . import get_submodules_from_kwargs
+from .. import get_submodules_from_kwargs
 
 from ._common_blocks import Conv3DBn, Conv3DTrans
 from ._utils import freeze_model
