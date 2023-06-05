@@ -40,7 +40,7 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     train_masks = masks_reshaped.astype(np.float32)
     train_masks /= 255.0
 
-    train_masks_cat = to_categorical()
+    train_masks_cat = to_categorical(train_masks, dtype=np.float32)
 
     # Split dataset into training and validation sets
 
