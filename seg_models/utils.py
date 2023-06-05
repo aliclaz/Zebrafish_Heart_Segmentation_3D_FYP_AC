@@ -1,4 +1,4 @@
-from keras.applications import get_submodules_from_kwargs
+from tensorflow.keras.applications import get_submodules_from_kwargs
 from . import inject_global_submodules
 
 def set_trainable(model, recompile=True, **kwargs):

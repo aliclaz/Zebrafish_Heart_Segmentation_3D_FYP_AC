@@ -1,4 +1,4 @@
-from keras.applications import get_submodules_from_kwargs
+from tensorflow.keras.applications import get_submodules_from_kwargs
 
 
 def freeze_model(model, **kwargs):
