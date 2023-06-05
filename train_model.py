@@ -1,5 +1,6 @@
 import argparse
 import tensorflow as tf
+from tensorflow import keras
 # coding: utf-8
 
 if __name__ == '__main__':
@@ -12,7 +13,7 @@ if __name__ == '__main__':
 
 import os
 import numpy as np
-from tensorflow.keras.optimizers import Adam
+from keras.optimizers import Adam
 from sklearn.utils import compute_class_weight
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, CSVLogger, EarlyStopping
 import pandas as pd
