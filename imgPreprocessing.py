@@ -1,6 +1,7 @@
 from skimage.io import imread
 import numpy as np
 from patchify import patchify
+from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 
 def get_hpf(hpf):
@@ -15,7 +16,7 @@ def get_hpf(hpf):
 
     return mod_hpf
 
-def load_process_imgs(img_path, mask_path, split):
+def load_process_imgs(img_path, mask_path, split, n_classes):
 
     # Load input images and masks
 
@@ -33,10 +34,12 @@ def load_process_imgs(img_path, mask_path, split):
                                             mask_patches.shape[5]))
     
     # Convert image to have 3 channels, add a single channel to the masks and convert both to type np.float32
-
+    holder = []
     train_imgs = np.stack((imgs_reshaped,)*3, axis=-1).astype(np.float32)
     train_masks = np.expand_dims(masks_reshaped, axis=4).astype(np.float32)
     train_masks /= 255.0
+
+    train_masks = to_categorical(train_masks, num_classes=n_classes)
 
     # Split dataset into training and validation sets
 
