@@ -119,9 +119,9 @@ def main(args):
     cbs = [
         ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
         ModelCheckpoint(best_model_path, monitor='val_loss', verbose=0, save_best_only=True),
-        ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
+        ReduceLROnPlateau(monitor='val_loss', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='min'),
         CSVLogger(csv_log_path, append=True),
-        EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
+        EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='min')
     ]
 
     # Train the model
@@ -173,9 +173,9 @@ def main(args):
     cbs = [
         ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
         ModelCheckpoint(best_model_path, monitor='val_loss', verbose=10, save_best_only=True),
-        ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
+        ReduceLROnPlateau(monitor='val_loss', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='min'),
         CSVLogger(csv_log_path, append=True),
-        EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
+        EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='min')
     ]
 
 
@@ -226,9 +226,9 @@ def main(args):
     cbs = [
         ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
         ModelCheckpoint(best_model_path, monitor='val_loss', verbose=0, save_best_only=True),
-        ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='max'),
+        ReduceLROnPlateau(monitor='val_loss', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='min'),
         CSVLogger(csv_log_path, append=True),
-        EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='max')
+        EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='min')
     ]
 
     # Train the model

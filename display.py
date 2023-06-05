@@ -18,8 +18,8 @@ def show_history(history, model_name, backbone, out_path):
     ax[0].plot(epochs, loss, 'y', label='Training Loss')
     ax[0].plot(epochs, val_loss, 'r', label='Validation Loss')
     ax[0].set_title('Training and Validation Loss for ' + model_name + ' with ' + backbone + ' backbone')
-    ax[0].xlabel('Epochs')
-    ax[0].ylabel('Loss')
+    ax[0].set_xlabel('Epochs')
+    ax[0].set_ylabel('Loss')
     ax[0].legend()
 
     acc = history.history['iou_score']
@@ -27,8 +27,8 @@ def show_history(history, model_name, backbone, out_path):
     ax[1].plot(epochs, acc, 'y', label='Training IOU')
     ax[1].plot(epochs, val_acc, 'r', label='Validation IOU ')
     ax[1].set_title('Training and Validation IOU for ' + model_name + ' with ' + backbone + ' backbone')
-    ax[1].xlabel('Epochs')
-    ax[1].ylabel('IOU')
+    ax[1].set_xlabel('Epochs')
+    ax[1].set_ylabel('IOU')
     ax[1].legend()
 
     plt.savefig(out_path+'{}_history_plts.jpg')
@@ -48,8 +48,8 @@ def show_all_historys(historys, model_names, backbones, out_path):
         ax[i,0].plot(epochs, loss, 'y', label='Training Loss')
         ax[i,0].plot(epochs, val_loss, 'r', label='Validation Loss')
         ax[i,0].set_title('Training and Validation Loss for ' + model_names[i] + ' with ' + backbones[i] + ' backbone')
-        ax[i,0].xlabel('Epochs')
-        ax[i,0].ylabel('Loss')
+        ax[i,0].set_xlabel('Epochs')
+        ax[i,0].setylabel('Loss')
         ax[i,0].legend()
 
         acc = historys[i].history['iou_score']
@@ -57,8 +57,8 @@ def show_all_historys(historys, model_names, backbones, out_path):
         ax[i,1].plot(epochs, acc, 'y', label='Training IOU')
         ax[i,1].plot(epochs, val_acc, 'r', label='Validation IOU ')
         ax[i,1].set_title('Training and Validation IOU for ' + model_names[i] + ' with ' + backbones[i] + ' backbone')
-        ax[i,1].xlabel('Epochs')
-        ax[i,1].ylabel('IOU')
+        ax[i,1].set_xlabel('Epochs')
+        ax[i,1].set_ylabel('IOU')
         ax[i,1].legend()
     plt.savefig(out_path+'all_model_history_plots.jpg')
 
