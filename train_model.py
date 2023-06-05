@@ -10,11 +10,11 @@ if __name__ == '__main__':
     os.environ['KERAS_BACKEND'] = 'tensorflow'
     mult_gpus = [i + 1 for i in range(len(DEVICES) - 1)]
     if len(DEVICES) > 1:
-        for i in range(len(DEVICES)):
+        for i in range(len(DEVICES) - 1):
             if i == 0:
                 str_gpu_use = '0'
             else:
-                str_gpu_use = str_gpu_use + ', {}'.format(mult_gpus[i])
+                str_gpu_use = str_gpu_use + ', {}'.format(mult_gpus[i + 1])
     else:
         str_gpu_use = '0'
     os.environ['CUDA_VISIBLE_DEVICES'] = str_gpu_use
