@@ -56,4 +56,4 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
 
     x_train, x_val, y_train, y_val = train_test_split(train_imgs, train_masks, test_size=split, random_state=0)
 
-    return x_train, x_val, y_train, y_val
+    return x_train, x_val, y_train, y_val, train_masks
