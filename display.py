@@ -17,7 +17,7 @@ def show_history(history, model_name, backbone, out_path):
     epochs = range(1, len(loss) + 1)
     ax[0].plot(epochs, loss, 'y', label='Training Loss')
     ax[0].plot(epochs, val_loss, 'r', label='Validation Loss')
-    ax[0].title('Training and Validation Loss for {} with {} backbone'.format(model_name, backbone))
+    ax[0].title('Training and Validation Loss for ' + model_name + ' with ' + backbone + ' backbone')
     ax[0].xlabel('Epochs')
     ax[0].ylabel('Loss')
     ax[0].legend()
@@ -26,7 +26,7 @@ def show_history(history, model_name, backbone, out_path):
     val_acc = history.history['val_iou_score']
     ax[1].plot(epochs, acc, 'y', label='Training IOU')
     ax[1].plot(epochs, val_acc, 'r', label='Validation IOU ')
-    ax[1].title('Training and Validation IOU for {} with {} backbone'.format(model_name, backbone))
+    ax[1].title('Training and Validation IOU for ' + model_name + ' with ' + backbone + ' backbone')
     ax[1].xlabel('Epochs')
     ax[1].ylabel('IOU')
     ax[1].legend()
@@ -47,7 +47,7 @@ def show_all_historys(historys, model_names, backbones, out_path):
         epochs = range(1, len(loss) + 1)
         ax[i,0].plot(epochs, loss, 'y', label='Training Loss')
         ax[i,0].plot(epochs, val_loss, 'r', label='Validation Loss')
-        ax[i,0].title('Training and Validation Loss for {} with {} backbone'.format(model_names[i], backbones[i]))
+        ax[i,0].title('Training and Validation Loss for ' + model_names[i] + ' with ' + backbones[i] + ' backbone')
         ax[i,0].xlabel('Epochs')
         ax[i,0].ylabel('Loss')
         ax[i,0].legend()
@@ -56,7 +56,7 @@ def show_all_historys(historys, model_names, backbones, out_path):
         val_acc = historys[i].history['val_iou_score']
         ax[i,1].plot(epochs, acc, 'y', label='Training IOU')
         ax[i,1].plot(epochs, val_acc, 'r', label='Validation IOU ')
-        ax[i,1].title('Training and Validation IOU for {} with {} backbone'.format(model_names[i], backbones[i]))
+        ax[i,1].title('Training and Validation IOU for ' + model_names[i] + ' with ' + backbones[i] + ' backbone')
         ax[i,1].xlabel('Epochs')
         ax[i,1].ylabel('IOU')
         ax[i,1].legend()
@@ -89,7 +89,7 @@ def show_val_masks(model_names, imgs, gts, preds, out_path, classes):
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
                 ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             else:
-                ax[i,j].set_title('Predicted Mask by {}'.format(model_names[j - 2]))
+                ax[i,j].set_title('Predicted Mask by ' + model_names[j - 2])
                 ax[i,j].imshow(preds[j-2,slices[k],:,:,:,0], cmap='gray')
                 c = [ax[i,j].cmap(ax[i,j].norm(value)) for value in values]
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
@@ -120,7 +120,7 @@ def show_test_masks(model_names, imgs, preds, out_path, classes):
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
                 ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             else:
-                ax[i,j].set_title('Predicted Mask by {}'.format(model_names[j - 1]))
+                ax[i,j].set_title('Predicted Mask by ' + model_names[j - 1])
                 ax[i,j].imshow(preds[j-1,slices[k],:,:,:,0], cmap='gray')
                 c = [ax[i,j].cmap(ax[i,j].norm(value)) for value in values]
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
@@ -156,7 +156,7 @@ def show_pred_masks(imgs, preds, out_path, classes):
     plt.savefig(out_path+'pred_imgs_and_masks.jpg')
     plt.show()
 
-def disp_3D_val(val_imgs, val_masks, all_val_preds, model_names, classes, out_path):
+def disp_3D_val(val_masks, all_val_preds, model_names, classes, out_path):
     # Plot the validation actual masks and their predicted masks for each patch in the validation set, predictions from all models
 
     fig = plt.figure(figsize=(8, 4*len(val_masks)))
@@ -178,7 +178,7 @@ def disp_3D_val(val_imgs, val_masks, all_val_preds, model_names, classes, out_pa
 
         for j in all_val_preds:
             ax = fig.add_subplot(len(val_masks), 4, (4*i)+j+2, projection='3d')
-            ax.set_title('Predicted Mask by {}'.format(model_names[j]))
+            ax.set_title('Predicted Mask by ' + model_names[j])
             val_pred = all_val_preds[j,i].reshape(all_val_preds[j,i].shape[0], all_val_preds[j,i].shape[1], all_val_preds[j,i].shape[2])
             y, x, z = np.where(val_pred != 0)
             colours = val_pred[y, x, z]
@@ -191,7 +191,7 @@ def disp_3D_val(val_imgs, val_masks, all_val_preds, model_names, classes, out_pa
     plt.savefig(out_path+'val_imgs_and_masks3D.jpg')
     plt.show()
 
-def disp_3D_test(test_masks, test_preds, model_names, out_path, classes):
+def disp_3D_test(test_masks, test_preds, model_name, out_path, classes):
     # Plot the predicted masks for each patch in the validation set, predictions from all models
 
     fig = plt.figure(figsize=(8, 4*len(test_masks)))
