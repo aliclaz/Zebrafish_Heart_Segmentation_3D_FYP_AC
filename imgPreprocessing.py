@@ -57,7 +57,7 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
         for i in range(n_classes):
             train_class = train_masks[i,:,:,:,j]
             y, x, z = np.where(train_class != 0)
-            train_class = (j + 1)*(train_class[y, x, z] / 6)
+            train_class[y, x, z] = (j + 1)*(train_class[y, x, z] / 6)
             train_class_list.append(train_class)
         train_mask = np.array(train_class_list)
         train_masks_list.append(train_mask)
