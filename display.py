@@ -188,7 +188,7 @@ def disp_3D_val(val_imgs, val_masks, all_val_preds, model_names, classes, out_pa
             c = np.unique(greyscale_colours.ravel())
             patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
             ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    plt.savefig(out_path+'val_imgs_and_masks.jpg')
+    plt.savefig(out_path+'val_imgs_and_masks3D.jpg')
     plt.show()
 
 def disp_3D_test(test_masks, test_preds, model_names, out_path, classes):
@@ -222,5 +222,5 @@ def disp_3D_test(test_masks, test_preds, model_names, out_path, classes):
         c = np.unique(greyscale_colours.ravel())
         patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
         ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    plt.savefig(out_path+'test_imgs_and_masks.jpg')
+    plt.savefig(out_path+'test_imgs_and_masks3D.jpg')
     plt.show()
