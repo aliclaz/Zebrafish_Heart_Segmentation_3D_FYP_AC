@@ -1,6 +1,6 @@
 import os
 from .. import get_submodules_from_kwargs
-from keras_applications import imagenet_utils
+from . import imagenet_utils
 from ..weights import load_model_weights
 
 preprocess_input = imagenet_utils.preprocess_input

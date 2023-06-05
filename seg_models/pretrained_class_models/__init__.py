@@ -1,4 +1,4 @@
-import keras_applications as ka
+import . as ka
 
 def get_submodules_from_kwargs(kwargs):
     backend = kwargs.get('backend', ka._KERAS_BACKEND)

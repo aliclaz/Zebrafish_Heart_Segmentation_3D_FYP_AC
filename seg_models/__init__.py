@@ -12,6 +12,18 @@ _KERAS_MODELS = None
 _KERAS_UTILS = None
 _KERAS_LOSSES = None
 
+
+def get_submodules_from_kwargs(kwargs):
+    backend = kwargs.get('backend', _KERAS_BACKEND)
+    layers = kwargs.get('layers', _KERAS_LAYERS)
+    models = kwargs.get('models', _KERAS_MODELS)
+    utils = kwargs.get('utils', _KERAS_UTILS)
+    for key in kwargs.keys():
+        if key not in ['backend', 'layers', 'models', 'utils']:
+            raise TypeError('Invalid keyword argument: %s', key)
+    return backend, layers, models, utils
+
+
 def inject_global_losses(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -104,5 +116,5 @@ def get_preprocessing(name):
 
     return preprocess_input
     
-__all__ = ['Unet', 'defUnet', 'AttentionUnet', 'defAttentionUnet', 'AttentionResUnet', 'set_framework',
+__all__ = ['get_submodules_from_kwargs', 'Unet', 'defUnet', 'AttentionUnet', 'defAttentionUnet', 'AttentionResUnet', 'set_framework',
            'framework', 'get_preprocessing', 'get_available_backbone_names', 'losses', 'metrics', 'utils']
