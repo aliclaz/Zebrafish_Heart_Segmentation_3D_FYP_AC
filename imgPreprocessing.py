@@ -36,7 +36,9 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     # Convert image to have 3 channels, add 1 channels to the masks and convert both to type np.float32
     
     train_imgs = np.stack((imgs_reshaped,)*3, axis=-1).astype(np.float32)
-    train_masks = np.expand_dims(masks_reshaped, axis=4)
+    train_masks = np.expand_dims(masks_reshaped, axis=4).astype(np.float32)
+    x, y, z = np.where(train_masks != 0)
+    train_masks[x, y, z] = train_masks[x, y, z] * 10
                                  
     # Encode binary-like labels for each 
 
