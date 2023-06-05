@@ -38,9 +38,9 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     train_imgs = np.stack((imgs_reshaped,)*3, axis=-1).astype(np.float32)
     train_masks = masks_reshaped.astype(np.float32)
 
-    train_mask_6ch = []
     train_masks_6ch = []
     for i in range(len(train_masks)):
+        train_mask_6ch = []
         for j in range(n_classes):
             train_mask = train_masks[i,:,:,:]
             x, y, z = np.where(train_mask == j)
@@ -49,7 +49,7 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
             train_mask_6ch.append(cl)
         train_mask_6ch = np.stack(train_mask_6ch, axis=-1)
         train_masks_6ch.append(train_mask_6ch)
-    train_masks = np.array(train_masks_6ch, dtype=np.ndarray)
+    train_masks = np.asarray(train_masks_6ch, dtype=np.ndarray)
     train_masks /= 255.0
 
     # Split dataset into training and validation sets
