@@ -39,7 +39,7 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
         if i == 0:
             mask_patches = mask_channels_patches[i]
         else:
-            mask_patches = np.concatenate((mask_patches, mask_channels_patches[i])).astype(np.float32)
+            mask_patches = np.concatenate((mask_patches, mask_channels_patches[i]))
 
     # Reshape each array to have shape (n_patches, height, width, depth)
 
@@ -51,6 +51,7 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     # Convert image to have 3 channels, add a single channel to the masks and convert both to type np.float32
     
     train_imgs = np.stack((imgs_reshaped,)*3, axis=-1).astype(np.float32)
+    train_masks = masks_reshaped.astype(np.float32)
     train_masks = masks_reshaped / 255.0
 
     train_masks = to_categorical(train_masks, num_classes=n_classes)
