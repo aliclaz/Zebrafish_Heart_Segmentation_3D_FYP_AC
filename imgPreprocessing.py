@@ -59,9 +59,9 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
             y, x, z = np.where(train_class != 0)
             train_class[y, x, z] = (j + 1)*(train_class[y, x, z] / 6)
             train_class_list.append(train_class)
-        train_mask = np.array(train_class_list)
+        train_mask = np.asarray(train_class_list)
         train_masks_list.append(train_mask)
-    train_masks = np.array(train_masks_list)
+    train_masks = np.asarray(train_masks_list)
     train_masks /= 255.0
 
     print(train_masks)
