@@ -64,6 +64,8 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     train_masks = np.array(train_masks_list)
     train_masks /= 255.0
 
+    print(train_masks)
+
     print(np.unique(train_masks))
 
     # Split dataset into training and validation sets
