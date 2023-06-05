@@ -35,12 +35,14 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     for i in range(n_classes):
         mask_channels[i] = np.array(mask_channels[i])
         mask_channel_patches = patchify(mask_channels[i], (64, 64, 64), step=64)
+        print(mask_channel_patches.shape)
         mask_channel_patches = np.expand_dims(mask_channel_patches, axis=5)
+        print(mask_channel_patches.shape)
         mask_channels_patches.append(mask_channel_patches)
         if i == 0:
             mask_patches = mask_channels_patches[i]
         else:
-            mask_patches = np.concatenate((mask_patches, mask_channels_patches[i]), axis=6)
+            mask_patches = np.concatenate((mask_patches, mask_channels_patches[i]), axis=5)
 
     # Reshape each array to have shape (n_patches, height, width, depth)
 
