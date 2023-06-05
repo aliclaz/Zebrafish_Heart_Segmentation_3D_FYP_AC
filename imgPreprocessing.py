@@ -1,6 +1,7 @@
 from skimage.io import imread
 import numpy as np
 from patchify import patchify
+from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 
@@ -36,16 +37,20 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     # Convert image to have 3 channels, add 1 channels to the masks and convert both to type np.float32
     
     train_imgs = np.stack((imgs_reshaped,)*3, axis=-1).astype(np.float32)
-    train_masks = np.expand_dims(masks_reshaped, axis=4).astype(np.float32)
-    x, y, z = np.where(train_masks != 0)
-    train_masks[x, y, z] = train_masks[x, y, z] * 10
-                                 
-    # Encode binary-like labels for each 
+    
+    # Encode labels from 0 to number of classes - 1
 
-    train_masks_cat = to_categorical(train_masks, num_classes=n_classes)
+    labelencoder = LabelEncoder()
+    n, h, w, d = masks_reshaped.shape
+    masks_flat = masks_reshaped.reshape(-1, 1)
+    encoded_masks = labelencoder.fit_transform(masks_flat)
+    encoded_masks_reshaped = encoded_masks.reshape(n, h, w, d)
+    train_masks = np.expand_dims(encoded_masks_reshaped, axis=4).astype(np.float32)
+
+    train_masks_cat = to_categorical(encoded_masks_reshaped, num_classes=n_classes)
 
     # Split dataset into training and validation sets
 
     x_train, x_val, y_train, y_val = train_test_split(train_imgs, train_masks_cat, test_size=split, random_state=0)
 
-    return x_train, x_val, y_train, y_val, train_masks
+    return x_train, x_val, y_train, y_val, encoded_masks_reshaped
