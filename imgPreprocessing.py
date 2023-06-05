@@ -26,9 +26,11 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     mask = imread(mask_path)
     mask = mask.reshape(256, 256, 256, n_classes)
     mask_channels = [[] for i in range(n_classes)]
+
     for i in range(256):
         for j in range(n_classes):
             temp_mask = mask[:,:,i,j]
+            temp_mask[temp_mask != 0] = j*(1 / (255 // 6))
             mask_channels[j].append(temp_mask)
 
     mask_channels_patches = []

@@ -80,7 +80,11 @@ def main(args):
 
         opt = Adam(args.learning_rate)
 
-        dice_loss = losses.DiceLoss(class_weights=np.array([1/6, 1/6, 1/6, 1/6, 1/6, 1/6]))
+        train_masks = np.concatenate((y_train, y_val), axis=0)
+        train_masks_flat = train_masks.reshape(-1,)
+        class_weights = compute_class_weight('balanced', classes=np.unique(train_masks_flat), y=train_masks_flat)
+
+        dice_loss = losses.DiceLoss(class_weights=class_weights)
         cat_focal_loss = losses.CategoricalFocalLoss()
         total_loss =  dice_loss + cat_focal_loss
 
