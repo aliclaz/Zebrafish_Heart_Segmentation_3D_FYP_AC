@@ -49,7 +49,7 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
             train_mask_6ch.append(cl)
         train_mask_6ch = np.stack(train_mask_6ch, axis=-1)
         train_masks_6ch.append(train_mask_6ch)
-    train_masks = np.asarray(train_masks_6ch)
+    train_masks = np.array(train_masks_6ch, dtype=np.ndarray)
     train_masks /= 255.0
 
     # Split dataset into training and validation sets
