@@ -101,7 +101,7 @@ def main(args):
         model1 = AttentionResUnet(args.backbone1, classes=n_classes, 
                                 input_shape=(patch_size, patch_size, patch_size, channels), 
                                 encoder_weights=encoder_weights, activation=activation)
-        model1.compile(optimizer=opt, loss=total_loss, metrics=m)
+        model1.compile(optimizer=opt, loss=cat_focal_loss, metrics=m)
 
     # Summarise the model architecture
 
