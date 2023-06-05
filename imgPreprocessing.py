@@ -35,9 +35,7 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     for i in range(n_classes):
         mask_channels[i] = np.array(mask_channels[i])
         mask_channel_patches = patchify(mask_channels[i], (64, 64, 64), step=64)
-        print(mask_channel_patches.shape)
-        mask_channel_patches = np.expand_dims(mask_channel_patches, axis=5)
-        print(mask_channel_patches.shape)
+        mask_channel_patches = np.expand_dims(mask_channel_patches, axis=6)
         mask_channels_patches.append(mask_channel_patches)
         if i == 0:
             mask_patches = mask_channels_patches[i]
@@ -51,7 +49,6 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     masks_reshaped = np.reshape(mask_patches, (-1, mask_patches.shape[3], mask_patches.shape[4], 
                                             mask_patches.shape[5], mask_patches.shape[6]))
     
-    print(masks_reshaped.shape)
     # Convert image to have 3 channels, add a single channel to the masks and convert both to type np.float32
     
     train_imgs = np.stack((imgs_reshaped,)*3, axis=-1).astype(np.float32)
