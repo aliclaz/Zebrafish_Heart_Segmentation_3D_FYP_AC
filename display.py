@@ -15,21 +15,21 @@ def show_history(history, model_name, backbone, out_path):
     loss = history.history['loss']
     val_loss = history.history['val_loss']
     epochs = range(1, len(loss) + 1)
-    ax[0,0].plot(epochs, loss, 'y', label='Training Loss')
-    ax[0,0].plot(epochs, val_loss, 'r', label='Validation Loss')
-    ax[0,0].title('Training and Validation Loss for {} with {} backbone'.format(model_name, backbone))
-    ax[0,0].xlabel('Epochs')
-    ax[0,0].ylabel('Loss')
-    ax[0,0].legend()
+    ax[0].plot(epochs, loss, 'y', label='Training Loss')
+    ax[0].plot(epochs, val_loss, 'r', label='Validation Loss')
+    ax[0].title('Training and Validation Loss for {} with {} backbone'.format(model_name, backbone))
+    ax[0].xlabel('Epochs')
+    ax[0].ylabel('Loss')
+    ax[0].legend()
 
     acc = history.history['iou_score']
     val_acc = history.history['val_iou_score']
-    ax[0,1].plot(epochs, acc, 'y', label='Training IOU')
-    ax[0,1].plot(epochs, val_acc, 'r', label='Validation IOU ')
-    ax[0,1].title('Training and Validation IOU for {} with {} backbone'.format(model_name, backbone))
-    ax[0,1].xlabel('Epochs')
-    ax[0,1].ylabel('IOU')
-    ax[0,1].legend()
+    ax[1].plot(epochs, acc, 'y', label='Training IOU')
+    ax[1].plot(epochs, val_acc, 'r', label='Validation IOU ')
+    ax[1].title('Training and Validation IOU for {} with {} backbone'.format(model_name, backbone))
+    ax[1].xlabel('Epochs')
+    ax[1].ylabel('IOU')
+    ax[1].legend()
 
     plt.savefig(out_path+'{}_history_plts.jpg')
     plt.show()

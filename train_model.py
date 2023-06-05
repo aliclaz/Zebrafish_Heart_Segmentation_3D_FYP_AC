@@ -71,8 +71,8 @@ def main(args):
         class_weights = compute_class_weight('balanced', classes=np.unique(flat_train_masks), y=flat_train_masks)
         class_weights = tf.convert_to_tensor(class_weights, dtype=tf.float32)
 
-        dice_loss = losses.DiceLoss(class_weights=class_weights)
-        cat_focal_loss = losses.CategoricalFocalLoss()
+        dice_loss = losses.DiceLoss(class_weights=class_weights, class_indexes=np.unique(flat_train_masks))
+        cat_focal_loss = losses.CategoricalFocalLoss(class_indexes=np.unique(flat_train_masks))
         total_loss =  dice_loss + cat_focal_loss
 
         m = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]
