@@ -34,6 +34,7 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     mask_channels_patches = []
     for i in range(n_classes):
         mask_channels[i] = np.array(mask_channels[i])
+        print(mask_channels[i].shape)
         mask_channel_patches = patchify(mask, (64, 64, 64), step=64)
         mask_channels_patches.append(mask_channel_patches)
         if i == 0:

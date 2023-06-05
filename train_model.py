@@ -4,11 +4,20 @@ from tensorflow import keras
 
 if __name__ == '__main__':
     import os
-    print(tf.config.list_physical_devices('GPU'))
-    gpu_use = '0, 1'
-    print('GPU use: {}'.format(gpu_use))
+    DEVICES = tf.config.list_physical_devices('GPU')
+    print(DEVICES)
+    gpu_use = [i for i in len(DEVICES)]
     os.environ['KERAS_BACKEND'] = 'tensorflow'
-    os.environ['CUDA_VISIBLE_DEVICES'] = '{}'.format(gpu_use)
+    mult_gpus = [i + 1 for i in range(len(DEVICES) - 1)]
+    if len(DEVICES) > 1:
+        for i in range(len(DEVICES)):
+            if i == 0:
+                str_gpu_use = '0'
+            else:
+                str_gpu_use = str_gpu_use + ', {}'.format(mult_gpus[i])
+    else:
+        str_gpu_use = '0'
+    os.environ['CUDA_VISIBLE_DEVICES'] = str_gpu_use
 
 import os
 import numpy as np
@@ -51,8 +60,10 @@ def main(args):
 
     x_train, x_val, y_train, y_val = load_process_imgs(img_path, mask_path, args.train_val_split, n_classes)
 
-    strategy = tf.distribute.MirroredStrategy(['GPU:0', 'GPU:1'])
+    strategy = tf.distribute.MirroredStrategy(['GPU:{}'.format(i) for i in range(len(DEVICES))])
     print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
+
+    batch_size = args.batch_size * strategy.num_replicas_in_sync
 
     with strategy.scope():
 
@@ -113,7 +124,7 @@ def main(args):
 
     # Train the model
 
-    history1 = model1.fit(x_train_prep, y_train, batch_size=args.batch_size, epochs=args.epochs, verbose=1,
+    history1 = model1.fit(x_train_prep, y_train, batch_size=batch_size, epochs=args.epochs, verbose=1,
                           steps_per_epoch=args.steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
     
     # Create lists of models, historys and backbones used
