@@ -36,7 +36,7 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
         mask_channels[i] = np.array(mask_channels[i])
         mask_channel_patches = patchify(mask_channels[i], (64, 64, 64), step=64)
         mask_channels_patches.append(mask_channel_patches)
-    mask_patches = np.stack(mask_channels_patches, axis=6)
+    mask_patches = np.stack(mask_channels_patches, axis=-1)
     print(mask_patches.shape)
 
     # Reshape each array to have shape (n_patches, height, width, depth)
