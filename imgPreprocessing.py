@@ -52,6 +52,8 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     train_masks = np.asarray(train_masks_6ch, dtype=np.float)
     train_masks /= 255.0
 
+    print(np.unique(train_masks))
+
     # Split dataset into training and validation sets
 
     x_train, x_val, y_train, y_val = train_test_split(train_imgs, train_masks, test_size=split, random_state=0)
