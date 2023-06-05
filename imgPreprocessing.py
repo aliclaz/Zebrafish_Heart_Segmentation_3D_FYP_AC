@@ -49,6 +49,7 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     masks_reshaped = np.reshape(mask_patches, (-1, mask_patches.shape[3], mask_patches.shape[4], 
                                             mask_patches.shape[5], mask_patches.shape[6]))
     
+    print(masks_reshaped.shape)
     # Convert image to have 3 channels, add a single channel to the masks and convert both to type np.float32
     
     train_imgs = np.stack((imgs_reshaped,)*3, axis=-1).astype(np.float32)
