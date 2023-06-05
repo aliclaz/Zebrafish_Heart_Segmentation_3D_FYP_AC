@@ -58,7 +58,7 @@ def main(args):
 
     # Load the training masks and images into the code and preprocess both datasets
 
-    x_train, x_val, y_train, y_val, train_masks = load_process_imgs(img_path, mask_path, args.train_val_split, n_classes)
+    x_train, x_val, y_train, y_val = load_process_imgs(img_path, mask_path, args.train_val_split, n_classes)
 
     # Initialising mirrored distribution for multi-gpu support
 
@@ -68,9 +68,6 @@ def main(args):
     batch_size = args.batch_size * strategy.num_replicas_in_sync
 
     steps_per_epoch = (len(x_train) // batch_size) // strategy.num_replicas_in_sync
-
-    train_masks_flat = train_masks.reshape(-1,)
-    class_weights = compute_class_weight('balanced', classes=np.unique(train_masks_flat), y=train_masks_flat)
 
     with strategy.scope():
 
@@ -83,7 +80,7 @@ def main(args):
 
         opt = Adam(args.learning_rate)
 
-        dice_loss = losses.DiceLoss(class_weights=class_weights)
+        dice_loss = losses.DiceLoss(class_weights=np.ones(n_classes))
         cat_focal_loss = losses.CategoricalFocalLoss()
         total_loss =  dice_loss + cat_focal_loss
 
