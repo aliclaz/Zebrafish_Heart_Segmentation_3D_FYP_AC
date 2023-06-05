@@ -49,7 +49,7 @@ def main(args):
 
     # Load the training masks and images into the code and preprocess both datasets
 
-    x_train, x_val, y_train, y_val = load_process_imgs(img_path, mask_path, args.train_val_split)
+    x_train, x_val, y_train, y_val = load_process_imgs(img_path, mask_path, args.train_val_split, n_classes)
 
     strategy = tf.distribute.MirroredStrategy(['GPU:0', 'GPU:1'])
     print('Number of devices: {}'.format(strategy.num_replicas_in_sync))

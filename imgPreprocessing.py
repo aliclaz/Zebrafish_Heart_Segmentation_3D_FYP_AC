@@ -24,19 +24,30 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     img_patches = patchify(image, (64, 64, 64), step=64)
 
     mask = imread(mask_path)
-    mask_patches = patchify(mask, (64, 64, 64), step=64)
+    mask = mask.reshape(256, 256, 256, n_classes)
+    mask_channels = [[] for i in range(n_classes)]
+    for i in range(256):
+        for j in range(n_classes):
+            temp_mask = mask[:,:,i,j]
+            mask_channels[j].append(temp_mask)
+    for i in range(n_classes):
+        mask_channels[i] = np.array(mask_channels[i])
+        if i == 0:
+            mask = mask_channels[i]
+        else:
+            mask = np.concatenate((mask, mask_channels[i])).astype(np.float32)
+    mask_patches = patchify(mask, (64, 64, 64, n_classes), step=64)
 
     # Reshape each array to have shape (n_patches, height, width, depth)
 
     imgs_reshaped = np.reshape(img_patches, (-1, img_patches.shape[3], img_patches.shape[4], 
                                             img_patches.shape[5]))
     masks_reshaped = np.reshape(mask_patches, (-1, mask_patches.shape[3], mask_patches.shape[4], 
-                                            mask_patches.shape[5]))
+                                            mask_patches.shape[5], mask_patches))
     
     # Convert image to have 3 channels, add a single channel to the masks and convert both to type np.float32
-    holder = []
+    
     train_imgs = np.stack((imgs_reshaped,)*3, axis=-1).astype(np.float32)
-    train_masks = np.expand_dims(masks_reshaped, axis=4).astype(np.float32)
     train_masks /= 255.0
 
     train_masks = to_categorical(train_masks, num_classes=n_classes)
