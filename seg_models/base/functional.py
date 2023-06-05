@@ -4,7 +4,9 @@ def _gather_channels(x, indexes, **kwargs):
     """Slice tensor along channels axis by given indexes"""
     backend = kwargs['backend']
     if backend.image_data_format() == 'channels_last':
+        print(x.shape)
         x = backend.permute_dimensions(x, (4, 0, 1, 2, 3))
+        print(x.shape)
         x = backend.gather(x, indexes)
         x = backend.permute_dimensions(x, (1, 2, 3, 4, 0))
     else:
