@@ -52,15 +52,16 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     train_masks = masks_reshaped.astype(np.float32)
     print(train_masks.shape)
 
-    train_mask_list = []
+    train_class_list = []
     train_masks_list = []
     for i in range(len(train_masks)):
         for i in range(n_classes):
-            y, x, z = np.where(train_masks[i,:,:,:,j] != 0)
-            train_mask = (j + 1)*(train_masks[i, y, x, z, j] / 6)
-            train_mask_list.append(train_mask)
-        train_masks = np.array(train_mask_list)
-        train_masks_list.append(train_masks)
+            train_class = train_masks[i,:,:,:,j]
+            y, x, z = np.where(train_class != 0)
+            train_class = (j + 1)*(train_class[y, x, z] / 6)
+            train_class_list.append(train_class)
+        train_mask = np.array(train_class_list)
+        train_masks_list.append(train_mask)
     train_masks = np.array(train_masks_list)
     train_masks /= 255.0
 
