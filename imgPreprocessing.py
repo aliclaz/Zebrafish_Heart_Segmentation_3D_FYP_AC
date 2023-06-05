@@ -30,6 +30,7 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     for i in range(256):
         for j in range(n_classes):
             temp_mask = mask[:,:,i,j]
+            print(temp_mask)
             temp_mask[temp_mask != 0] = (j + 1)*(1 / (255 // 6))
             print(np.unique(temp_mask))
             mask_channels[j].append(temp_mask)
