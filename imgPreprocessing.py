@@ -50,8 +50,7 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     
     train_imgs = np.stack((imgs_reshaped,)*3, axis=-1).astype(np.float32)
     train_masks = masks_reshaped.astype(np.float32)
-
-    train_masks = to_categorical(train_masks, num_classes=n_classes)
+    train_masks = masks_reshaped / 255.0
 
     # Split dataset into training and validation sets
 
