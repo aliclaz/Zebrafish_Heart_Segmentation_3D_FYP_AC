@@ -24,7 +24,7 @@ def val_predict(model, imgs, patch_size):
         pred = (pred > 0.5).astype(np.uint8)
         pred = np.argmax(pred, axis=4)
         val_preds.append(pred)
-    val_preds = np.array(val_preds)
+    val_preds = np.asarray(val_preds, dtype=np.ndarray)
     val_preds = val_preds.reshape(val_preds.shape[0], patch_size, patch_size, patch_size, val_preds.shape[1])
     val_preds = val_preds.astype(np.uint8)
 
@@ -46,8 +46,8 @@ def test_predict(model, backbone, in_paths, out_path, hpf):
         imgs_full_size.append(img)
         patches = patchify(img, (64, 64, 64), step=64)
         imgs.append(patches)
-    imgs_full_size = np.array(imgs_full_size)
-    imgs = np.array(imgs)
+    imgs_full_size = np.asarray(imgs_full_size, dtype=np.ndarray)
+    imgs = np.asrray(imgs, dtype=np.ndarray)
 
     # Convert full sized image to have 3 channels for display purposes
 
@@ -73,8 +73,8 @@ def test_predict(model, backbone, in_paths, out_path, hpf):
                     pred_patches.append(single_patch_pred_argmax)
         preds.append(pred_patches)
     for i in range(len(preds)):
-        preds[i] = np.array(preds[i])
-    preds = np.array(preds)
+        preds[i] = np.asarray(preds[i], dtype=np.ndarray)
+    preds = np.asarray(preds, dtype=np.ndarray)
 
     # Reshape patches to shape just after patchifying
 
@@ -90,7 +90,7 @@ def test_predict(model, backbone, in_paths, out_path, hpf):
     for i in range(len(preds_reshaped)):
         reconstructed_pred = unpatchify(preds_reshaped[i], imgs_full_size.shape)
         reconstructed_preds.append(reconstructed_pred)
-    reconstructed_preds = np.array(reconstructed_preds)
+    reconstructed_preds = np.asarray(reconstructed_preds, dtype=np.ndarray)
 
     # Convert to uint8 for opening in image viewing software
 
@@ -125,8 +125,8 @@ def predict(model, backbone, in_paths, out_path, hpf):
         imgs_256x256x256.append(img_256x256x256)
         patches = patchify(img_256x256x256, (64, 64, 64), step=64)
         imgs.append(patches)
-    imgs_256x256x256 = np.array(imgs_256x256x256)
-    imgs = np.array(imgs)
+    imgs_256x256x256 = np.asarray(imgs_256x256x256, dtype=np.ndarray)
+    imgs = np.asarray(imgs, dtype=np.ndarray)
 
     # Convert full sized image to have 3 channels for display purposes
 
@@ -152,8 +152,8 @@ def predict(model, backbone, in_paths, out_path, hpf):
                     pred_patches.append(single_patch_pred_argmax)
         preds.append(pred_patches)
     for i in range(len(preds)):
-        preds[i] = np.array(preds[i])
-    preds = np.array(preds)
+        preds[i] = np.asarray(preds[i], dtype=np.ndarray)
+    preds = np.asarray(preds, dtype=np.ndarray)
 
     # Reshape patches to shape just after patchifying
 
@@ -169,7 +169,7 @@ def predict(model, backbone, in_paths, out_path, hpf):
     for i in range(len(preds_reshaped)):
         reconstructed_pred = unpatchify(preds_reshaped[i], imgs_256x256x256.shape)
         reconstructed_preds.append(reconstructed_pred)
-    reconstructed_preds = np.array(reconstructed_preds)
+    reconstructed_preds = np.asarray(reconstructed_preds, dtype=np.ndarray)
 
     # Convert to uint8 for opening in image viewing software
 

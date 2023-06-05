@@ -34,7 +34,7 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
 
     mask_channels_patches = []
     for i in range(n_classes):
-        mask_channels[i] = np.array(mask_channels[i])
+        mask_channels[i] = np.asarray(mask_channels[i], dtype=np.ndarray)
         mask_channel_patches = patchify(mask_channels[i], (64, 64, 64), step=64)
         mask_channels_patches.append(mask_channel_patches)
     mask_patches = np.stack(mask_channels_patches, axis=-1)
@@ -59,9 +59,9 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
             y, x, z = np.where(train_class != 0)
             train_class[y, x, z] = (j + 1)*(train_class[y, x, z] / 6)
             train_class_list.append(train_class)
-        train_mask = np.asarray(train_class_list, dtype=object)
+        train_mask = np.asarray(train_class_list, dtype=np.ndarray)
         train_masks_list.append(train_mask)
-    train_masks = np.asarray(train_masks_list, dtype=object)
+    train_masks = np.asarray(train_masks_list, dtype=np.ndarray)
     train_masks /= 255.0
 
     print(train_masks)

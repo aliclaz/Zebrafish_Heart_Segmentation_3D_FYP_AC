@@ -264,7 +264,7 @@ def main(args):
 
     for i in range(len(models)):
         val_preds_each_model.append(val_predict(models[i], x_val, 64))
-    val_preds_each_model = np.array(val_preds_each_model)
+    val_preds_each_model = np.asarray(val_preds_each_model, dtype=np.ndarray)
 
     # Display the validation images, their actual masks and their masks predicted by each model at 3 slices
 
