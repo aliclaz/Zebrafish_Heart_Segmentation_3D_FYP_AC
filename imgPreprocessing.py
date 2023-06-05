@@ -24,52 +24,26 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     img_patches = patchify(image, (64, 64, 64), step=64)
 
     mask = imread(mask_path)
-    mask = mask.reshape(256, 256, 256, n_classes)
-    mask_channels = [[] for i in range(n_classes)]
-
-    for i in range(256):
-        for j in range(n_classes):
-            temp_mask = mask[:,:,i,j]
-            mask_channels[j].append(temp_mask)
-
-    mask_channels_patches = []
-    for i in range(n_classes):
-        mask_channels[i] = np.asarray(mask_channels[i], dtype=np.ndarray)
-        mask_channel_patches = patchify(mask_channels[i], (64, 64, 64), step=64)
-        mask_channels_patches.append(mask_channel_patches)
-    mask_patches = np.stack(mask_channels_patches, axis=-1)
+    mask_patches = patchify(mask, (64, 64, 64), step=64)
 
     # Reshape each array to have shape (n_patches, height, width, depth)
 
     imgs_reshaped = np.reshape(img_patches, (-1, img_patches.shape[3], img_patches.shape[4], 
                                             img_patches.shape[5]))
     masks_reshaped = np.reshape(mask_patches, (-1, mask_patches.shape[3], mask_patches.shape[4], 
-                                            mask_patches.shape[5], mask_patches.shape[6]))
+                                            mask_patches.shape[5]))
     
     # Convert image to have 3 channels, add a single channel to the masks and convert both to type np.float32
     
     train_imgs = np.stack((imgs_reshaped,)*3, axis=-1).astype(np.float32)
+    train_masks = np.expand_dims(masks_reshaped, axis=4)
     train_masks = masks_reshaped.astype(np.float32)
-
-    train_class_list = []
-    train_masks_list = []
-    for i in range(len(train_masks)):
-        for i in range(n_classes):
-            train_class = train_masks[i,:,:,:,j]
-            y, x, z = np.where(train_class != 0)
-            train_class[y, x, z] = (j + 1)*(train_class[y, x, z] / 6)
-            train_class_list.append(train_class)
-        train_mask = np.asarray(train_class_list, dtype=np.ndarray)
-        train_masks_list.append(train_mask)
-    train_masks = np.asarray(train_masks_list, dtype=np.ndarray)
     train_masks /= 255.0
 
-    print(train_masks)
-
-    print(np.unique(train_masks))
+    train_masks_cat = to_categorical()
 
     # Split dataset into training and validation sets
 
-    x_train, x_val, y_train, y_val = train_test_split(train_imgs, train_masks, test_size=split, random_state=0)
+    x_train, x_val, y_train, y_val = train_test_split(train_imgs, train_masks_cat, test_size=split, random_state=0)
 
-    return x_train, x_val, y_train, y_val
+    return x_train, x_val, y_train, y_val, train_masks

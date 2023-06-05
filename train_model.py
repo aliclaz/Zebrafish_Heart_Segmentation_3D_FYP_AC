@@ -58,7 +58,7 @@ def main(args):
 
     # Load the training masks and images into the code and preprocess both datasets
 
-    x_train, x_val, y_train, y_val = load_process_imgs(img_path, mask_path, args.train_val_split, n_classes)
+    x_train, x_val, y_train, y_val, train_masks = load_process_imgs(img_path, mask_path, args.train_val_split, n_classes)
 
     # Initialising mirrored distribution for multi-gpu support
 
@@ -69,11 +69,8 @@ def main(args):
 
     steps_per_epoch = (len(x_train) // batch_size) // strategy.num_replicas_in_sync
 
-    train_masks = np.concatenate((y_train, y_val), axis=0)
     train_masks_flat = train_masks.reshape(-1,)
-    print(np.unique(train_masks_flat))
     class_weights = compute_class_weight('balanced', classes=np.unique(train_masks_flat), y=train_masks_flat)
-    print(class_weights)
 
     with strategy.scope():
 
@@ -285,11 +282,11 @@ def main(args):
     # Define the class labels for each stage of development
 
     if args.hpf == 48:
-        classes = ['Background', 'Noise', 'Endocardium', 'Atrium', 'AVC', 'Ventricle']
+        classes = ['Background', 'AVC', 'Endocardium' 'Noise', 'Atrium', 'Ventricle']
         healthy_masks = np.concatenate((y_train, y_val, test_imgs), axis=0)
         healthy_scales = [295.53, 233.31, 233.31, 246.27, 246.27]
     elif args.hpf == 36:
-        classes = ['Background', 'Endocardium', 'Noise', 'Atrium', 'Ventricle']
+        classes = ['Background', 'Endocardium', 'Atrium', 'Noise', 'Ventricle']
         healthy_masks = np.concatenate((y_train, y_val, test_imgs), axis=0)
         healthy_scales = [221.65, 221.65, 221.65, 221.65, 221.65, 221.65]
     elif args.hpf == 30:
