@@ -69,6 +69,12 @@ def main(args):
 
     steps_per_epoch = (len(x_train) // batch_size) // strategy.num_replicas_in_sync
 
+    train_masks = np.concatenate((y_train, y_val), axis=0)
+    train_masks_flat = train_masks.reshape(-1,)
+    print(np.unique(train_masks_flat))
+    class_weights = compute_class_weight('balanced', classes=np.unique(train_masks_flat), y=train_masks_flat)
+    print(class_weights)
+
     with strategy.scope():
 
         # Define model parameters
@@ -79,10 +85,6 @@ def main(args):
         channels = 3
 
         opt = Adam(args.learning_rate)
-
-        train_masks = np.concatenate((y_train, y_val), axis=0)
-        train_masks_flat = train_masks.reshape(-1,)
-        class_weights = compute_class_weight('balanced', classes=np.unique(train_masks_flat), y=train_masks_flat)
 
         dice_loss = losses.DiceLoss(class_weights=class_weights)
         cat_focal_loss = losses.CategoricalFocalLoss()
