@@ -6,7 +6,7 @@ from tensorflow import keras
 if __name__ == '__main__':
     import os
     print(tf.config.list_physical_devices('GPU'))
-    gpu_use = 0
+    gpu_use = '0, 1'
     print('GPU use: {}'.format(gpu_use))
     os.environ['KERAS_BACKEND'] = 'tensorflow'
     os.environ['CUDA_VISIBLE_DEVICES'] = '{}'.format(gpu_use)
@@ -71,8 +71,8 @@ def main(args):
         class_weights = compute_class_weight('balanced', classes=np.unique(flat_train_masks), y=flat_train_masks)
         class_weights = tf.convert_to_tensor(class_weights, dtype=tf.float32)
 
-        dice_loss = losses.DiceLoss(class_weights=class_weights, class_indexes=np.unique(flat_train_masks))
-        cat_focal_loss = losses.CategoricalFocalLoss(class_indexes=np.unique(flat_train_masks))
+        dice_loss = losses.DiceLoss(class_weights=class_weights)
+        cat_focal_loss = losses.CategoricalFocalLoss()
         total_loss =  dice_loss + cat_focal_loss
 
         m = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]

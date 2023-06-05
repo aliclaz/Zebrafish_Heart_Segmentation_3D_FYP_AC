@@ -69,7 +69,9 @@ def f_score(gt, pr, beta=1, class_weights=1, class_indexes=None, smooth=SMOOTH, 
     backend = kwargs['backend']
 
     gt, pr = gather_channels(gt, pr, indexes=class_indexes, **kwargs)
+    print(gt.shape, pr.shape)
     pr = round_if_needed(pr, threshold, **kwargs)
+    print(pr.shape)
     axes = get_reduce_axes(per_image, **kwargs)
 
     # calculate score
