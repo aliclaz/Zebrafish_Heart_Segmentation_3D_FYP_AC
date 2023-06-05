@@ -6,7 +6,7 @@ if __name__ == '__main__':
     import os
     DEVICES = tf.config.list_physical_devices('GPU')
     print(DEVICES)
-    gpu_use = [i for i in len(DEVICES)]
+    gpu_use = [i for i in range(len(DEVICES))]
     os.environ['KERAS_BACKEND'] = 'tensorflow'
     mult_gpus = [i + 1 for i in range(len(DEVICES) - 1)]
     if len(DEVICES) > 1:
