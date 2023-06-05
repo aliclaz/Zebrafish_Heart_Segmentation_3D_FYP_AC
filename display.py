@@ -181,7 +181,7 @@ def disp_3D_val(val_imgs, val_masks, all_val_preds, model_names, classes, out_pa
             ax.set_title('Predicted Mask by {}'.format(model_names[j]))
             val_pred = all_val_preds[j,i].reshape(all_val_preds[j,i].shape[0], all_val_preds[j,i].shape[1], all_val_preds[j,i].shape[2])
             y, x, z = np.where(val_pred != 0)
-            colours = val_pred[x, y, z]
+            colours = val_pred[y, x, z]
             colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
             greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
             ax.scatter(x, y, z, c=greyscale_colours, markers='s', s=cube_size**2)
