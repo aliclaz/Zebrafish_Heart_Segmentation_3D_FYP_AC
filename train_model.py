@@ -60,10 +60,14 @@ def main(args):
 
     x_train, x_val, y_train, y_val = load_process_imgs(img_path, mask_path, args.train_val_split, n_classes)
 
+    # Initialising mirrored distribution for multi-gpu support
+
     strategy = tf.distribute.MirroredStrategy(['GPU:{}'.format(i) for i in range(len(DEVICES))])
     print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
 
     batch_size = args.batch_size * strategy.num_replicas_in_sync
+
+    steps_per_epoch = (len(x_train) // batch_size) // strategy.num_replicas_in_sync
 
     with strategy.scope():
 
@@ -75,10 +79,6 @@ def main(args):
         channels = 3
 
         opt = Adam(args.learning_rate)
-
-        train_masks = np.concatenate((y_train, y_val), axis=0)
-        flat_train_masks = train_masks.reshape(-1)
-        class_weights = compute_class_weight('balanced', classes=np.unique(flat_train_masks), y=flat_train_masks)
 
         dice_loss = losses.DiceLoss(class_weights=class_weights)
         cat_focal_loss = losses.CategoricalFocalLoss()
@@ -125,7 +125,7 @@ def main(args):
     # Train the model
 
     history1 = model1.fit(x_train_prep, y_train, batch_size=batch_size, epochs=args.epochs, verbose=1,
-                          steps_per_epoch=args.steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
+                          steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
     
     # Create lists of models, historys and backbones used
 
@@ -180,7 +180,7 @@ def main(args):
     # Train the model
 
     history2 = model2.fit(x_train_prep, y_train, batch_size=args.batch_size, epochs=args.epochs, verbose=1,
-                          steps_per_epoch=args.steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
+                          steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
     
     # Create lists of models, historys and backbones used
 
@@ -232,7 +232,7 @@ def main(args):
     # Train the model
 
     history3 = model3.fit(x_train_prep, y_train, batch_size=8, epochs=100, verbose=1,
-                          steps_per_epoch=args.steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
+                          steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
     
     # Create lists of models, git historys and backbones used
 
@@ -280,18 +280,15 @@ def main(args):
 
     if args.hpf == 48:
         classes = ['Background', 'Noise', 'Endocardium', 'Atrium', 'AVC', 'Ventricle']
-        train_masks = np.expand_dims(train_masks, axis=4)
-        healthy_masks = np.concatenate((train_masks, test_imgs), axis=0)
+        healthy_masks = np.concatenate((y_train, y_val, test_imgs), axis=0)
         healthy_scales = [295.53, 233.31, 233.31, 246.27, 246.27]
     elif args.hpf == 36:
         classes = ['Background', 'Endocardium', 'Noise', 'Atrium', 'Ventricle']
-        train_masks = np.expand_dims(train_masks, axis=4)
-        healthy_masks = np.concatenate((train_masks, test_imgs), axis=0)
+        healthy_masks = np.concatenate((y_train, y_val, test_imgs), axis=0)
         healthy_scales = [221.65, 221.65, 221.65, 221.65, 221.65, 221.65]
     elif args.hpf == 30:
         classes = ['Background','Endocardium', 'Linear Heart Tube', 'Noise']
-        train_masks = np.expand_dims(train_masks, axis=4)
-        healthy_masks = np.concatenate((train_masks, test_imgs), axis=0)
+        healthy_masks = np.concatenate((y_train, y_val, test_imgs), axis=0)
         healthy_scales = [221.65, 221.65]
 
     # Calculate the means, standard deviations and confidence intervals of the volume of each class
@@ -306,7 +303,6 @@ if __name__ == '__main__':
     parser.add_argument('--train_val_split', type=float, help='determines size of validation set')
     parser.add_argument('--learning_rate', type=float, help='learning rate used in training of models', required=True)
     parser.add_argument('--batch_size', type=int, help='size of the batch used to train the model during an epoch', required=True)
-    parser.add_argument('--steps_per_epoch', type=int, help='number of times per epoch the batch is trained on', required=True)
     parser.add_argument('--epochs', type=int, help='number of epochs used in training', required=True)
     parser.add_argument('--backbone1', type=str, help='pretrained backbone for AttentionResUnet model', required=True)
     parser.add_argument('--backbone2', type=str, help='pretrained backbone for AttentionUnet model', required=True)
