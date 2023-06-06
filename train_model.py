@@ -83,12 +83,11 @@ def main(args):
 
         opt = Adam(args.learning_rate)
 
-        dice_loss = losses.DiceLoss(class_weights=class_weights, per_image=True)
+        dice_loss = losses.DiceLoss()
         cat_focal_loss = losses.CategoricalFocalLoss()
         total_loss =  dice_loss + cat_focal_loss
 
-        m = [metrics.IOUScore(threshold=0.5, class_weights=class_weights, per_image=True),
-             metrics.FScore(threshold=0.5, class_weights=class_weights, per_image=True)]
+        m = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]
 
         # Preprocess input data with defined backbone
 
