@@ -4,11 +4,11 @@ from __future__ import print_function
 
 import os
 from .. import get_submodules_from_kwargs
-from tensorflow.keras.applications import imagenet_utils
+from tensorflow.keras.applications import vgg16
 from .weights import load_model_weights
 
 def preprocess_input(x, **kwargs):
-    x = imagenet_utils.preprocess_input(x)
+    x = vgg16.preprocess_input(x)
 
     return x
 
