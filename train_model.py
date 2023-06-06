@@ -68,9 +68,6 @@ def main(args):
 
     steps_per_epoch = (len(x_train) // batch_size) // strategy.num_replicas_in_sync
 
-    indice_encoded_masks_flat = indice_encoded_masks.reshape(-1,)
-    class_weights = compute_class_weight('balanced', classes=np.unique(indice_encoded_masks_flat), y=indice_encoded_masks_flat)
-
     with strategy.scope():
 
         # Define model parameters
