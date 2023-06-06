@@ -70,7 +70,7 @@ def VGG16(include_top=False, weights='imagenet', input_tensor=None, input_shape=
             x = layers.Conv3D(init_filters, (3, 3, 3), activation='relu', padding='same', 
                               name='block{}_conv{}'.format(stage + 1, i + 1))(x)
             
-        x = layers.MaxPooling3D(stride_size[stage], strides=stride_size[stage], name='block{}_pool'.format(stage + 1))
+        x = layers.MaxPooling3D(stride_size[stage], strides=stride_size[stage], name='block{}_pool'.format(stage + 1))(x)
 
         init_filters *= 2
         if init_filters > max_filters:
