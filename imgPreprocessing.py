@@ -47,7 +47,7 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     encoded_masks_reshaped = encoded_masks.reshape(n, h, w, d)
     train_masks = np.expand_dims(encoded_masks_reshaped, axis=4).astype(np.float32)
 
-    train_masks_cat = to_categorical(encoded_masks_reshaped, num_classes=n_classes)
+    train_masks_cat = to_categorical(train_masks, num_classes=n_classes)
 
     # Split dataset into training and validation sets
 
