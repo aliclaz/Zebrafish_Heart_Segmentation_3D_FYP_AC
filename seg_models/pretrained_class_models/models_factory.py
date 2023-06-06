@@ -8,7 +8,7 @@ class ModelsFactory:
         'resnet18': [rn.ResNet18, rn.preprocess_input],
         'resnet34': [rn.ResNet34, rn.preprocess_input],
         'resnet50': [rn.ResNet50, rn.preprocess_input],
-        'vgg16': [vgg16.VGG16, vgg16.preprocess_input]
+        'vgg16': [vgg16.VGG16, vgg16.ppi]
     }
 
     @property
