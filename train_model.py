@@ -71,6 +71,7 @@ def main(args):
 
     train_masks_flat = train_masks.reshape(-1,)
     class_weights = compute_class_weight('balanced', classes=np.unique(train_masks_flat), y=train_masks_flat)
+    dict_cw = dict(zip(np.unique(train_masks), class_weights))
 
     with strategy.scope():
 
@@ -127,7 +128,7 @@ def main(args):
 
     # Train the model
 
-    history1 = model1.fit(x_train_prep, y_train, batch_size=batch_size, epochs=args.epochs, verbose=1,
+    history1 = model1.fit(x_train_prep, y_train, batch_size=batch_size, epochs=args.epochs, verbose=1, class_weight=dict_cw
                           steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
     
     # Create lists of models, historys and backbones used
