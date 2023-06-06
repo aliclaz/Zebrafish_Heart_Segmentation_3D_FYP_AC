@@ -60,7 +60,7 @@ def main(args):
 
     x_train, x_val, y_train, y_val, indice_encoded_masks = load_process_imgs(img_path, mask_path, args.train_val_split, n_classes)
 
-    # Initialising mirrored distribution for multi-gpu support
+    # Initialising mirrored distribution for multi-gpu support and adjust batch size and steps per epoch accordingly
 
     strategy = tf.distribute.MirroredStrategy(['GPU:{}'.format(i) for i in range(len(DEVICES))])
     print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
