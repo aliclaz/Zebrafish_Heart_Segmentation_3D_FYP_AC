@@ -97,7 +97,8 @@ def main(args):
         model1 = AttentionResUnet(args.backbone1, classes=n_classes, 
                                 input_shape=(patch_size, patch_size, patch_size, channels), 
                                 encoder_weights=encoder_weights, activation=activation)
-        model1.compile(optimizer=opt, loss=total_loss, metrics=m, run_eagerly=True)
+    
+    model1.compile(optimizer=opt, loss=total_loss, metrics=m, run_eagerly=True)
 
     # Summarise the model architecture
 
@@ -167,7 +168,8 @@ def main(args):
         model2 = AttentionUnet(args.backbone2, classes=n_classes, 
                             input_shape=(patch_size, patch_size, patch_size, channels), 
                             encoder_weights=encoder_weights, activation=activation)
-        model2.compile(optimizer=opt, loss=total_loss, metrics=m)
+    
+    model2.compile(optimizer=opt, loss=total_loss, metrics=m)
 
     # Summarise the model architecture
 
@@ -208,6 +210,21 @@ def main(args):
 
     with strategy.scope():
 
+        # Define model parameters
+
+        encoder_weights = 'imagenet'
+        activation = 'softmax'
+        patch_size = 64
+        channels = 3
+
+        opt = Adam(args.learning_rate)
+
+        dice_loss = losses.DiceLoss()
+        cat_focal_loss = losses.CategoricalFocalLoss()
+        total_loss =  dice_loss + cat_focal_loss
+
+        m = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]
+
         # Preprocess input data with defined backbone
 
         preprocess_input3 = get_preprocessing(args.backbone2)
@@ -220,7 +237,8 @@ def main(args):
         model3 = Unet(args.backbone3, classes=n_classes, 
                                     input_shape=(patch_size, patch_size, patch_size, channels), 
                                     encoder_weights=encoder_weights, activation=activation)
-        model3.compile(optimizer=opt, loss=total_loss, metrics=m)
+    
+    model3.compile(optimizer=opt, loss=total_loss, metrics=m)
 
     # Summarise the model architecture
 
