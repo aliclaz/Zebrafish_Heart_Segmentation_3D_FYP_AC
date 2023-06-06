@@ -52,14 +52,15 @@ def VGG16(include_top=False, weights='imagenet', input_tensor=None, input_shape=
         if type(stride_size[i]) not in (tuple, list):
             stride_size[i] = (stride_size[i], stride_size[i], stride_size[i])
 
-    print(backend.is_keras_tensor(input_tensor))
     if input_tensor is None:
         input_img = layers.Input(shape=input_shape)
     else:
         if not backend.is_keras_tensor(input_tensor):
             input_img = layers.Input(tensor=input_tensor, shape=input_shape)
+            print(type(input_img))
         else:
             input_img = input_tensor
+            print(type(input_img))
 
     x = input_img
     print(type(x))
