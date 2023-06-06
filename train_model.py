@@ -144,6 +144,7 @@ def main(args):
 
         preprocess_input2 = get_preprocessing(args.backbone2)
         x_train_prep2 = preprocess_input2(x_train)
+        x_train_prep2.dtype
         x_val_prep2 = preprocess_input2(x_val)
 
         # Define model - using AttentionUnet with a vgg16 backbone and 
