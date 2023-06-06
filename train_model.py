@@ -140,6 +140,21 @@ def main(args):
 
     with strategy.scope():
 
+        # Define model parameters
+
+        encoder_weights = 'imagenet'
+        activation = 'softmax'
+        patch_size = 64
+        channels = 3
+
+        opt = Adam(args.learning_rate)
+
+        dice_loss = losses.DiceLoss()
+        cat_focal_loss = losses.CategoricalFocalLoss()
+        total_loss =  dice_loss + cat_focal_loss
+
+        m = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]
+
         # Preprocess input data with defined backbone
 
         preprocess_input2 = get_preprocessing(args.backbone2)
