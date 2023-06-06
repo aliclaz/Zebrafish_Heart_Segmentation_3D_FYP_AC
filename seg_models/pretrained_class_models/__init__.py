@@ -1,4 +1,4 @@
-import tensroflow.keras.applications as ka
+import tensorflow.keras.applications as ka
 from .__version__ import __version__
 
 
