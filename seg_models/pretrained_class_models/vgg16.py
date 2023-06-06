@@ -9,8 +9,6 @@ from .weights import load_model_weights
 
 x = imagenet_utils.preprocess_input(x, mode='tf')
 
-    return x
-
 def VGG16(include_top=False, weights='imagenet', input_tensor=None, input_shape=None, pooling=None, classes=1000, stride_size=2, 
           init_filters=64, max_filters=512, repetitions=(2, 2, 3, 3, 3), **kwargs):
     
