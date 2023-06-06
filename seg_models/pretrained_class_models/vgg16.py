@@ -61,6 +61,7 @@ def VGG16(include_top=False, weights='imagenet', input_tensor=None, input_shape=
             input_img = input_tensor
 
     x = input_img
+    print(type(x))
 
     for stage, rep in enumerate(repetitions):
         for i in range(rep):

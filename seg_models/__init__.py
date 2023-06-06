@@ -102,7 +102,7 @@ from .default_seg_models.def_unet import defUnet
 from .pretrained_seg_models.atten_unet import AttentionUnet as _AttentionUnet
 from .default_seg_models.def_atten_unet import defAttentionUnet
 from .pretrained_seg_models.atten_res_unet import AttentionResUnet as _AttentionResUnet
-from .default_seg_models.def_atten_res_unet import defAttentionResUnet
+from .default_seg_models.def_atten_res_unet import defAttentionResUnet 
 
 Unet = inject_global_submodules(_Unet)
 AttentionUnet = inject_global_submodules(_AttentionUnet)
@@ -116,5 +116,5 @@ def get_preprocessing(name):
 
     return preprocess_input
     
-__all__ = ['get_submodules_from_kwargs', 'Unet', 'defUnet', 'AttentionUnet', 'defAttentionUnet', 'AttentionResUnet', 'set_framework',
-           'framework', 'get_preprocessing', 'get_available_backbone_names', 'utils']
+__all__ = ['get_submodules_from_kwargs', 'Unet', 'defUnet', 'AttentionUnet', 'defAttentionUnet', 'AttentionResUnet', 
+           , 'defAttentionResUnet', 'set_framework', 'framework', 'get_preprocessing', 'get_available_backbone_names', 'utils']
