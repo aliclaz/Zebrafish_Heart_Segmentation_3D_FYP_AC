@@ -128,7 +128,7 @@ def main(args):
 
     # Train the model
 
-    history1 = model1.fit(x_train_prep, y_train, batch_size=batch_size, epochs=args.epochs, verbose=1, class_weight=dict_cw
+    history1 = model1.fit(x_train_prep, y_train, batch_size=batch_size, epochs=args.epochs, verbose=1, class_weight=dict_cw,
                           steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
     
     # Create lists of models, historys and backbones used
