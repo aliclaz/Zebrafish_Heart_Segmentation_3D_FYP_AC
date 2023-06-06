@@ -88,8 +88,8 @@ def main(args):
         # Preprocess input data with defined backbone
 
         preprocess_input1 = get_preprocessing(args.backbone1)
-        x_train_prep = preprocess_input1(x_train)
-        x_val_prep = preprocess_input1(x_val)
+        x_train_prep1 = preprocess_input1(x_train)
+        x_val_prep1 = preprocess_input1(x_val)
 
         # Define model - using AttentionResUnet with a resnet34 backbone and 
         # pretrained weights
@@ -123,8 +123,8 @@ def main(args):
 
     # Train the model
 
-    history1 = model1.fit(x_train_prep, y_train, batch_size=batch_size, epochs=args.epochs, verbose=1,
-                          steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
+    history1 = model1.fit(x_train_prep1, y_train, batch_size=batch_size, epochs=args.epochs, verbose=1,
+                          steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep1, y_val), callbacks=cbs)
     
     # Create lists of models, historys and backbones used
 
@@ -143,8 +143,8 @@ def main(args):
         # Preprocess input data with defined backbone
 
         preprocess_input2 = get_preprocessing(args.backbone2)
-        x_train_prep = preprocess_input2(x_train)
-        x_val_prep = preprocess_input2(x_val)
+        x_train_prep2 = preprocess_input2(x_train)
+        x_val_prep2 = preprocess_input2(x_val)
 
         # Define model - using AttentionUnet with a vgg16 backbone and 
         # pretrained weights
@@ -178,8 +178,8 @@ def main(args):
 
     # Train the model
 
-    history2 = model2.fit(x_train_prep, y_train, batch_size=args.batch_size, epochs=args.epochs, verbose=1,
-                          steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
+    history2 = model2.fit(x_train_prep2, y_train, batch_size=args.batch_size, epochs=args.epochs, verbose=1,
+                          steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep2, y_val), callbacks=cbs)
     
     # Create lists of models, historys and backbones used
 
@@ -195,9 +195,9 @@ def main(args):
 
         # Preprocess input data with defined backbone
 
-        preprocess_input2 = get_preprocessing(args.backbone2)
-        x_train_prep = preprocess_input2(x_train)
-        x_val_prep = preprocess_input2(x_val)
+        preprocess_input3 = get_preprocessing(args.backbone2)
+        x_train_prep3 = preprocess_input2(x_train)
+        x_val_prep3 = preprocess_input2(x_val)
 
         # Define model - using Unet with a vgg16 backbone and 
         # pretrained weights
@@ -230,8 +230,8 @@ def main(args):
 
     # Train the model
 
-    history3 = model3.fit(x_train_prep, y_train, batch_size=8, epochs=100, verbose=1,
-                          steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
+    history3 = model3.fit(x_train_prep3, y_train, batch_size=8, epochs=100, verbose=1,
+                          steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep3, y_val), callbacks=cbs)
     
     # Create lists of models, git historys and backbones used
 

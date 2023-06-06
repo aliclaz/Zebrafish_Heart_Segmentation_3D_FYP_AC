@@ -7,8 +7,7 @@ from .. import get_submodules_from_kwargs
 from tensorflow.keras.applications import imagenet_utils
 from .weights import load_model_weights
 
-def preprocess_input(x, **kwargs):
-    x = imagenet_utils.preprocess_input(x, mode='tf')
+x = imagenet_utils.preprocess_input(x, mode='tf')
 
     return x
 
