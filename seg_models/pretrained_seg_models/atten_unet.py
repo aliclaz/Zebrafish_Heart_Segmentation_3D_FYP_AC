@@ -66,7 +66,7 @@ def AttentionBlock(inter_shape, use_batchnorm, name=None):
                                        shape_x[3] // shape_sigmoid[3]), name=name, **kwargs)(sigmoid_xg)
         upsample_psi = RepeatElement(upsample_psi, shape_x[4])
 
-        y = Mult(**kwargs, name=name)([upsample_psi, skip_connection])
+        y = Mult(**kwargs, name=name)(upsample_psi, skip_connection)
 
         result = Conv3DBn(shape_x[4], (1, 1, 1), kernel_intitializer='he_normal', padding='same', use_batchnorm=True, 
                           name=conv4_name, **kwargs)(y)
