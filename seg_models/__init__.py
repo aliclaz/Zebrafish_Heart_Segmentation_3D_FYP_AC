@@ -117,4 +117,4 @@ def get_preprocessing(name):
     return preprocess_input
     
 __all__ = ['get_submodules_from_kwargs', 'Unet', 'defUnet', 'AttentionUnet', 'defAttentionUnet', 'AttentionResUnet', 
-           , 'defAttentionResUnet', 'set_framework', 'framework', 'get_preprocessing', 'get_available_backbone_names', 'utils']
+           'defAttentionResUnet', 'set_framework', 'framework', 'get_preprocessing', 'get_available_backbone_names', 'utils']
