@@ -4,15 +4,7 @@ def _gather_channels(x, indexes, **kwargs):
     """Slice tensor along channels axis by given indexes"""
     backend = kwargs['backend']
     if backend.image_data_format() == 'channels_last':
-        print(x.shape)
-        x = backend.permute_dimensions(x, (4, 0, 1, 2, 3))
-        print(x.shape)
-        x = backend.gather(x, indexes)
-        x = backend.permute_dimensions(x, (1, 2, 3, 4, 0))
-    else:
-        x = backend.permute_dimensions(x, (1, 0, 2, 3, 4))
-        x = backend.gather(x, indexes)
-        x = backend.permute_dimensions(x, (1, 0, 2, 3, 4))
+        x = backend.permute_dimensions(x, (4, 1, 2, 3, 0))
 
     return x
 
@@ -96,3 +88,7 @@ def categorical_focal_loss(gt, pr, gamma=2.0, alpha=0.25, class_indexes=None, **
     loss = - gt * (alpha * backend.pow((1 - pr), gamma) * backend.log(pr))
 
     return backend.mean(loss)
+
+def tversky_index(gt, pr, class_weights=1, class_indexes=None, smooth=SMOOTH, per_image=False,
+                  threshold=None, **kwargs):
+    gt, pr = gather_channels

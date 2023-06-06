@@ -1,5 +1,6 @@
 from .base import Metric
 from .base import functional as F
+from . import get_submodules_from_kwargs
 
 SMOOTH = 1e-5
 
