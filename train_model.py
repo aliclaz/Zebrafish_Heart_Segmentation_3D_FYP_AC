@@ -98,7 +98,7 @@ def main(args):
                                 input_shape=(patch_size, patch_size, patch_size, channels), 
                                 encoder_weights=encoder_weights, activation=activation)
     
-    model1.compile(optimizer=opt, loss=total_loss, metrics=m, run_eagerly=True)
+    model1.compile(optimizer=opt, loss=total_loss, metrics=m)
 
     # Summarise the model architecture
 
