@@ -1,11 +1,20 @@
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+
 import matplotlib
-matplotlib.use('GTK')
+from matplotlib.backends.backend_gtk3agg import (FigureCanvasGTK3Agg as FigureCanvas)
 from matplotlib import pyplot as plt
 import numpy as np
 import matplotlib.patches as mpatches
 from mpl_toolkits.mplot3d import Axes3D
 
 def show_history(history, model_name, backbone, out_path):
+
+    win = Gtk.Window()
+    win.connect('delete-event', Gtk.main_quit)
+    win.set_default_size(400, 300)
+    win.set_title('Training and Validation Losses and IOU Scores for ' + model_name + ' with {} backbone'.format(backbone))
 
     # Plot training and validation loss and accuracy at each epoch for certain model
     # Model and backbone are the names of the model and backbone used
@@ -32,7 +41,17 @@ def show_history(history, model_name, backbone, out_path):
     ax[1].legend()
 
     plt.savefig(out_path+model_name+'_history_plts.jpg')
-    plt.show()
+    
+    sw = Gtk.ScrolledWindow()
+    win.add(sw)
+    sw.set_border_width(10)
+
+    canvas = FigureCanvas(fig)
+    canvas.set_size_request(800, 600)
+    sw.add(canvas)
+
+    win.show_all()
+    Gtk.main()
 
 def show_all_historys(historys, model_names, backbones, out_path):
 
