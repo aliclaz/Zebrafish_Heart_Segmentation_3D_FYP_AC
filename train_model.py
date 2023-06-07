@@ -93,7 +93,7 @@ def main(args):
         # Define model - using AttentionResUnet with a resnet34 backbone and 
         # pretrained weights
 
-        model1 = AttentionResUnet(args.backbone1, classes=n_classes, 
+        model1 = AttentionResUnet(args.backbone1, classes=n_classes, dropout=args.dropout1,
                                 input_shape=(patch_size, patch_size, patch_size, channels), 
                                 encoder_weights=encoder_weights, activation=activation)
     
@@ -164,7 +164,7 @@ def main(args):
         # Define model - using AttentionUnet with a vgg16 backbone and 
         # pretrained weights
 
-        model2 = AttentionUnet(args.backbone2, classes=n_classes, 
+        model2 = AttentionUnet(args.backbone2, classes=n_classes, dropout=args.dropout2,
                             input_shape=(patch_size, patch_size, patch_size, channels), 
                             encoder_weights=encoder_weights, activation=activation)
     
@@ -233,9 +233,9 @@ def main(args):
         # Define model - using Unet with a vgg16 backbone and 
         # pretrained weights
 
-        model3 = Unet(args.backbone3, classes=n_classes, 
-                                    input_shape=(patch_size, patch_size, patch_size, channels), 
-                                    encoder_weights=encoder_weights, activation=activation)
+        model3 = Unet(args.backbone3, classes=n_classes, dropout=args.dropout3,
+                      input_shape=(patch_size, patch_size, patch_size, channels), 
+                      encoder_weights=encoder_weights, activation=activation)
     
     model3.compile(optimizer=opt, loss=total_loss, metrics=m)
 
@@ -336,8 +336,11 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, help='size of the batch used to train the model during an epoch', required=True)
     parser.add_argument('--epochs', type=int, help='number of epochs used in training', required=True)
     parser.add_argument('--backbone1', type=str, help='pretrained backbone for AttentionResUnet model', required=True)
+    parser.add_argument('--dropout1', type=float, help='degree of dropout used in AttentionResUnet model', default=None)
     parser.add_argument('--backbone2', type=str, help='pretrained backbone for AttentionUnet model', required=True)
+    parser.add_argument('--dropout2', type=float, help='degree of dropout used in AttentionUnet model', default=None)
     parser.add_argument('--backbone3', type=str, help='pretrained backbone for Unet model', required=True)
+    parser.add_argument('--dropout3', type=float, help='degree of dropout used in Unet model', default=None)
 
     args = parser.parse_args()
 
