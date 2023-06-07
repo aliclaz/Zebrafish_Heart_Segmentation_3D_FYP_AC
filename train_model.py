@@ -9,7 +9,7 @@ if __name__ == '__main__':
     gpu_use = [i for i in range(len(DEVICES))]
     os.environ['KERAS_BACKEND'] = 'tensorflow'
     if len(DEVICES) > 1:
-        for i in range(len(DEVICES) - 1):
+        for i in range(len(DEVICES)):
             if i == 0:
                 str_gpu_use = '0'
             else:
@@ -65,7 +65,7 @@ def main(args):
 
     batch_size = args.batch_size * strategy.num_replicas_in_sync
 
-    steps_per_epoch = (len(x_train) // batch_size) // strategy.num_replicas_in_sync
+    steps_per_epoch = (len(x_train) // batch_size) * strategy.num_replicas_in_sync
 
     with strategy.scope():
 
