@@ -11,11 +11,6 @@ from mpl_toolkits.mplot3d import Axes3D
 
 def show_history(history, model_name, backbone, out_path):
 
-    win = Gtk.Window()
-    win.connect('delete-event', Gtk.main_quit)
-    win.set_default_size(400, 300)
-    win.set_title('Training and Validation Losses and IOU Scores for ' + model_name + ' with {} backbone'.format(backbone))
-
     # Plot training and validation loss and accuracy at each epoch for certain model
     # Model and backbone are the names of the model and backbone used
 
@@ -41,24 +36,9 @@ def show_history(history, model_name, backbone, out_path):
     ax[1].legend()
 
     plt.savefig(out_path+model_name+'_history_plts.jpg')
-    
-    sw = Gtk.ScrolledWindow()
-    win.add(sw)
-    sw.set_border_width(10)
-
-    canvas = FigureCanvas(fig)
-    canvas.set_size_request(800, 600)
-    sw.add(canvas)
-
-    win.show_all()
-    Gtk.main()
+    plt.show()
 
 def show_all_historys(historys, model_names, backbones, out_path):
-
-    win1 = Gtk.Window()
-    win1.connect('delete-event', Gtk.main_quit)
-    win1.set_default_size(400, 300)
-    win1.set_title('Training and Validation Losses and IOU Scores for each Model')
 
     # Plot training and validation loss and accuracy at each epoch for each model
     # historys, models and backbones are lists of the history, model name and backbone name of each model
@@ -86,23 +66,7 @@ def show_all_historys(historys, model_names, backbones, out_path):
         ax[i,1].legend()
     plt.savefig(out_path+'all_model_history_plots.jpg')
 
-    sw = Gtk.ScrolledWindow()
-    win1.add(sw)
-    sw.set_border_width(10)
-
-    canvas = FigureCanvas(fig)
-    canvas.set_size_request(800, 600)
-    sw.add(canvas)
-
-    win1.show_all()
-    Gtk.main()
-
 def show_val_masks(model_names, backbones, imgs, gts, preds, out_path, classes):
-
-    win2 = Gtk.Window()
-    win2.connect('delete-event', Gtk.main_quit)
-    win2.set_default_size(400, 300)
-    win2.set_title('Actual and Predicted Masks from Each Model for the Validation Set at Random Slices in the Volume')
 
     # Plot the validation images, and their actual and predicted masks for each patch from each model at 3 random slices
     # Models is an array of each model name and preds is an array containing arrays of the predicted masks from each model 
@@ -134,24 +98,9 @@ def show_val_masks(model_names, backbones, imgs, gts, preds, out_path, classes):
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
                 ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.savefig(out_path+'val_imgs_and_masks.jpg')
-    
-    sw = Gtk.ScrolledWindow()
-    win2.add(sw)
-    sw.set_border_width(10)
-
-    canvas = FigureCanvas(fig)
-    canvas.set_size_request(800, 600)
-    sw.add(canvas)
-
-    win2.show_all()
-    Gtk.main()
+    plt.show()
 
 def show_test_masks(model_names, backbones, imgs, preds, out_path, classes):
-
-    win3 = Gtk.Window()
-    win3.connect('delete-event', Gtk.main_quit)
-    win3.set_default_size(400, 300)
-    win3.set_title('Predicted Masks from Each Model for the Test Set at Random Slices in the Volume')
 
     # Plot images from the test set and their predicted masks from each model at 3 random slices
     # Models is an array of each model name and preds is an array containing arrays of the predicted masks from each model 
@@ -180,24 +129,9 @@ def show_test_masks(model_names, backbones, imgs, preds, out_path, classes):
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
                 ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.savefig(out_path+'test_imgs_and_masks.jpg')
-    
-    sw = Gtk.ScrolledWindow()
-    win3.add(sw)
-    sw.set_border_width(10)
-
-    canvas = FigureCanvas(fig)
-    canvas.set_size_request(800, 600)
-    sw.add(canvas)
-
-    win3.show_all()
-    Gtk.main()
+    plt.show()
 
 def show_pred_masks(imgs, preds, out_path, classes):
-
-    win4 = Gtk.Window()
-    win4.connect('delete-event', Gtk.main_quit)
-    win4.set_default_size(400, 300)
-    win4.set_title('Predicted Masks for the Images Entered at Random Slices in the Volume')
     
     # Plot images from the test set and their predicted masks at 3 random slices
     # Here preds is an array of predicted masks for each image, only 1 model used
@@ -223,24 +157,9 @@ def show_pred_masks(imgs, preds, out_path, classes):
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
                 ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.savefig(out_path+'pred_imgs_and_masks.jpg')
-    
-    sw = Gtk.ScrolledWindow()
-    win4.add(sw)
-    sw.set_border_width(10)
-
-    canvas = FigureCanvas(fig)
-    canvas.set_size_request(800, 600)
-    sw.add(canvas)
-
-    win4.show_all()
-    Gtk.main()
+    plt.show()
 
 def disp_3D_val(val_masks, all_val_preds, model_names, backbones, classes, out_path):
-
-    win5 = Gtk.Window()
-    win5.connect('delete-event', Gtk.main_quit)
-    win5.set_default_size(400, 300)
-    win5.set_title('Full 3D Actual and Predicted Masks from Each Model for the Validation Set')
 
     # Plot the validation actual masks and their predicted masks for each patch in the validation set, predictions from all models
 
@@ -274,24 +193,9 @@ def disp_3D_val(val_masks, all_val_preds, model_names, backbones, classes, out_p
             patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
             ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.savefig(out_path+'val_imgs_and_masks3D.jpg')
-    
-    sw = Gtk.ScrolledWindow()
-    win5.add(sw)
-    sw.set_border_width(10)
-
-    canvas = FigureCanvas(fig)
-    canvas.set_size_request(800, 600)
-    sw.add(canvas)
-
-    win5.show_all()
-    Gtk.main()
+    plt.show()
 
 def disp_3D_test(test_masks, all_test_preds, model_names, backbones, out_path, classes):
-
-    win6 = Gtk.Window()
-    win6.connect('delete-event', Gtk.main_quit)
-    win6.set_default_size(400, 300)
-    win6.set_title('Full 3D Actual and Predicted Masks from Each Model for the Validation Set')
 
     # Plot the predicted masks for each patch in the validation set, predictions from all models
 
@@ -325,14 +229,4 @@ def disp_3D_test(test_masks, all_test_preds, model_names, backbones, out_path, c
             patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
             ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.savefig(out_path+'test_imgs_and_masks3D.jpg')
-    
-    sw = Gtk.ScrolledWindow()
-    win6.add(sw)
-    sw.set_border_width(10)
-
-    canvas = FigureCanvas(fig)
-    canvas.set_size_request(800, 600)
-    sw.add(canvas)
-
-    win6.show_all()
-    Gtk.main()
+    plt.show()
