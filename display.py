@@ -1,9 +1,3 @@
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
-
-import matplotlib
-from matplotlib.backends.backend_gtk3agg import (FigureCanvasGTK3Agg as FigureCanvas)
 from matplotlib import pyplot as plt
 import numpy as np
 import matplotlib.patches as mpatches
@@ -21,7 +15,7 @@ def show_history(history, model_name, backbone, out_path):
     epochs = range(1, len(loss) + 1)
     ax[0].plot(epochs, loss, 'y', label='Training Loss')
     ax[0].plot(epochs, val_loss, 'r', label='Validation Loss')
-    ax[0].set_title('Training and Validation Loss for ' + model_name + ' with {} backbone'.format(backbone))
+    ax[0].set_title('Training and Validation Loss for {} with {} backbone'.format(model_name, backbone))
     ax[0].set_xlabel('Epochs')
     ax[0].set_ylabel('Loss')
     ax[0].legend()
@@ -30,7 +24,7 @@ def show_history(history, model_name, backbone, out_path):
     val_acc = history.history['val_iou_score']
     ax[1].plot(epochs, acc, 'y', label='Training IOU')
     ax[1].plot(epochs, val_acc, 'r', label='Validation IOU ')
-    ax[1].set_title('Training and Validation IOU for ' + model_name + ' with {}'.format(backbone))
+    ax[1].set_title('Training and Validation IOU for {} with {}'.format(model_name, backbone))
     ax[1].set_xlabel('Epochs')
     ax[1].set_ylabel('IOU')
     ax[1].legend()
@@ -51,7 +45,7 @@ def show_all_historys(historys, model_names, backbones, out_path):
         epochs = range(1, len(loss) + 1)
         ax[i,0].plot(epochs, loss, 'y', label='Training Loss')
         ax[i,0].plot(epochs, val_loss, 'r', label='Validation Loss')
-        ax[i,0].set_title('Training and Validation Loss for ' + model_names[i] + ' with {} backbone'.format(backbones[i]))
+        ax[i,0].set_title('Training and Validation Loss for {} with {} backbone'.format(model_names[i], backbones[i]))
         ax[i,0].set_xlabel('Epochs')
         ax[i,0].setylabel('Loss')
         ax[i,0].legend()
@@ -60,7 +54,7 @@ def show_all_historys(historys, model_names, backbones, out_path):
         val_acc = historys[i].history['val_iou_score']
         ax[i,1].plot(epochs, acc, 'y', label='Training IOU')
         ax[i,1].plot(epochs, val_acc, 'r', label='Validation IOU ')
-        ax[i,1].set_title('Training and Validation IOU for ' + model_names[i] + ' with {} backbone'.format(backbones[i]))
+        ax[i,1].set_title('Training and Validation IOU for {} with {} backbone'.format(model_names[i], backbones[i]))
         ax[i,1].set_xlabel('Epochs')
         ax[i,1].set_ylabel('IOU')
         ax[i,1].legend()
@@ -92,7 +86,7 @@ def show_val_masks(model_names, backbones, imgs, gts, preds, out_path, classes):
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
                 ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             else:
-                ax[i,j].set_title('Predicted Mask by ' + model_names[j - 2] + ' with {} backbone'.format(backbones[j - 2]))
+                ax[i,j].set_title('Predicted Mask by {} with {} backbone'.format(model_names[j - 2], backbones[j - 2]))
                 ax[i,j].imshow(preds[j-2,slices[k],:,:,:,0], cmap='gray')
                 c = [ax[i,j].cmap(ax[i,j].norm(value)) for value in values]
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
@@ -123,7 +117,7 @@ def show_test_masks(model_names, backbones, imgs, preds, out_path, classes):
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
                 ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             else:
-                ax[i,j].set_title('Predicted Mask by ' + model_names[j - 1] + ' with {} backbone'.format(backbones[j - 2]))
+                ax[i,j].set_title('Predicted Mask by {} with {} backbone'.format(model_names[j - 1], backbones[j - 2]))
                 ax[i,j].imshow(preds[j-1,slices[k],:,:,:,0], cmap='gray')
                 c = [ax[i,j].cmap(ax[i,j].norm(value)) for value in values]
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
@@ -182,7 +176,7 @@ def disp_3D_val(val_masks, all_val_preds, model_names, backbones, classes, out_p
 
         for j in all_val_preds:
             ax = fig.add_subplot(len(val_masks), 4, (4*i)+j+2, projection='3d')
-            ax.set_title('Predicted Mask by ' + model_names[j] + ' with {} backbone'.format(backbones[j]))
+            ax.set_title('Predicted Mask by {} with {} backbone'.format(model_names[j], backbones[j]))
             val_pred = all_val_preds[j,i].reshape(all_val_preds[j,i].shape[0], all_val_preds[j,i].shape[1], all_val_preds[j,i].shape[2])
             y, x, z = np.where(val_pred != 0)
             colours = val_pred[y, x, z]
@@ -218,7 +212,7 @@ def disp_3D_test(test_masks, all_test_preds, model_names, backbones, out_path, c
 
         for j in all_test_preds:
             ax = fig.add_subplot(len(test_masks), 4, (4*i)+2, projection='3d')
-            ax.set_title('Predicted Mask by ' + model_names[j] + ' with {} backbone'.format(backbones[j]))
+            ax.set_title('Predicted Mask by {} with {} backbone'.format(model_names[j], backbones[j]))
             test_pred = all_test_preds[i].reshape(all_test_preds[i].shape[0], all_test_preds[i].shape[1], all_test_preds[i].shape[2])
             y, x, z = np.where(test_pred != 0)
             colours = test_pred[x, y, z]
