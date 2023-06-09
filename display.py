@@ -29,7 +29,7 @@ def show_history(history, model_name, backbone, out_path):
     ax[1].set_ylabel('IOU')
     ax[1].legend()
 
-    plt.savefig(out_path+model_name+'_history_plts.jpg')
+    plt.savefig(out_path+'{}_{}_history_plts.jpg'.format(backbone, model_name))
     plt.show()
 
 def show_all_historys(historys, model_names, backbones, out_path):
