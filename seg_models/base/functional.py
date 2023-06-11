@@ -88,7 +88,3 @@ def categorical_focal_loss(gt, pr, gamma=2.0, alpha=0.25, class_indexes=None, **
     loss = - gt * (alpha * backend.pow((1 - pr), gamma) * backend.log(pr))
 
     return backend.mean(loss)
-
-def tversky_index(gt, pr, class_weights=1, class_indexes=None, smooth=SMOOTH, per_image=False,
-                  threshold=None, **kwargs):
-    gt, pr = gather_channels
