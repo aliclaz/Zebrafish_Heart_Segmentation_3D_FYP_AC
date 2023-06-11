@@ -9,7 +9,7 @@ from imgPreprocessing import get_hpf
 from seg_models import get_preprocessing
 from tifffile import imsave
 
-def val_predict(load_path, imgs, patch_size, strategy):
+def val_predict(load_path, strategy, imgs, patch_size):
     
     """ 
     Predictions of the masks by the entered model for each image in the validation set of shape 
@@ -33,7 +33,7 @@ def val_predict(load_path, imgs, patch_size, strategy):
 
     return val_preds
 
-def test_predict(load_path, backbone, in_paths, out_path, hpf):
+def test_predict(load_path, strategy, backbone, in_paths, out_path, hpf):
 
     """ 
     Loading of images and preprocessing followed by predictions of the masks by the entered model for each image
@@ -109,7 +109,7 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
 
     return imgs_full_size_3ch, reconstructed_preds
 
-def predict(model_path, backbone, in_paths, out_path, hpf):
+def predict(model_path, strategy, backbone, in_paths, out_path, hpf):
 
     """ 
     Loading of images and preprocessing followed by predictions of the masks by the entered model for each image
