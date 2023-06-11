@@ -128,9 +128,9 @@ def main(args):
 
     # Define callback parameters for model
 
-    cache_model_path = mod_path + '{}HPF_{}_{}_temp.h5'.format(args.hpf, args.backbone2, model_name2)
-    best_model_path = mod_path + '{}HPF_{}_{}'.format(args.hpf, args.backbone2, model_name2) + '-{val_iou_score:.4f}-{epoch:02d}.h5'
-    csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone2, model_name2, args.learning_rate)
+    cache_model_path = mod_path + '{}HPF_{}_{}_temp.h5'.format(args.hpf, args.backbone, args.model_name)
+    best_model_path = mod_path + '{}HPF_{}_{}'.format(args.hpf, args.backbone, args.model_name) + '-{val_iou_score:.4f}-{epoch:02d}.h5'
+    csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone, args.model_name, args.learning_rate)
 
     cbs = [
         ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
