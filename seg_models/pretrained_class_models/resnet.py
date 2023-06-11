@@ -197,7 +197,7 @@ MODEL_PARAMS = {
 }
 
 def ResNet18(input_shape=None, input_tensor=None, weights=None, classes=1000, stride_size=2, init_filters=64, include_top=False,
-             repetitions=(2, 2, 2, 2) **kwargs):
+             repetitions=(2, 2, 2, 2), **kwargs):
 
     return ResNet(MODEL_PARAMS['resnet18'], input_shape=input_shape, input_tensor=input_tensor, weights=weights, classes=classes, 
                   stride_size=stride_size, init_filters=init_filters, include_top=include_top, repetitions=repetitions, **kwargs)
@@ -209,7 +209,7 @@ def ResNet34(input_shape=None, input_tensor=None, weights=None, classes=1000, st
                   stride_size=stride_size, init_filters=init_filters, include_top=include_top, repetitions=repetitions, **kwargs)
 
 def ResNet50(input_shape=None, input_tensor=None, weights=None, classes=1000, stride_size=2, init_filters=64, include_top=False,
-             repetitions=(3, 4, 6, 3), strategy=None, **kwargs):
+             repetitions=(3, 4, 6, 3), **kwargs):
     
     return ResNet(MODEL_PARAMS['resnet50'], input_shape=input_shape, input_tensor=input_tensor, weights=weights, classes=classes, 
                   stride_size=stride_size, init_filters=init_filters, include_top=include_top, repetitions=repetitions, **kwargs)
