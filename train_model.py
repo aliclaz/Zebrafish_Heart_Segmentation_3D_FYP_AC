@@ -98,13 +98,23 @@ def main(args):
         x_train_prep = preprocess_input(x_train)
         x_val_prep = preprocess_input(x_val)
 
-        # Define model - using AttentionUnet with a vgg16 backbone and 
-        # pretrained weights
+        # Define model depending on script argument
 
-        model = AttentionUnet(args.backbone2, classes=n_classes, dropout=args.dropout2,
+        if args.model_name == 'AttentionResUnet':
+            model = model = AttentionResUnet(args.backbone, classes=n_classes, dropout=args.dropout,
                             input_shape=(patch_size, patch_size, patch_size, channels), 
                             encoder_weights=encoder_weights, activation=activation)
-    
+
+        elif args.model_name == 'AttentionUnet':
+            model = AttentionUnet(args.backbone, classes=n_classes, dropout=args.dropout,
+                            input_shape=(patch_size, patch_size, patch_size, channels), 
+                            encoder_weights=encoder_weights, activation=activation)
+
+        elif args.model_name == 'Unet':
+            model = Unet(args.backbone, classes=n_classes, dropout=args.dropout,
+                            input_shape=(patch_size, patch_size, patch_size, channels), 
+                            encoder_weights=encoder_weights, activation=activation)
+
     model.compile(optimizer=opt, loss=total_loss, metrics=m)
 
     # Summarise the model architecture
