@@ -13,7 +13,9 @@ from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, CSVLo
 import pandas as pd
 
 from imgPreprocessing import load_process_imgs
-from seg_models import Unet, AttentionUnet, AttentionResUnet, get_preprocessing, losses, metrics
+from seg_models import Unet, AttentionUnet, AttentionResUnet, get_preprocessing
+from seg_models import losses as l
+from seg_models import metrics as m
 from display import show_history, show_all_historys, show_val_masks, show_test_masks, disp_3D_val, disp_3D_test
 from predict_module import val_predict, test_predict
 from statistical_analysis.df_manipulation import healthy_df_calcs
@@ -80,11 +82,11 @@ def main(args):
 
         opt = Adam(args.learning_rate)
 
-        dice_loss = losses.DiceLoss()
-        cat_focal_loss = losses.CategoricalFocalLoss()
+        dice_loss = l.DiceLoss()
+        cat_focal_loss = l.CategoricalFocalLoss()
         total_loss = dice_loss + cat_focal_loss
 
-        m = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]
+        metrics = [m.IOUScore(threshold=0.5), m.FScore(threshold=0.5)]
 
         # Preprocess input data with defined backbone
 
@@ -109,7 +111,7 @@ def main(args):
                             input_shape=(patch_size, patch_size, patch_size, channels), 
                             encoder_weights=encoder_weights, activation=activation)
 
-    model.compile(optimizer=opt, loss=total_loss, metrics=m)
+    model.compile(optimizer=opt, loss=total_loss, metrics=metrics)
 
     # Summarise the model architecture
 
