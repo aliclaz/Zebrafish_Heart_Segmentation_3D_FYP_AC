@@ -155,7 +155,7 @@ def AttentionResUnet(backbone_name='vgg16', input_shape=(None, None, 3), classes
     global backend, layers, models, keras_utils
     backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
 
-    backbone = Backbones.get_backbone(backbone_name, input_shape=input_shape, weights=encoder_weights, include_top=False, strategy=strategy, **kwargs)
+    backbone = Backbones.get_backbone(backbone_name, input_shape=input_shape, weights=encoder_weights, include_top=False, **kwargs)
 
     if encoder_features == 'default':
         encoder_features = Backbones.get_feature_layers(backbone_name, n=4)
