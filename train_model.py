@@ -82,7 +82,7 @@ def main(args):
 
         dice_loss = losses.DiceLoss()
         cat_focal_loss = losses.CategoricalFocalLoss()
-        total_loss =  dice_loss + cat_focal_loss
+        total_loss = dice_loss + cat_focal_loss
 
         m = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]
 
@@ -120,38 +120,27 @@ def main(args):
     model_names.append(args.model_name)
     backbones.append(args.backbone)
 
-    # Define callback parameters for model
-
-    cache_model_path = mod_path + '{}HPF_{}_{}_temp.h5'.format(args.hpf, args.backbone, args.model_name)
-    best_model_path = mod_path + '{}HPF_{}_{}'.format(args.hpf, args.backbone, args.model_name) + '-{val_iou_score:.4f}-{epoch:02d}.h5'
-    csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone, args.model_name, args.learning_rate)
-
     cbs = [
-        ModelCheckpoint(cache_model_path, monitor='val_iou_score', verbose=0),
-        ModelCheckpoint(best_model_path, monitor='val_iou_score', verbose=10, save_best_only=True),
         ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='min'),
-        CSVLogger(csv_log_path, append=True),
-        EarlyStopping(monitor='val_iou_score', patience=10, verbose=0, mode='min')
     ]
-
 
     # Train the model
 
     history = model.fit(x_train_prep, y_train, batch_size=batch_size, epochs=args.epochs, verbose=1,
                           steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
     
+    # Save the model for use for predictions
+
+    model.save(mod_path + '{}HPF_{}_{}_{}_epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs))
+    
     # Plot the train and validation losses and IOU scores at each epoch for the model
     
     show_history(history, args.model_name, args.backbone, out_path)
 
-    # Save model
-
-    model.save(mod_path+'{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs))
-
     # Use model to predict masks for each validation image
 
     val_preds_list = []
-    val_preds = val_predict(mod_path+'{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), strategy, x_val, 64)
+    val_preds = val_predict(mod_path + '{}HPF_{}_{}_{}_epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), strategy, x_val, patch_size)
     val_preds_list.append(val_preds)
     val_preds = np.array(val_preds_list)
 
@@ -180,7 +169,7 @@ def main(args):
     # Use model to predict masks for each validation image
 
     test_preds_list = []
-    test_imgs, test_preds = test_predict(mod_path+'{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), strategy, args.backbone, test_paths, out_path, args.hpf)
+    test_imgs, test_preds = test_predict(mod_path + '{}HPF_{}_{}_{}_epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), strategy, args.backbone, test_paths, out_path, args.hpf)
     test_preds_list.append(test_preds)
     test_preds = np.array(val_preds_list)
 
