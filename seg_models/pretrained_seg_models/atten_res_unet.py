@@ -149,14 +149,14 @@ def build_atten_res_unet(backbone, skip_connection_layers, decoder_filters=(256,
 
     return model
 
-def AttentionResUnet(backbone_name='vgg16', input_shape=(None, None, 3), classes=1, activation='sigmoid', weights=None, encoder_weights='imagenet', 
-                     encoder_freeze=False, encoder_features='default', decoder_filters=(256, 128, 64, 32, 16,), decoder_use_batchnorm=True, dropout=None, strategy, **kwargs):
+def AttentionResUnet(backbone_name='vgg16', input_shape=(None, None, 3), classes=1, activation='sigmoid', weights=None, encoder_weights='imagenet',
+                     encoder_freeze=False, encoder_features='default', decoder_filters=(256, 128, 64, 32, 16,), decoder_use_batchnorm=True, dropout=None, strategy=None, **kwargs):
     
     global backend, layers, models, keras_utils
     backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
 
     with strategy.scope():
-        backbone = Backbones.get_backbone(backbone_name, input_shape=input_shape, weights=encoder_weights, include_top=False, **kwargs)
+        backbone = Backbones.get_backbone(backbone_name, input_shape=input_shape, weights=encoder_weights, include_top=False, strategy=strategy, **kwargs)
 
         if encoder_features == 'default':
             encoder_features = Backbones.get_feature_layers(backbone_name, n=4)
