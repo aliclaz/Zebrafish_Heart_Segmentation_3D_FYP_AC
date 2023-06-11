@@ -54,6 +54,9 @@ def main(args):
 
     devices = tf.config.list_physical_devices('GPU')
 
+    for i in range(len(devices)):
+        tf.config.experimental.set_memory_growth(devices[i], True)
+
     strategy = tf.distribute.MirroredStrategy(['GPU:{}'.format(i) for i in range(len(devices))])
     print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
 
