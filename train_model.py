@@ -104,17 +104,17 @@ def main(args):
         if args.model_name == 'AttentionResUnet':
             model = model = AttentionResUnet(args.backbone, classes=n_classes, dropout=args.dropout,
                             input_shape=(patch_size, patch_size, patch_size, channels), 
-                            encoder_weights=encoder_weights, activation=activation)
+                            encoder_weights=encoder_weights, activation=activation, strategy)
 
         elif args.model_name == 'AttentionUnet':
             model = AttentionUnet(args.backbone, classes=n_classes, dropout=args.dropout,
                             input_shape=(patch_size, patch_size, patch_size, channels), 
-                            encoder_weights=encoder_weights, activation=activation)
+                            encoder_weights=encoder_weights, activation=activation, strategy)
 
         elif args.model_name == 'Unet':
             model = Unet(args.backbone, classes=n_classes, dropout=args.dropout,
                             input_shape=(patch_size, patch_size, patch_size, channels), 
-                            encoder_weights=encoder_weights, activation=activation)
+                            encoder_weights=encoder_weights, activation=activation, strategy)
 
     model.compile(optimizer=opt, loss=total_loss, metrics=m)
 
