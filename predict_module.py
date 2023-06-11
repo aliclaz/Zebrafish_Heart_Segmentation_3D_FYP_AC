@@ -9,7 +9,7 @@ from imgPreprocessing import get_hpf
 from seg_models import get_preprocessing
 from tifffile import imsave
 
-def val_predict(load_path, strategy, imgs, patch_size):
+def val_predict(load_path, strategy, loss, imgs, patch_size):
     
     """ 
     Predictions of the masks by the entered model for each image in the validation set of shape 
@@ -17,7 +17,7 @@ def val_predict(load_path, strategy, imgs, patch_size):
     
     """
     with strategy.scope():
-        model = load_model(load_path)
+        model = load_model(load_path, customs_objects={'loss': loss})
 
     val_preds = []
 
@@ -33,7 +33,7 @@ def val_predict(load_path, strategy, imgs, patch_size):
 
     return val_preds
 
-def test_predict(load_path, strategy, backbone, in_paths, out_path, hpf):
+def test_predict(load_path, strategy, loss, backbone, in_paths, out_path, hpf):
 
     """ 
     Loading of images and preprocessing followed by predictions of the masks by the entered model for each image
@@ -41,7 +41,7 @@ def test_predict(load_path, strategy, backbone, in_paths, out_path, hpf):
     """
 
     with strategy.scope():
-        model = load_model(load_path)
+        model = load_model(load_path, customs_objects={'loss': loss})
 
     # Read each image in the directory, convert it into patches and add the patches to an array
 
@@ -109,7 +109,7 @@ def test_predict(load_path, strategy, backbone, in_paths, out_path, hpf):
 
     return imgs_full_size_3ch, reconstructed_preds
 
-def predict(model_path, strategy, backbone, in_paths, out_path, hpf):
+def predict(model_path, strategy, loss, backbone, in_paths, out_path, hpf):
 
     """ 
     Loading of images and preprocessing followed by predictions of the masks by the entered model for each image
@@ -117,7 +117,7 @@ def predict(model_path, strategy, backbone, in_paths, out_path, hpf):
     """
 
     with strategy.scope():
-        model = load_model(model_path)
+        model = load_model(model_path, customs_objects={'loss': loss})
 
     mod_hpf = get_hpf(hpf)
 
