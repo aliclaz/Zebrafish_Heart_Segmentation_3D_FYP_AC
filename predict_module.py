@@ -1,5 +1,6 @@
 import numpy as np
 import os
+from keras.models import load_model
 from skimage import io
 from skimage.transform import resize
 from skimage.exposure import rescale_intensity
@@ -8,13 +9,15 @@ from imgPreprocessing import get_hpf
 from seg_models import get_preprocessing
 from tifffile import imsave
 
-def val_predict(model, imgs, patch_size):
+def val_predict(load_path, imgs, patch_size):
     
     """ 
     Predictions of the masks by the entered model for each image in the validation set of shape 
     (patch_size x patch_size x patch_size) 
     
     """
+
+    model = load_model(load_path)
 
     val_preds = []
 
@@ -30,12 +33,14 @@ def val_predict(model, imgs, patch_size):
 
     return val_preds
 
-def test_predict(model, backbone, in_paths, out_path, hpf):
+def test_predict(load_path, backbone, in_paths, out_path, hpf):
 
     """ 
     Loading of images and preprocessing followed by predictions of the masks by the entered model for each image
     
     """
+
+    model = load_model(load_path)
 
     # Read each image in the directory, convert it into patches and add the patches to an array
 
@@ -99,7 +104,7 @@ def test_predict(model, backbone, in_paths, out_path, hpf):
     # Save masks as segmented volumes
 
     for i in reconstructed_preds:
-        imsave(out_path+'{}HPF_test_mask.tif'.format(hpf), reconstructed_preds[i])
+        imsave(out_path+'{}HPF_test_pred.tif'.format(hpf), reconstructed_preds[i])
 
     return imgs_full_size_3ch, reconstructed_preds
 

@@ -26,7 +26,7 @@ import pandas as pd
 
 from imgPreprocessing import load_process_imgs
 from seg_models import Unet, AttentionUnet, AttentionResUnet, get_preprocessing, losses, metrics
-from display import show_history, show_all_historys, show_val_masks, show_test_masks
+from display import show_history, show_all_historys, show_val_masks, show_test_masks, disp_3D_val, disp_3D_test
 from predict_module import val_predict, test_predict
 from statistical_analysis.df_manipulation import healthy_df_calcs
 
@@ -42,21 +42,25 @@ def main(args):
     stats_path = path + '/Stats/'
     if args.hpf == 48:
         n_classes = 6
+        classes = ['Background', 'AVC', 'Endocardium' 'Noise', 'Atrium', 'Ventricle']
         n_imgs = 5
     elif args.hpf == 36:
         n_classes = 5
+        classes = ['Background', 'Endocardium', 'Atrium', 'Noise', 'Ventricle']
         n_imgs = 6
     elif args.hpf == 30:
         n_classes = 4
+        classes = ['Background','Endocardium', 'Linear Heart Tube', 'Noise']
         n_imgs = 2
     else:
         n_classes = None
+        classes = None
         n_imgs = None
     test_paths = ['{}HPF_image{}.tif'.format(args.hpf, i) for i in range(2, n_imgs + 1)]
 
     # Load the training masks and images into the code and preprocess both datasets
 
-    x_train, x_val, y_train, y_val, indice_encoded_masks = load_process_imgs(img_path, mask_path, args.train_val_split, n_classes)
+    x_train, x_val, y_train, y_val = load_process_imgs(img_path, mask_path, args.train_val_split, n_classes)
 
     # Initialising mirrored distribution for multi-gpu support and adjust batch size and steps per epoch accordingly
 
@@ -65,9 +69,9 @@ def main(args):
 
     batch_size = args.batch_size * strategy.num_replicas_in_sync
 
-    print('Batch size per device: ', batch_size)
+    print('Batch size per device: ', batch_size / strategy.num_replicas_in_sync)
 
-    steps_per_epoch = (len(x_train) // batch_size) * strategy.num_replicas_in_sync
+    steps_per_epoch = (len(x_train) // batch_size) / strategy.num_replicas_in_sync
 
     print('Number of steps per epoch: ', steps_per_epoch)
 
@@ -90,98 +94,29 @@ def main(args):
 
         # Preprocess input data with defined backbone
 
-        preprocess_input1 = get_preprocessing(args.backbone1)
-        x_train_prep1 = preprocess_input1(x_train)
-        x_val_prep1 = preprocess_input1(x_val)
-
-        # Define model - using AttentionResUnet with a resnet34 backbone and 
-        # pretrained weights
-
-        model1 = AttentionResUnet(args.backbone1, classes=n_classes, dropout=args.dropout1,
-                                input_shape=(patch_size, patch_size, patch_size, channels), 
-                                encoder_weights=encoder_weights, activation=activation)
-    
-    model1.compile(optimizer=opt, loss=total_loss, metrics=m)
-
-    # Summarise the model architecture
-
-    model1.summary()
-
-    # Define callback parameters for model1
-
-    model_names = []
-    model_name1 = 'AttentionResUnet'
-    model_names.append(model_name1)
-
-    cache_model_path = mod_path + '{}HPF_{}_{}_temp.h5'.format(args.hpf, args.backbone1, model_name1)
-    best_model_path = mod_path + '{}HPF_{}_{}'.format(args.hpf, args.backbone1, model_name1) + '-{val_iou_score:.4f}-{epoch:02d}.h5'
-    csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone1, model_name1, args.learning_rate)
-
-    cbs = [
-        ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
-        ModelCheckpoint(best_model_path, monitor='val_loss', verbose=0, save_best_only=True),
-        ReduceLROnPlateau(monitor='val_loss', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='min'),
-        CSVLogger(csv_log_path, append=True),
-        EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='min')
-    ]
-
-    # Train the model
-
-    history1 = model1.fit(x_train_prep1, y_train, batch_size=batch_size, epochs=args.epochs, verbose=1,
-                          steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep1, y_val), callbacks=cbs)
-    
-    # Create lists of models, historys and backbones used
-
-    models = historys = backbones = []
-
-    models.append(model1)
-    historys.append(history1)
-    backbones.append(args.backbone1)
-
-    # Plot the train and validation losses and IOU scores at each epoch for model 1
-
-    show_history(history1, model_name1, args.backbone1, out_path)
-
-    with strategy.scope():
-
-        # Define model parameters
-
-        encoder_weights = 'imagenet'
-        activation = 'softmax'
-        patch_size = 64
-        channels = 3
-
-        opt = Adam(args.learning_rate)
-
-        dice_loss = losses.DiceLoss()
-        cat_focal_loss = losses.CategoricalFocalLoss()
-        total_loss =  dice_loss + cat_focal_loss
-
-        m = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]
-
-        # Preprocess input data with defined backbone
-
-        preprocess_input2 = get_preprocessing(args.backbone2)
-        x_train_prep2 = preprocess_input2(x_train)
-        x_val_prep2 = preprocess_input2(x_val)
+        preprocess_input = get_preprocessing(args.backbone)
+        x_train_prep = preprocess_input(x_train)
+        x_val_prep = preprocess_input(x_val)
 
         # Define model - using AttentionUnet with a vgg16 backbone and 
         # pretrained weights
 
-        model2 = AttentionUnet(args.backbone2, classes=n_classes, dropout=args.dropout2,
+        model = AttentionUnet(args.backbone2, classes=n_classes, dropout=args.dropout2,
                             input_shape=(patch_size, patch_size, patch_size, channels), 
                             encoder_weights=encoder_weights, activation=activation)
     
-    model2.compile(optimizer=opt, loss=total_loss, metrics=m)
+    model.compile(optimizer=opt, loss=total_loss, metrics=m)
 
     # Summarise the model architecture
 
-    model2.summary()
+    model.summary()
 
-    # Define callback parameters for model2
+    model_names = []
+    backbones = []
+    model_names.append(args.model_name)
+    backbones.append(args.backbone)
 
-    model_name2 = 'AttentionUnet'
-    model_names.append(model_name2)
+    # Define callback parameters for model
 
     cache_model_path = mod_path + '{}HPF_{}_{}_temp.h5'.format(args.hpf, args.backbone2, model_name2)
     best_model_path = mod_path + '{}HPF_{}_{}'.format(args.hpf, args.backbone2, model_name2) + '-{val_iou_score:.4f}-{epoch:02d}.h5'
@@ -198,132 +133,74 @@ def main(args):
 
     # Train the model
 
-    history2 = model2.fit(x_train_prep2, y_train, batch_size=args.batch_size, epochs=args.epochs, verbose=1,
-                          steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep2, y_val), callbacks=cbs)
+    history = model.fit(x_train_prep, y_train, batch_size=args.batch_size, epochs=args.epochs, verbose=1,
+                          steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
     
-    # Create lists of models, historys and backbones used
-
-    models.append(model2)
-    historys.append(history2)
-    backbones.append(args.backbone2)
-
-    # Plot train and validation losses and IOU scores for model 2
-
-    show_history(history2, model2, args.backbone2, out_path)
-
-    with strategy.scope():
-
-        # Define model parameters
-
-        encoder_weights = 'imagenet'
-        activation = 'softmax'
-        patch_size = 64
-        channels = 3
-
-        opt = Adam(args.learning_rate)
-
-        dice_loss = losses.DiceLoss()
-        cat_focal_loss = losses.CategoricalFocalLoss()
-        total_loss =  dice_loss + cat_focal_loss
-
-        m = [metrics.IOUScore(threshold=0.5), metrics.FScore(threshold=0.5)]
-
-        # Preprocess input data with defined backbone
-
-        preprocess_input3 = get_preprocessing(args.backbone2)
-        x_train_prep3 = preprocess_input2(x_train)
-        x_val_prep3 = preprocess_input2(x_val)
-
-        # Define model - using Unet with a vgg16 backbone and 
-        # pretrained weights
-
-        model3 = Unet(args.backbone3, classes=n_classes, dropout=args.dropout3,
-                      input_shape=(patch_size, patch_size, patch_size, channels), 
-                      encoder_weights=encoder_weights, activation=activation)
+    # Plot the train and validation losses and IOU scores at each epoch for the model
     
-    model3.compile(optimizer=opt, loss=total_loss, metrics=m)
-
-    # Summarise the model architecture
-
-    model3.summary()
-
-    # Define callback parameters
-
-    model_name3 = 'Unet'
-    model_names.append(model_name3)
-
-    cache_model_path = mod_path + '{}HPF_{}_{}_temp.h5'.format(args.hpf, args.backbone3, model_name3)
-    best_model_path = mod_path + '{}HPF_{}_{}'.format(args.hpf, args.backbone3, model_name3) + '-{val_iou_score:.4f}-{epoch:02d}.h5'
-    csv_log_path = mod_path + '{}HPF_history_{}_{}_lr_{}.csv'.format(args.hpf, args.backbone3, model_name3, args.learning_rate)
-
-    cbs = [
-        ModelCheckpoint(cache_model_path, monitor='val_loss', verbose=0),
-        ModelCheckpoint(best_model_path, monitor='val_loss', verbose=0, save_best_only=True),
-        ReduceLROnPlateau(monitor='val_loss', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='min'),
-        CSVLogger(csv_log_path, append=True),
-        EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='min')
-    ]
-
-    # Train the model
-
-    history3 = model3.fit(x_train_prep3, y_train, batch_size=8, epochs=100, verbose=1,
-                          steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep3, y_val), callbacks=cbs)
-    
-    # Create lists of models, git historys and backbones used
-
-    models.append(model3)
-    historys.append(history3)
-    backbones.append(args.backbone3)
-
-    # Plot the train and validation losses and IOU scores at each epoch for model 3
-
-    show_history(history3, model_name3, args.backbone3, out_path)
+    show_history(history, args.model_name, args.backbone, out_path)
 
     # Save model
 
-    model3.save(mod_path+'{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone3, model_name3, args.epochs))
+    model.save(mod_path+'{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs))
 
-    # Display the historys of all models together for comparison
+    # Use model to predict masks for each validation image
 
-    show_all_historys(historys, model_names, backbones, out_path)  
+    val_preds_list = []
+    val_preds = val_predict(mod_path+'{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), x_val, 64)
+    val_preds_list.append(val_preds)
+    val_preds = np.array(val_preds_list)
 
-    # Use each model to predict masks for each validation image
+    # Convert train and validation masks back from categorical
 
-    val_preds_each_model = []
+    train_masks = []
+    for i in range(len(y_train)):
+        train_mask = np.argmax(y_train[i], axis=4)
+        train_masks.append(train_mask)
+    train_masks = np.asarray(train_masks)
 
-    for i in range(len(models)):
-        val_preds_each_model.append(val_predict(models[i], x_val, 64))
-    val_preds_each_model = np.asarray(val_preds_each_model, dtype=np.ndarray)
+    val_masks = []
+    for i in range(len(y_val)):
+        val_mask = np.argmax(y_val[i], axis=4)
+        val_masks.append(val_mask)
+    val_masks = np.asarray(val_masks)
 
-    # Display the validation images, their actual masks and their masks predicted by each model at 3 slices
+    # Display validation images, their actual masks and their predicted masks by the model in 2D slices
 
-    show_val_masks(model_names, x_val, y_val, val_preds_each_model, out_path)
+    show_val_masks(model_names, x_val, val_masks, val_preds, out_path, classes)
 
-    # Use each model to predict masks for each test image
+    # Display the the actual masks and predicted masks in 3D
 
-    test_preds_each_model = []
+    disp_3D_val(val_masks, val_preds, model_names, backbones, classes, out_path)
 
-    for i in range(len(models)):
-        test_imgs, test_preds = test_predict(models[i], backbones[i], test_paths, out_path)
-        test_preds_each_model.append(test_preds)
+    # Use model to predict masks for each validation image
 
-    # Display test images, actual masks and predicted masks from each model
+    test_preds_list = []
+    test_imgs, test_preds = test_predict(mod_path+'{}HPF_{}_{}_{}epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), args.backbone, test_paths, out_path, args.hpf)
+    test_preds_list.append(test_preds)
+    test_preds = np.array(val_preds_list)
 
-    show_test_masks(model_names, test_imgs, test_preds_each_model, out_path)
+    # Display test images and their predicted masks from the model in 2D slices
 
-    # Define the class labels for each stage of development
+    show_test_masks(model_names, backbones, test_imgs, test_preds, out_path, classes)
+
+    # Display predicted masks from test images in 3D
+
+    disp_3D_test(test_preds, model_names, backbones, out_path, classes)
+
+    # Collect train and validation original masks and test predictions into healthy dataset
+    # with a list of their scales
 
     if args.hpf == 48:
-        classes = ['Background', 'AVC', 'Endocardium' 'Noise', 'Atrium', 'Ventricle']
-        healthy_masks = np.concatenate((y_train, y_val, test_imgs), axis=0)
+        healthy_masks = np.concatenate((train_masks, val_masks, test_preds[0]), axis=0)
         healthy_scales = [295.53, 233.31, 233.31, 246.27, 246.27]
     elif args.hpf == 36:
         classes = ['Background', 'Endocardium', 'Atrium', 'Noise', 'Ventricle']
-        healthy_masks = np.concatenate((y_train, y_val, test_imgs), axis=0)
+        healthy_masks = np.concatenate((train_masks, val_masks, test_preds[0]), axis=0)
         healthy_scales = [221.65, 221.65, 221.65, 221.65, 221.65, 221.65]
     elif args.hpf == 30:
         classes = ['Background','Endocardium', 'Linear Heart Tube', 'Noise']
-        healthy_masks = np.concatenate((y_train, y_val, test_imgs), axis=0)
+        healthy_masks = np.concatenate((train_masks, val_masks, test_preds[0]), axis=0)
         healthy_scales = [221.65, 221.65]
 
     # Calculate the means, standard deviations and confidence intervals of the volume of each class
@@ -336,15 +213,12 @@ if __name__ == '__main__':
 
     parser.add_argument('--hpf', type=int, help='stage of development fish at in train images', required=True)
     parser.add_argument('--train_val_split', type=float, help='determines size of validation set')
+    parser.add_argument('--model_name', type=str, help='model to be trained', required=True)
+    parser.add_argument('--backbone', type=str, help='pretrained backbone for model', required=True)
     parser.add_argument('--learning_rate', type=float, help='learning rate used in training of models', required=True)
     parser.add_argument('--batch_size', type=int, help='size of the batch used to train the model during an epoch', required=True)
     parser.add_argument('--epochs', type=int, help='number of epochs used in training', required=True)
-    parser.add_argument('--backbone1', type=str, help='pretrained backbone for AttentionResUnet model', required=True)
-    parser.add_argument('--dropout1', type=float, help='degree of dropout used in AttentionResUnet model', default=None)
-    parser.add_argument('--backbone2', type=str, help='pretrained backbone for AttentionUnet model', required=True)
-    parser.add_argument('--dropout2', type=float, help='degree of dropout used in AttentionUnet model', default=None)
-    parser.add_argument('--backbone3', type=str, help='pretrained backbone for Unet model', required=True)
-    parser.add_argument('--dropout3', type=float, help='degree of dropout used in Unet model', default=None)
+    parser.add_argument('--dropout', type=float, help='degree of dropout used in model', default=None)
 
     args = parser.parse_args()
 

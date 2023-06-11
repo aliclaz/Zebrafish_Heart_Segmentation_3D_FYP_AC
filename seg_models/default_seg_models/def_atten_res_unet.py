@@ -32,7 +32,7 @@ def ResConvBlock(filters, use_batchnorm, name=None):
     return wrapper
 
 def RepeatElement(tensor, rep):
-    return layers.Lambda(lambda x, repnum: K.repeat_elements(x, repnum, axis=4), arguments={'repnum': rep})(tensor)   
+    return layers.Lambda(lambda x, repnum: backend.repeat_elements(x, repnum, axis=4), arguments={'repnum': rep})(tensor)   
 
 def GatingSignal(filters, use_batchnorm, name=None):
     kwargs = get_submodules()
