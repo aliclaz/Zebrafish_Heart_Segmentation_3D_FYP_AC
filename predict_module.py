@@ -9,15 +9,15 @@ from imgPreprocessing import get_hpf
 from seg_models import get_preprocessing
 from tifffile import imsave
 
-def val_predict(load_path, imgs, patch_size):
+def val_predict(load_path, imgs, patch_size, strategy):
     
     """ 
     Predictions of the masks by the entered model for each image in the validation set of shape 
     (patch_size x patch_size x patch_size) 
     
     """
-
-    model = load_model(load_path)
+    with strategy.scope():
+        model = load_model(load_path)
 
     val_preds = []
 
@@ -40,7 +40,8 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
     
     """
 
-    model = load_model(load_path)
+    with strategy.scope():
+        model = load_model(load_path)
 
     # Read each image in the directory, convert it into patches and add the patches to an array
 
@@ -115,7 +116,8 @@ def predict(model_path, backbone, in_paths, out_path, hpf):
     
     """
 
-    model = load_model(model_path)
+    with strategy.scope():
+        model = load_model(model_path)
 
     mod_hpf = get_hpf(hpf)
 
