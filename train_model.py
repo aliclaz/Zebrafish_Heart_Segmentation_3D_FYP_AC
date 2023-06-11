@@ -52,7 +52,9 @@ def main(args):
 
     # Initialising mirrored distribution for multi-gpu support and adjust batch size and steps per epoch accordingly
 
-    strategy = tf.distribute.MirroredStrategy(['GPU:{}'.format(i) for i in range(len(DEVICES))])
+    devices = tf.config.list_physical_devices('GPU')
+
+    strategy = tf.distribute.MirroredStrategy(['GPU:{}'.format(i) for i in range(len(devices))])
     print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
 
     batch_size = args.batch_size * strategy.num_replicas_in_sync
