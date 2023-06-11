@@ -69,7 +69,9 @@ def main(args):
 
     batch_size = args.batch_size * strategy.num_replicas_in_sync
 
-    print('Batch size per device: ', batch_size / strategy.num_replicas_in_sync)
+    print('Total batch size: ', batch_size)
+
+    print('Batch size per device: ', args.batch_size)
 
     steps_per_epoch = (batch_size // args.batch_size)
     print('Number of steps per epoch: ', steps_per_epoch)
