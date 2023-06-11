@@ -137,7 +137,7 @@ def main(args):
 
     # Train the model
 
-    history = model.fit(x_train_prep, y_train, batch_size=args.batch_size, epochs=args.epochs, verbose=1,
+    history = model.fit(x_train_prep, y_train, batch_size=batch_size, epochs=args.epochs, verbose=1,
                           steps_per_epoch=steps_per_epoch, validation_data=(x_val_prep, y_val), callbacks=cbs)
     
     # Plot the train and validation losses and IOU scores at each epoch for the model
