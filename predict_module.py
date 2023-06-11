@@ -108,12 +108,14 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
 
     return imgs_full_size_3ch, reconstructed_preds
 
-def predict(model, backbone, in_paths, out_path, hpf):
+def predict(model_path, backbone, in_paths, out_path, hpf):
 
     """ 
     Loading of images and preprocessing followed by predictions of the masks by the entered model for each image
     
     """
+
+    model = load_model(model_path)
 
     mod_hpf = get_hpf(hpf)
 

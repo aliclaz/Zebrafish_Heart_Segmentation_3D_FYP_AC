@@ -18,8 +18,8 @@ from statistical_analysis.df_manipulation import gm_df_calcs, healthy_df_calcs, 
 
 # Define the input paths for the trained model and the csv files containing the data from previous statistical analysis
 
-STAT_PATH = '.Data/Stats/'
-MOD_PATH = '.Data/Models/'
+STAT_PATH = '/Stats/'
+MOD_PATH = '/Models/'
 
 # Define the required size parameters of the image for the model and the backbone used in the model
 
@@ -30,19 +30,14 @@ BACKBONE = 'resnet34'
 
 def main(args):
 
-    # Load the model being used to make the predictions
+    # Import images, preprocess, load_model, make predictions and save the predicted masks
 
-    model = load_model(MOD_PATH+'{}HPF_{}_{}epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), compile=True)
-
-    # Import images, preprocess, make predictions and save the predicted masks
-
-    imgs, preds = predict(model, BACKBONE, args.args.args.in_path, args.out_path)
+    imgs, preds = predict(MOD_PATH+'{}HPF_{}_{}epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), BACKBONE, args.args.args.in_path, args.out_path)
 
     # Plot the test images and their predicted masks at 3 random slice
     
     show_pred_masks(imgs, preds, args.out_path)
 
-    
     # Get one of the default hpf values (30, 36, 48) based on which the entered value is closest to
 
     mod_hpf = get_hpf(args.entered_hpf)
