@@ -197,19 +197,28 @@ MODEL_PARAMS = {
 }
 
 def ResNet18(input_shape=None, input_tensor=None, weights=None, classes=1000, stride_size=2, init_filters=64, include_top=False,
-             repetitions=(2, 2, 2, 2), **kwargs):
-    return ResNet(MODEL_PARAMS['resnet18'], input_shape=input_shape, input_tensor=input_tensor, weights=weights, classes=classes, 
+             repetitions=(2, 2, 2, 2), strategy, **kwargs):
+    with strategy.scope():
+        output = ResNet(MODEL_PARAMS['resnet18'], input_shape=input_shape, input_tensor=input_tensor, weights=weights, classes=classes, 
                   stride_size=stride_size, init_filters=init_filters, include_top=include_top, repetitions=repetitions, **kwargs)
+
+    return output
 
 def ResNet34(input_shape=None, input_tensor=None, weights=None, classes=1000, stride_size=2, init_filters=64, include_top=False,
-             repetitions=(3, 4, 6, 3), **kwargs):
-    return ResNet(MODEL_PARAMS['resnet34'], input_shape=input_shape, input_tensor=input_tensor, weights=weights, classes=classes, 
+             repetitions=(3, 4, 6, 3), strategy, **kwargs):
+    with strategy.scope():
+        output = ResNet(MODEL_PARAMS['resnet34'], input_shape=input_shape, input_tensor=input_tensor, weights=weights, classes=classes, 
                   stride_size=stride_size, init_filters=init_filters, include_top=include_top, repetitions=repetitions, **kwargs)
 
+    return output
+
 def ResNet50(input_shape=None, input_tensor=None, weights=None, classes=1000, stride_size=2, init_filters=64, include_top=False,
-             repetitions=(3, 4, 6, 3), **kwargs):
-    return ResNet(MODEL_PARAMS['resnet50'], input_shape=input_shape, input_tensor=input_tensor, weights=weights, classes=classes, 
+             repetitions=(3, 4, 6, 3), strategy, **kwargs):
+    with strategy.scope():
+        output = ResNet(MODEL_PARAMS['resnet50'], input_shape=input_shape, input_tensor=input_tensor, weights=weights, classes=classes, 
                   stride_size=stride_size, init_filters=init_filters, include_top=include_top, repetitions=repetitions, **kwargs)
+    
+    return output 
 
 def preprocess_input(x, **kwargs):
     return x

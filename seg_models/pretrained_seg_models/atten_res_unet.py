@@ -150,17 +150,19 @@ def build_atten_res_unet(backbone, skip_connection_layers, decoder_filters=(256,
     return model
 
 def AttentionResUnet(backbone_name='vgg16', input_shape=(None, None, 3), classes=1, activation='sigmoid', weights=None, encoder_weights='imagenet', 
-                     encoder_freeze=False, encoder_features='default', decoder_filters=(256, 128, 64, 32, 16,), decoder_use_batchnorm=True, dropout=None, **kwargs):
+                     encoder_freeze=False, encoder_features='default', decoder_filters=(256, 128, 64, 32, 16,), decoder_use_batchnorm=True, dropout=None, strategy, **kwargs):
+    
     global backend, layers, models, keras_utils
     backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
 
-    backbone = Backbones.get_backbone(backbone_name, input_shape=input_shape, weights=encoder_weights, include_top=False, **kwargs)
+    with strategy.scope():
+        backbone = Backbones.get_backbone(backbone_name, input_shape=input_shape, weights=encoder_weights, include_top=False, **kwargs)
 
-    if encoder_features == 'default':
-        encoder_features = Backbones.get_feature_layers(backbone_name, n=4)
+        if encoder_features == 'default':
+            encoder_features = Backbones.get_feature_layers(backbone_name, n=4)
 
-    model = build_atten_res_unet(backbone=backbone, skip_connection_layers=encoder_features, decoder_filters=decoder_filters, n_upsample_blocks=len(decoder_filters), 
-                                 classes=classes, activation=activation, use_batchnorm=decoder_use_batchnorm, dropout=dropout,)
+        model = build_atten_res_unet(backbone=backbone, skip_connection_layers=encoder_features, decoder_filters=decoder_filters, n_upsample_blocks=len(decoder_filters), 
+                                    classes=classes, activation=activation, use_batchnorm=decoder_use_batchnorm, dropout=dropout,)
     
     # lock encoder weights for fine-tuning
     if encoder_freeze:
