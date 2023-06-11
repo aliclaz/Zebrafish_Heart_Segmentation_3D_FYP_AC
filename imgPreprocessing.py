@@ -49,8 +49,6 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
 
     train_masks_cat = to_categorical(train_masks, num_classes=n_classes)
 
-    print(type(train_masks_cat))
-
     # Split dataset into training and validation sets
 
     x_train, x_val, y_train, y_val = train_test_split(train_imgs, train_masks_cat, test_size=split, random_state=0)

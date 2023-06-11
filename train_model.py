@@ -71,7 +71,7 @@ def main(args):
 
     print('Batch size per device: ', batch_size / strategy.num_replicas_in_sync)
 
-    steps_per_epoch = (len(x_train) // batch_size) / strategy.num_replicas_in_sync
+    steps_per_epoch = (batch_size // args.batch_size) / strategy.num_replicas_in_sync
 
     print('Number of steps per epoch: ', steps_per_epoch)
 
