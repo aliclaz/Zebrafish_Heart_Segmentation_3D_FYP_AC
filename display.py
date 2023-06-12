@@ -43,6 +43,8 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes):
 
     fig, ax = plt.subplots(len(imgs)*3, 3, figsize=(15, 12*len(imgs)))
 
+    print(len(imgs))
+
     k = 0
     for i in range(3*len(imgs)):
         if i % 2 == 0 and i != 0:
