@@ -16,8 +16,7 @@ def val_predict(load_path, imgs, patch_size):
     (patch_size x patch_size x patch_size) 
     
     """
-    with strategy.scope():
-        model = load_model(load_path, compile=False)
+    model = load_model(load_path, compile=False)
 
     val_preds = []
 
@@ -40,8 +39,7 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
     
     """
 
-    with strategy.scope():
-        model = load_model(load_path, compile=False)
+    model = load_model(load_path, compile=False)
 
     # Read each image in the directory, convert it into patches and add the patches to an array
 
@@ -116,8 +114,7 @@ def predict(load_path, backbone, in_paths, out_path, hpf, GM):
     
     """
 
-    with strategy.scope():
-        model = load_model(load_path, compile=False)
+    model = load_model(load_path, compile=False)
 
     mod_hpf = get_hpf(hpf)
 
