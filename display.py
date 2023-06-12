@@ -39,7 +39,7 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes, hp
     slices = np.random.randint(len(imgs), size=(3))
     colours = np.unique(gts.ravel())
     colours = colours[colours != 0]
-    colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
+    colours_normalized = colours / np.max(colours)
     c = np.stack([colours_normalized]*3, axis=-1)
 
     fig, ax = plt.subplots(len(imgs)*3, 3, figsize=(24, 12*len(imgs)))
@@ -71,7 +71,7 @@ def show_pred_masks(model_name, backbone, imgs, preds, out_path, classes, hpf):
     slices = np.random.randint(len(imgs), size=(3))
     colours = np.unique(preds.ravel())
     colours = colours[colours != 0]
-    colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
+    colours_normalized = colours / np.max(colours)
     c = np.stack([colours_normalized]*3, axis=-1)
 
     fig, ax = plt.subplots(3*len(imgs), 2, figsize=(16, 12*len(imgs)))
@@ -103,8 +103,8 @@ def disp_3D_val(val_masks, val_preds, model_name, backbone, classes, out_path, h
         ax.set_title('Actual Mask {}'.format(i+1))
         val_mask = val_masks[i].reshape(val_masks[i].shape[0], val_masks[i].shape[1], val_masks[i].shape[2])
         y, x, z = np.where(val_mask != 0)
-        colours = val_mask[x, y, z]
-        colours_normalized = (colours - np.min(colours)) / ((np.max(colours)) - np.min(colours))
+        colours = val_mask[y, x, z]
+        colours_normalized = colours / np.max(colours)
         greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
         ax.scatter(x, y, z, c=greyscale_colours, marker='s', s=cube_size**2)
         c = np.unique(greyscale_colours.ravel())
@@ -116,7 +116,7 @@ def disp_3D_val(val_masks, val_preds, model_name, backbone, classes, out_path, h
         val_pred = val_preds[i].reshape(val_preds[i].shape[0], val_preds[i].shape[1], val_preds[i].shape[2])
         y, x, z = np.where(val_pred != 0)
         colours = val_pred[y, x, z]
-        colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
+        colours_normalized = colours / np.max(colours)
         greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
         ax.scatter(x, y, z, c=greyscale_colours, markers='s', s=cube_size**2)
         c = np.unique(greyscale_colours.ravel())
@@ -138,7 +138,7 @@ def disp_3D_pred(preds, model_name, backbone, out_path, classes, hpf):
         pred = preds[i].reshape(preds[i].shape[0], preds[i].shape[1], preds[i].shape[2])
         y, x, z = np.where(pred != 0)
         colours = pred[y, x, z]
-        colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
+        colours_normalized = colours / np.max(colours)
         greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
         ax.scatter(x, y, z, c=greyscale_colours, markers='s', s=cube_size**2)
         c = np.unique(greyscale_colours.ravel())
