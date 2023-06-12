@@ -114,8 +114,8 @@ def healthy_df_calcs(masks, classes, scales, hpf, out_path):
     # Create display dataframe and analysis dataframe as all classes needed for analysis of new images
 
     stats = pd.DataFrame()
-    stats = stats.append(msd_class_vols_df)
-    stats = stats.append(class_vol_CIs_df)
+    stats = pd.concat([stats, msd_class_vols_df], axis=1)
+    stats = pd.concat([stats, class_vol_CIs_df])
 
     # Remove unwanted classes for displaying the results
 
