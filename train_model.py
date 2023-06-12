@@ -79,7 +79,7 @@ def main(args):
 
         opt = Adam(args.learning_rate)
 
-        def dice_plus_focal_loss():
+        def dice_plus_focal_loss(gt, pr):
             dice_loss = l.DiceLoss()
             cat_focal_loss = l.CategoricalFocalLoss()
             total_loss = dice_loss + cat_focal_loss
