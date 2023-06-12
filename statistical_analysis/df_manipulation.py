@@ -115,7 +115,7 @@ def healthy_df_calcs(masks, classes, scales, hpf, out_path):
 
     stats = pd.DataFrame()
     stats = pd.concat([stats, msd_class_vols_df], axis=1)
-    stats = pd.concat([stats, class_vol_CIs_df])
+    stats = pd.concat([stats, class_vol_CIs_df], axis=1)
 
     # Remove unwanted classes for displaying the results
 
