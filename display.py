@@ -42,7 +42,7 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes, hp
     colours_normalized = colours / np.max(colours)
     c = np.stack([colours_normalized]*3, axis=-1)
 
-    fig, ax = plt.subplots(len(imgs)*3, 3, figsize=(24, 15*len(imgs)))
+    fig, ax = plt.subplots(len(imgs)*3, 3, figsize=(24, 18*len(imgs)))
 
     k = 0
     for i in range(len(imgs)):
@@ -74,7 +74,7 @@ def show_pred_masks(model_name, backbone, imgs, preds, out_path, classes, hpf):
     colours_normalized = colours / np.max(colours)
     c = np.stack([colours_normalized]*3, axis=-1)
 
-    fig, ax = plt.subplots(3*len(imgs), 2, figsize=(16, 15*len(imgs)))
+    fig, ax = plt.subplots(3*len(imgs), 2, figsize=(16, 18*len(imgs)))
 
     k = 0
     for i in range(len(imgs)):
@@ -95,7 +95,7 @@ def disp_3D_val(val_masks, val_preds, model_name, backbone, classes, out_path, h
 
     # Plot the validation actual masks and their predicted masks for each patch in the validation set, predictions from all models
 
-    fig = plt.figure(figsize=(8, 4*len(val_masks)))
+    fig = plt.figure(figsize=(16, 6*len(val_masks)))
     cube_size = 1
     all_colours = np.unique(val_masks.ravel())
     all_colours = all_colours[all_colours != 0]
@@ -113,7 +113,7 @@ def disp_3D_val(val_masks, val_preds, model_name, backbone, classes, out_path, h
         ax.scatter(x, y, z, c=greyscale_colours, marker='s', s=cube_size**2)
         c = np.unique(greyscale_colours.ravel())
         patches = [mpatches.Patch(ec='k', fc=fc[i], label=classes[all_colours[i]]) for i in range(len(fc))]
-        ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        ax.legend(handles=patches, bbox_to_anchor=(1.05, 1.05), loc=2, borderaxespad=0.)
 
         ax = fig.add_subplot(len(val_masks), 2, (2*i)+2, projection='3d')
         ax.set_title('Predicted Mask {} by\n{} with {} backbone'.format((i+1), model_name, backbone))
@@ -125,7 +125,7 @@ def disp_3D_val(val_masks, val_preds, model_name, backbone, classes, out_path, h
         ax.scatter(x, y, z, c=greyscale_colours, marker='s', s=cube_size**2)
         c = np.unique(greyscale_colours.ravel())
         patches = [mpatches.Patch(ec='k', fc=fc[i], label=classes[all_colours[i]]) for i in range(len(fc))]
-        ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        ax.legend(handles=patches, bbox_to_anchor=(1.05, 1.05), loc=2, borderaxespad=0.)
     plt.savefig(out_path+'{}HPF_{}_{}_val_masks_and_preds3D.jpg'.format(hpf, backbone, model_name))
     plt.show()
 
@@ -133,7 +133,7 @@ def disp_3D_pred(preds, model_name, backbone, out_path, classes, hpf):
 
     # Plot the predicted masks for each patch in the validation set, predictions from all models
 
-    fig = plt.figure(figsize=(4, 4*len(preds)))
+    fig = plt.figure(figsize=(8, 6*len(preds)))
     cube_size = 1
     all_colours = np.unique(preds.ravel())
     all_colours = all_colours[all_colours != 0]
@@ -151,6 +151,6 @@ def disp_3D_pred(preds, model_name, backbone, out_path, classes, hpf):
         ax.scatter(x, y, z, c=greyscale_colours, marker='s', s=cube_size**2)
         c = np.unique(greyscale_colours.ravel())
         patches = [mpatches.Patch(ec='k', fc=fc[i], label=classes[all_colours[i]]) for i in range(len(fc))]
-        ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        ax.legend(handles=patches, bbox_to_anchor=(1.05, 1.05), loc=2, borderaxespad=0.)
     plt.savefig(out_path+'{}HPF_{}_{}_test_preds3D.jpg'.format(hpf, backbone, model_name))
     plt.show()
