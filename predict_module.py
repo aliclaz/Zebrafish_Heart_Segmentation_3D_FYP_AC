@@ -95,6 +95,8 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
         reconstructed_preds.append(reconstructed_pred)
     reconstructed_preds = np.asarray(reconstructed_preds, dtype=np.ndarray)
 
+    print(reconstructed_preds.shape)
+
     # Convert to uint8 for opening in image viewing software
 
     reconstructed_preds = reconstructed_preds.astype(np.uint8)
