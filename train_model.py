@@ -52,7 +52,7 @@ def main(args):
 
     x_train, x_val, y_train, y_val = load_process_imgs(img_path, mask_path, args.train_val_split, n_classes)
 
-    # Initialising mirrored distribution for multi-gpu support and adjust batch size and steps per epoch accordingly
+    # Initialising mirrored distribution for multi-gpu support and adjust batch size accordingly
 
     devices = tf.config.list_physical_devices('GPU')
 
@@ -137,7 +137,7 @@ def main(args):
     # Use model to predict masks for each validation image
 
     with strategy.scope():
-        val_preds = val_predict(load_path, strategy, x_val, patch_size)
+        val_preds = val_predict(load_path, x_val, patch_size)
 
     # Convert train and validation masks back from categorical
 
@@ -164,7 +164,7 @@ def main(args):
     # Use model to predict masks for each validation image
 
     with strategy.scope():
-        test_imgs, test_preds = test_predict(load_path, strategy, args.backbone, test_paths, out_path, args.hpf)
+        test_imgs, test_preds = test_predict(load_path, args.backbone, test_paths, out_path, args.hpf)
 
     # Display test images and their predicted masks from the model in 2D slices
 
