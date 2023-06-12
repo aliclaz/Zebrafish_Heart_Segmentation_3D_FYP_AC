@@ -137,6 +137,11 @@ def predict(load_path, backbone, in_paths, out_path, hpf, GM):
 
     imgs_256x256x256_3ch = np.stack((imgs_256x256x256,)*3, axis=-1).astype(np.uint8)
 
+    # Reshape array for patches for each image so that the element for each array contains an 
+    # element for each patch
+
+    imgs_reshaped = imgs.reshape(imgs.shape[0], -1, imgs.shape[4], imgs.shape[5], imgs.shape[6])
+
     # Use model to predict mask for each 3D patch and add the patches to an array of shape 
     # (n_images, n_patches, height, width, depth, classes)
 
@@ -144,35 +149,29 @@ def predict(load_path, backbone, in_paths, out_path, hpf, GM):
     preds = []
     preprocess_input = get_preprocessing(backbone)
 
-    for i in range(imgs.shape[0]):
-        for j in range(imgs.shape[1]):
-            for k in range(imgs.shape[2]):
-                for l in range(imgs.shape[3]):
-                    single_patch = imgs[i,j,k,l,:,:,:]
-                    single_patch_3ch = np.stack((single_patch,)*3, axis=-1)
-                    single_patch_3ch_input = preprocess_input(np.expand_dims(single_patch_3ch, axis=0))
-                    single_patch_pred = model.predict(single_patch_3ch_input)
-                    single_patch_pred_argmax = np.argmax(single_patch_pred,
-                                                        axis=4)[0,:,:,:]
-                    pred_patches.append(single_patch_pred_argmax)
+    for img_patches in imgs_reshaped:
+        pred_patches = []
+        for patch in img_patches:
+            patch_3ch = np.stack([patch]*3, axis=-1)
+            patch_3ch_add_axis = np.expand_dims(patch_3ch, axis=0).astype(np.float32)
+            patch_3ch_input = preprocess_input(patch_3ch_add_axis)
+            patch_pred = model.predict(patch_3ch_input)
+            patch_pred_argmax = np.argmax(patch_pred, axis=4)[0,:,:,:]
+            pred_patches.append(patch_pred_argmax)
+        pred_patches = np.asarray(pred_patches, dtype=np.ndarray)
         preds.append(pred_patches)
-    for i in range(len(preds)):
-        preds[i] = np.asarray(preds[i], dtype=np.ndarray)
     preds = np.asarray(preds, dtype=np.ndarray)
 
     # Reshape patches to shape just after patchifying
 
-    preds_reshaped = np.reshape(preds, (imgs.shape[0], imgs.shape[1],
-                                imgs.shape[2], imgs.shape[3],
-                                imgs.shape[4], imgs.shape[5],
-                                imgs.shape[6]))
+    preds_reshaped = np.reshape(preds, imgs.shape)
 
     # Repatch the patches to the volume of the original images
 
     reconstructed_preds = []
 
-    for i in range(len(preds_reshaped)):
-        reconstructed_pred = unpatchify(preds_reshaped[i], imgs_256x256x256.shape)
+    for pred_patches in preds_reshaped:
+        reconstructed_pred = unpatchify(pred_patches, img_256x256x256.shape)
         reconstructed_preds.append(reconstructed_pred)
     reconstructed_preds = np.asarray(reconstructed_preds, dtype=np.ndarray)
 
@@ -182,7 +181,7 @@ def predict(load_path, backbone, in_paths, out_path, hpf, GM):
 
     # Save masks as segmented volumes
 
-    for i in reconstructed_preds:
-        imsave(out_path+'{}HPF_{}_predicted_mask.tif'.format(hpf, GM), reconstructed_preds[i])
+    for reconstructed_pred in reconstructed_preds:
+        imsave(out_path+'{}HPF_{}_predicted_mask.tif'.format(hpf, GM), reconstructed_pred)
 
     return imgs_256x256x256_3ch, reconstructed_preds
