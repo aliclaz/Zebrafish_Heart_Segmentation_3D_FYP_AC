@@ -48,6 +48,7 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
 
     for in_path in in_paths:
         img = io.imread(in_path)
+        img = img.astype(np.float32)
         imgs_full_size.append(img)
         patches = patchify(img, (64, 64, 64), step=64)
         imgs.append(patches)
