@@ -109,7 +109,7 @@ def test_predict(load_path, strategy, backbone, in_paths, out_path, hpf):
 
     return imgs_full_size_3ch, reconstructed_preds
 
-def predict(model_path, strategy, backbone, in_paths, out_path, hpf):
+def predict(load_path, strategy, backbone, in_paths, out_path, hpf, GM):
 
     """ 
     Loading of images and preprocessing followed by predictions of the masks by the entered model for each image
@@ -117,7 +117,7 @@ def predict(model_path, strategy, backbone, in_paths, out_path, hpf):
     """
 
     with strategy.scope():
-        model = load_model(model_path, compile=False)
+        model = load_model(load_path, compile=False)
 
     mod_hpf = get_hpf(hpf)
 
@@ -182,11 +182,11 @@ def predict(model_path, strategy, backbone, in_paths, out_path, hpf):
 
     # Convert to uint8 for opening in image viewing software
 
-    recounstructed_imgs = reconstructed_preds.astype(np.uint8)
+    reconstructed_preds = reconstructed_preds.astype(np.uint8)
 
     # Save masks as segmented volumes
 
     for i in reconstructed_preds:
-        imsave(out_path+'{}HPF_predicted_mask.tif'.format(hpf), reconstructed_preds[i])
+        imsave(out_path+'{}HPF_{}_predicted_mask.tif'.format(hpf, GM), reconstructed_preds[i])
 
     return imgs_256x256x256_3ch, reconstructed_preds

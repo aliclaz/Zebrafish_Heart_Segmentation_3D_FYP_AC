@@ -133,7 +133,8 @@ def main(args):
 
     # Use model to predict masks for each validation image
 
-    val_preds = val_predict(mod_path + '{}HPF_{}_{}_{}_epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), strategy, x_val, patch_size)
+    with strategy.scope():
+        val_preds = val_predict(mod_path + '{}HPF_{}_{}_{}_epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), strategy, x_val, patch_size)
 
     # Convert train and validation masks back from categorical
 
@@ -159,7 +160,8 @@ def main(args):
 
     # Use model to predict masks for each validation image
 
-    test_imgs, test_preds = test_predict(mod_path + '{}HPF_{}_{}_{}_epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), strategy, args.backbone, test_paths, out_path, args.hpf)
+    with strategy.scope():
+        test_imgs, test_preds = test_predict(mod_path + '{}HPF_{}_{}_{}_epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), strategy, args.backbone, test_paths, out_path, args.hpf)
 
     # Display test images and their predicted masks from the model in 2D slices
 

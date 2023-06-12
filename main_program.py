@@ -17,7 +17,6 @@ from statistical_analysis.df_manipulation import gm_df_calcs, healthy_df_calcs, 
 
 STAT_PATH = '/Stats/'
 MOD_PATH = '/Models/'
-OUT_PATH = '/Results/'
 
 # Define the required size parameters of the image for the model and the backbone used in the model
 
@@ -32,11 +31,25 @@ def main(args):
 
     # Import images, preprocess, load_model, make predictions and save the predicted masks
 
-    imgs, preds = predict(MOD_PATH+'{}HPF_{}_{}_{}epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), strategy, args.backbone, args.in_path, args.out_path)
+    with strategy.scope():
+        imgs, preds = predict(MOD_PATH+'{}HPF_{}_{}_{}epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), strategy, args.backbone, args.in_files, args.out_path, GM=args.gm)
+
+    # Get the class labels for each stage of development
+
+    if mod_hpf == 30:
+        classes = ['Background', 'AVC', 'Endocardium' 'Noise', 'Atrium', 'Ventricle']
+    elif mod_hpf == 36:
+        classes = ['Background', 'Endocardium', 'Atrium', 'Noise', 'Ventricle']
+    elif mod_hpf == 48:
+        classes = ['Background', 'Noise', 'Endocardium', 'Atrium', 'AVC', 'Ventricle']
 
     # Plot the test images and their predicted masks at 3 random slice
     
-    show_pred_masks(imgs, preds, args.out_path)
+    show_pred_masks(args.model_name, args.backbone, imgs, preds, args.out_path, classes)
+
+    # Show the 3D predicted mask for each image
+
+
 
     # Get one of the default hpf values (30, 36, 48) based on which the entered value is closest to
 
@@ -47,17 +60,7 @@ def main(args):
 
     scales = args.scale.split(' ')
     scales = [float(scale) for scale in scales]
-
-    # Find volume of each class in the image
-    # Get the class labels for each stage of development
-
-    if mod_hpf == 30:
-        classes = ['Background', 'Noise', 'Endocardium', 'Linear Heart Tube']
-    elif mod_hpf == 36:
-        classes = ['Background', 'Noise', 'Endocardium', 'Atrium', 'Ventricle']
-    elif mod_hpf == 48:
-        classes = ['Background', 'Noise', 'Endocardium', 'Atrium', 'AVC', 'Ventricle']
-        
+    
     # Complete calculations of the volumes of each class from the predicted masks and complete a statistical test as to whether the difference between
     # the mean volume of each class of the entered images is statistically significantly different to that of the mean healthy volume of each class
 
@@ -86,7 +89,7 @@ if __name__ == '__main__':
     parser.add_argument('--scale', type=str, help='Enter the width dimension of each image in \u03bcm separated by a single space. Press ENTER when done.', required=True)
     parser.add_argument('--model_name', type=str, help='Model architecture to be used for predictions', default='AttentionResUnet')
     parser.add_argument('--backbone', type=str, help='Pretrained backbone used in the model', default='resnet34')
-    parser.add_argument('--epochs', type=int, help='Number of epochs used to train the model', default=100)
+    parser.add_argument('--epochs', type=int, help='Number of epochs the model was trained on', default=100)
 
     args = parser.parse_args()
 
