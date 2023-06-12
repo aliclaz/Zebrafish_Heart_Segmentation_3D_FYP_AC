@@ -327,8 +327,3 @@ def add_healthy_df_calcs(new_healthy_masks, classes, hpf, scales, in_path, out_p
     n_samples[hpf, 'Healthy'] = n + len(new_healthy_masks)
 
     n_samples.to_csv(out_path+'n_samples.csv')
-
-
-    
-
-    
