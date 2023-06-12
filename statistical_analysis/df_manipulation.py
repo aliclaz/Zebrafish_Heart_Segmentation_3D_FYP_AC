@@ -66,10 +66,10 @@ def gm_df_calcs(masks, classes, hpf, gm, scales, in_path, out_path):
     if len(masks) == 1:
         column = ['{} Volume (\u03bcm\u00b2) at {}HPF'.format(gm, hpf)]
         observed = pd.DataFrame(observed, index=classes, columns=column, dtype=float)
-        stats = stats.append(observed)
+        stats = pd.concat([stats, observed], axis=1)
     else:
-        stats = stats.append(observed)
-    stats = stats.append(results_df)
+        stats = pd.concat([stats, observed], axis=1)
+    stats = pd.concat([stats, results_df], axis=1)
 
     # Remove unwanted classes from the dataframe for display
 
@@ -90,7 +90,7 @@ def gm_df_calcs(masks, classes, hpf, gm, scales, in_path, out_path):
     # of samples into it
 
     n_new = pd.DataFrame([len(masks)], index=[hpf], columns=[gm], dtype=int)
-    n_samples = n_samples.append(n_new)
+    n_samples = pd.concat([n_samples, n_new], axis=1)
 
     # Save the dataframe
 
