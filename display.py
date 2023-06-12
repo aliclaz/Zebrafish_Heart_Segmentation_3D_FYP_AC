@@ -40,6 +40,7 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes):
     values = np.unique(gts.ravel())
 
     fig, ax = plt.subplots(len(imgs)*3, 3, figsize=(15, 12*len(imgs)))
+    print(imgs.shape)
 
     k = 0
     for i in range(3*len(imgs)):
@@ -48,6 +49,7 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes):
         for j in range(3):
             if j == 0:
                 ax[i,j].set_title('Validation Image')
+                print(imgs[i,:,:,slices[k],0].shape)
                 ax[i,j].imshow(imgs[i,:,:,slices[k],0])
             elif j == 1:
                 ax[i,j].set_title('Ground Truth Mask')
