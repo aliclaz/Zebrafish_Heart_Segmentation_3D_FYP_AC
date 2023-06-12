@@ -15,7 +15,7 @@ def show_history(history, model_name, backbone, out_path, hpf):
     epochs = range(1, len(loss) + 1)
     ax[0].plot(epochs, loss, 'y', label='Training Loss')
     ax[0].plot(epochs, val_loss, 'r', label='Validation Loss')
-    ax[0].set_title('Training and Validation Loss for {} with {} Backbone'.format(model_name, backbone))
+    ax[0].set_title('Training and Validation Loss for\n{} with {} Backbone'.format(model_name, backbone))
     ax[0].set_xlabel('Epochs')
     ax[0].set_ylabel('Loss')
     ax[0].legend()
@@ -24,7 +24,7 @@ def show_history(history, model_name, backbone, out_path, hpf):
     val_acc = history.history['val_iou_score']
     ax[1].plot(epochs, acc, 'y', label='Training IOU')
     ax[1].plot(epochs, val_acc, 'r', label='Validation IOU ')
-    ax[1].set_title('Training and Validation IOU for {} with {} Backbone'.format(model_name, backbone))
+    ax[1].set_title('Training and Validation IOU for\n{} with {} Backbone'.format(model_name, backbone))
     ax[1].set_xlabel('Epochs')
     ax[1].set_ylabel('IOU')
     ax[1].legend()
@@ -41,7 +41,7 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes, hp
     colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
     c = np.stack([colours_normalized]*3, axis=-1)
 
-    fig, ax = plt.subplots(len(imgs)*3, 3, figsize=(24, 15*len(imgs)))
+    fig, ax = plt.subplots(len(imgs)*3, 3, figsize=(24, 12*len(imgs)))
 
     k = 0
     for i in range(len(imgs)):
@@ -54,7 +54,7 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes, hp
             patches = [mpatches.Patch(ec='k', fc=c[i], label=classes[i]) for i in range(len(classes))]
             ax[k,1].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
-            ax[k,2].set_title('Predicted Mask {}, Slice {} by {} with {} Backbone'.format((i+1), slice, model_name, backbone))
+            ax[k,2].set_title('Predicted Mask {}, Slice {} by\n{}with {} Backbone'.format((i+1), slice, model_name, backbone))
             ax[k,2].imshow(preds[i,:,:,slice], cmap='gray')
             patches = [mpatches.Patch(ec='k', fc=c[i], label=classes[i]) for i in range(len(classes))]
             ax[k,2].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
@@ -72,7 +72,7 @@ def show_pred_masks(model_name, backbone, imgs, preds, out_path, classes, hpf):
     colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
     c = np.stack([colours_normalized]*3, axis=-1)
 
-    fig, ax = plt.subplots(3*len(imgs), 2, figsize=(16, 15*len(imgs)))
+    fig, ax = plt.subplots(3*len(imgs), 2, figsize=(16, 12*len(imgs)))
 
     k = 0
     for i in range(len(imgs)):
@@ -80,7 +80,7 @@ def show_pred_masks(model_name, backbone, imgs, preds, out_path, classes, hpf):
             ax[k,0].set_title('Test Image {}, Slice {}'.format((i+1), slice))
             ax[k,0].imshow(imgs[i,:,:,slice])
         
-            ax[k,1].set_title('Predicted Mask {}, Slice {} by {} with {} Backbone'.format((i+1), slice, model_name, backbone))
+            ax[k,1].set_title('Predicted Mask {}, Slice {} by\n{} with {} Backbone'.format((i+1), slice, model_name, backbone))
             ax[k,1].imshow(preds[i,:,:,slice], cmap='gray')
             patches = [mpatches.Patch(ec='k', fc=c[i], label=classes[i]) for i in range(len(classes))]
             ax[k,1].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
@@ -111,7 +111,7 @@ def disp_3D_val(val_masks, val_preds, model_name, backbone, classes, out_path, h
         ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
         ax = fig.add_subplot(len(val_masks), 2, (2*i)+2, projection='3d')
-        ax.set_title('Predicted Mask {} by {} with {} backbone'.format((i+1), model_name, backbone))
+        ax.set_title('Predicted Mask {} by\n{} with {} backbone'.format((i+1), model_name, backbone))
         val_pred = val_preds[i].reshape(val_preds[i].shape[0], val_preds[i].shape[1], val_preds[i].shape[2])
         y, x, z = np.where(val_pred != 0)
         colours = val_pred[y, x, z]
@@ -134,7 +134,7 @@ def disp_3D_pred(preds, model_name, backbone, out_path, classes, hpf):
 
     for i in range(len(preds)):
         ax = fig.add_subplot(len(preds), 1, i+1, projection='3d')
-        ax.set_title('Predicted Mask {} by {} with {} backbone'.format((i+1), model_name, backbone))
+        ax.set_title('Predicted Mask {} by\n{} with {} backbone'.format((i+1), model_name, backbone))
         pred = preds[i].reshape(preds[i].shape[0], preds[i].shape[1], preds[i].shape[2])
         y, x, z = np.where(pred != 0)
         colours = pred[y, x, z]
