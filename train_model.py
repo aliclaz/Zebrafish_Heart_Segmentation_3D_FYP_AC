@@ -16,7 +16,7 @@ from imgPreprocessing import load_process_imgs
 from seg_models import Unet, AttentionUnet, AttentionResUnet, get_preprocessing
 from seg_models import losses as l
 from seg_models import metrics as m
-from display import show_history, show_val_masks, show_test_masks, disp_3D_val, disp_3D_test
+from display import show_history, show_val_masks, show_pred_masks, disp_3D_val, disp_3D_pred
 from predict_module import val_predict, test_predict
 from statistical_analysis.df_manipulation import healthy_df_calcs
 
@@ -163,11 +163,11 @@ def main(args):
 
     # Display test images and their predicted masks from the model in 2D slices
 
-    show_test_masks(args.model_name, args.backbone, test_imgs, test_preds, out_path, classes)
+    show_pred_masks(args.model_name, args.backbone, test_imgs, test_preds, out_path, classes)
 
     # Display predicted masks from test images in 3D
 
-    disp_3D_test(test_preds, args.model_name, args.backbone, out_path, classes)
+    disp_3D_pred(test_preds, args.model_name, args.backbone, out_path, classes)
 
     # Collect train and validation original masks and test predictions into healthy dataset
     # with a list of their scales

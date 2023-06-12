@@ -1,14 +1,11 @@
 import argparse
+import tensorflow as tf
 
 # coding: utf-8
 
 if __name__ == '__main__':
     import os
-
-    gpu_use = 0
-    print('GPU use: {}'.format(gpu_use))
     os.environ['KERAS_BACKEND'] = 'tensorflow'
-    os.environ['CUDA_VISIBLE_DEVICES'] = '{}'.format(gpu_use)
 
 from imgPreprocessing import get_hpf
 from keras.models import load_model
@@ -20,19 +17,22 @@ from statistical_analysis.df_manipulation import gm_df_calcs, healthy_df_calcs, 
 
 STAT_PATH = '/Stats/'
 MOD_PATH = '/Models/'
+OUT_PATH = '/Results/'
 
 # Define the required size parameters of the image for the model and the backbone used in the model
 
 HEIGHT = 512
 WIDTH = 512
 DEPTH = 512
-BACKBONE = 'resnet34'
 
 def main(args):
 
+    devices = tf.config.list_physical_devices('GPU')
+    strategy = tf.distribute.MirroredStrategy(['GPU:{}'.format(i) for i in range(len(devices))])
+
     # Import images, preprocess, load_model, make predictions and save the predicted masks
 
-    imgs, preds = predict(MOD_PATH+'{}HPF_{}_{}epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), BACKBONE, args.args.args.in_path, args.out_path)
+    imgs, preds = predict(MOD_PATH+'{}HPF_{}_{}_{}epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), strategy, args.backbone, args.in_path, args.out_path)
 
     # Plot the test images and their predicted masks at 3 random slice
     
