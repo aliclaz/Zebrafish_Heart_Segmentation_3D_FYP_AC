@@ -122,7 +122,7 @@ def disp_3D_val(val_masks, val_preds, model_name, backbone, classes, out_path, h
         colours = val_pred[y, x, z]
         colours_normalized = colours / np.max(all_colours)
         greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
-        ax.scatter(x, y, z, c=greyscale_colours, markers='s', s=cube_size**2)
+        ax.scatter(x, y, z, c=greyscale_colours, marker='s', s=cube_size**2)
         c = np.unique(greyscale_colours.ravel())
         patches = [mpatches.Patch(ec='k', fc=fc[i], label=classes[all_colours[i]]) for i in range(len(fc))]
         ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
@@ -148,7 +148,7 @@ def disp_3D_pred(preds, model_name, backbone, out_path, classes, hpf):
         colours = pred[y, x, z]
         colours_normalized = colours / np.max(all_colours)
         greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
-        ax.scatter(x, y, z, c=greyscale_colours, markers='s', s=cube_size**2)
+        ax.scatter(x, y, z, c=greyscale_colours, marker='s', s=cube_size**2)
         c = np.unique(greyscale_colours.ravel())
         patches = [mpatches.Patch(ec='k', fc=fc[i], label=classes[all_colours[i]]) for i in range(len(fc))]
         ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
