@@ -43,25 +43,20 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes):
 
     fig, ax = plt.subplots(len(imgs)*3, 3, figsize=(15, 12*len(imgs)))
 
-    k = 0
-    for i in range(3*len(imgs)):
-        if i % 2 == 0 and i != 0:
-            k = 0
-        for j in range(3):
-            if j == 0:
-                ax[i,j].set_title('Validation Image')
-                ax[i,j].imshow(imgs[i,:,:,slices[k]])
-            elif j == 1:
-                ax[i,j].set_title('Ground Truth Mask')
-                ax[i,j].imshow(gts[i,:,:,slices[k]], cmap='gray')
+    for i in range(len(imgs)):
+        for slice in slices:
+                ax[i,0].set_title('Validation Image')
+                ax[i,0].imshow(imgs[i,:,:,slice])
+
+                ax[i,1].set_title('Ground Truth Mask')
+                ax[i,1].imshow(gts[i,:,:,slice], cmap='gray')
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
-                ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-            else:
-                ax[i,j].set_title('Predicted Mask by {} with {} backbone'.format(model_name, backbone))
-                ax[i,j].imshow(preds[i,:,:,slices[k]], cmap='gray')
+                ax[i,1].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+
+                ax[i,2].set_title('Predicted Mask by {} with {} backbone'.format(model_name, backbone))
+                ax[i,2].imshow(preds[i,:,:,slice], cmap='gray')
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
-                ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-        k += 1
+                ax[i,2].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.savefig(out_path+'val_imgs_and_masks.jpg')
     plt.show()
 
@@ -76,18 +71,15 @@ def show_pred_masks(model_name, backbone, imgs, preds, out_path, classes):
 
     fig, ax = plt.subplots(3*len(imgs), 2, figsize=(10, 12*len(imgs)))
 
-    k = 0
     for i in range(3*len(imgs)):
-        if i % 2 == 0 and i != 0:
-            k = 0
-        ax[i,0].set_title('Test Image')
-        ax[i,0].imshow(imgs[i,:,:,slices[k],0])
-    
-        ax[i,1].set_title('Predicted Mask by {} with {} backbone'.format(model_name, backbone))
-        ax[i,1].imshow(preds[i,:,:,slices[k],0], cmap='gray')
-        patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
-        ax[i,1].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-        k += 1
+        for slice in slices:
+            ax[i,0].set_title('Test Image')
+            ax[i,0].imshow(imgs[i,:,:,slice])
+        
+            ax[i,1].set_title('Predicted Mask by {} with {} backbone'.format(model_name, backbone))
+            ax[i,1].imshow(preds[i,:,:,slice], cmap='gray')
+            patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
+            ax[i,1].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.savefig(out_path+'test_imgs_and_masks.jpg')
     plt.show()
 
