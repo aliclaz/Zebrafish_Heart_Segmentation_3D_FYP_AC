@@ -80,8 +80,8 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
             patch_pred = model.predict(patch_3ch_input)
             patch_pred_argmax = np.argmax(patch_pred, axis=4)[0,:,:,:]
             pred_patches.append(patch_pred_argmax)
-            np_pred_patches = np.asarray(pred_patches, dtype=np.ndarray)
-        preds.append(np_pred_patches)
+        pred_patches = np.asarray(pred_patches, dtype=np.ndarray)
+        preds.append(pred_patches)
     preds = np.asarray(preds, dtype=np.ndarray)
 
     # Reshape patches to shape just after patchifying
