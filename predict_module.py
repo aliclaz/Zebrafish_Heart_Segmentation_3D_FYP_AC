@@ -51,7 +51,7 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
         patches = patchify(img, (64, 64, 64), step=64)
         imgs.append(patches)
     imgs_full_size = np.asarray(imgs_full_size, dtype=np.ndarray)
-    imgs = np.asrray(imgs, dtype=np.ndarray)
+    imgs = np.asarray(imgs, dtype=np.ndarray)
 
     # Convert full sized image to have 3 channels for display purposes
 
