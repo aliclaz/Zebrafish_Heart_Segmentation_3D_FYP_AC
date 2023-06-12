@@ -43,7 +43,8 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
 
     # Read each image in the directory, convert it into patches and add the patches to an array
 
-    imgs = imgs_full_size = []
+    imgs = []
+    imgs_full_size = []
 
     for in_path in in_paths:
         img = io.imread(in_path)
