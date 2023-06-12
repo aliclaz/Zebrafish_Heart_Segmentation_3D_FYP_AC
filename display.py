@@ -36,14 +36,14 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes):
 
     # Plot the validation images, and their actual and predicted masks for each patch from each model at 3 random slices
     
-    slices = np.random.randint(64, size=(len(imgs), 3))
-    n_rows = len(imgs) * 3
+    slices = np.random.randint(64, size=(3))
     values = np.unique(gts.ravel())
 
-    fig, ax = plt.subplots(n_rows, 3, figsize=(15, 5*n_rows))
+    fig, ax = plt.subplots(len(imgs)*3, 3, figsize=(15, 12*len(imgs)))
+
     k = 0
-    for i in range(n_rows):
-        if i % 3 == 0 and k != 0:
+    for i in range(3*len(imgs)):
+        if i % 2 == 0 and k != 0:
             k += 1
         for j in range(3):
             if j == 0:
@@ -57,7 +57,7 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes):
                 ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             else:
                 ax[i,j].set_title('Predicted Mask by {} with {} backbone'.format(model_name, backbone))
-                ax[i,j].imshow(preds[j-2,slices[k],:,:,:,0], cmap='gray')
+                ax[i,j].imshow(preds[slices[k],:,:,:,0], cmap='gray')
                 c = [ax[i,j].cmap(ax[i,j].norm(value)) for value in values]
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
                 ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
@@ -68,26 +68,26 @@ def show_pred_masks(model_name, backbone, imgs, preds, out_path, classes):
 
     # Plot images from the test set and their predicted masks from each model at 3 random slices 
 
-    slices = np.random.randint(256, size=(len(imgs), 3))
-    n_rows = len(imgs) * 3
+    slices = np.random.randint(256, size=(3))
     values = np.unique(preds.ravel())
 
-    fig, ax = plt.subplots(n_rows, 2, figsize=(10, 5*n_rows))
+    fig, ax = plt.subplots(3*len(imgs), 2, figsize=(10, 12*len(imgs)))
+
     k = 0
-    for i in range(n_rows):
-        if i % 3 == 0 and k != 0:
+    for i in range(3):
+        if i % 2 == 0 and k != 0:
             k += 1
-            ax[i,0].set_title('Test Image')
-            ax[i,0].imshow(imgs[slices[k],:,:,:,0])
-            c = [ax[i,0].cmap(ax[i,0].norm(value)) for value in values]
-            patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
-            ax[i,0].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-        
-            ax[i,1].set_title('Predicted Mask by {} with {} backbone'.format(model_name, backbone))
-            ax[i,1].imshow(preds[0,slices[k],:,:,:,0], cmap='gray')
-            c = [ax[i,1].cmap(ax[i,1].norm(value)) for value in values]
-            patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
-            ax[i,1].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        ax[i,0].set_title('Test Image')
+        ax[i,0].imshow(imgs[slices[k],:,:,:,0])
+        c = [ax[i,0].cmap(ax[i,0].norm(value)) for value in values]
+        patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
+        ax[i,0].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    
+        ax[i,1].set_title('Predicted Mask by {} with {} backbone'.format(model_name, backbone))
+        ax[i,1].imshow(preds[slices[k],:,:,:,0], cmap='gray')
+        c = [ax[i,1].cmap(ax[i,1].norm(value)) for value in values]
+        patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
+        ax[i,1].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.savefig(out_path+'test_imgs_and_masks.jpg')
     plt.show()
 
