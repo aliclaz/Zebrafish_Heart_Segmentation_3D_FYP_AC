@@ -67,25 +67,24 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
     preds = []
     preprocess_input = get_preprocessing(backbone)
 
-    for i in range(imgs.shape[0]):
-        for j in range(imgs.shape[1]):
-            for k in range(imgs.shape[2]):
-                for l in range(imgs.shape[3]):
-                    single_patch = imgs[i,j,k,l,:,:,:]
-                    single_patch_3ch = np.stack((single_patch,)*3, axis=-1)
-                    single_patch_3ch_size5 = np.expand_dims(single_patch_3ch, axis=0).astype(np.float32)
-                    single_patch_3ch_input = preprocess_input(single_patch_3ch_size5)
-                    single_patch_pred = model.predict(single_patch_3ch_input)
-                    print(single_patch_pred.shape)
-                    single_patch_pred_argmax = np.argmax(single_patch_pred,
-                                                        axis=4)[0,:,:,:]
-                    print(single_patch_pred_argmax.shape)
-                    pred_patches.append(single_patch_pred_argmax)
-        preds.append(pred_patches)
-    for i in range(len(preds)):
-        preds[i] = np.asarray(preds[i], dtype=np.ndarray)
+    # Reshape array for patches for each image so that the element for each array contains an 
+    # element for each patch
+
+    imgs_reshaped = imgs.reshape(imgs.shape[0], -1, imgs.shape[4], imgs.shape[5], imgs.shape[6])
+
+    # Make predictions for each patch of each image
+
+    for img_patches in imgs_reshaped:
+        for patch in img_patches:
+            patch_3ch = np.stack([patch]*3, axis=-1)
+            patch_3ch_add_axis = np.expand_dims(patch_3ch, axis=0).astype(np.float32)
+            patch_3ch_input = preprocess_input(patch_3ch_add_axis)
+            patch_pred = model.predict(patch_3ch_input)
+            patch_pred_argmax = np.argmax(patch_pred, axis=4)[0,:,:,:]
+            pred_patches.append(patch_pred_argmax)
+            np_pred_patches = np.asarray(pred_patches, dtype=np.ndarray)
+        preds.append(np_pred_patches)
     preds = np.asarray(preds, dtype=np.ndarray)
-    print(preds.shape)
 
     # Reshape patches to shape just after patchifying
 
