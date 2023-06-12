@@ -153,20 +153,19 @@ def main(args):
 
     # Use model to predict masks for each validation image
 
-    with strategy.scope():
-        val_preds = val_predict(load_path, x_val, patch_size)
+    val_preds = val_predict(load_path, x_val, patch_size)
 
     # Convert train and validation masks back from categorical
 
     train_masks = []
     for i in range(len(y_train)):
-        train_mask = np.argmax(y_train[i], axis=4)
+        train_mask = np.argmax(y_train[i], axis=3)
         train_masks.append(train_mask)
     train_masks = np.asarray(train_masks)
 
     val_masks = []
     for i in range(len(y_val)):
-        val_mask = np.argmax(y_val[i], axis=4)
+        val_mask = np.argmax(y_val[i], axis=3)
         val_masks.append(val_mask)
     val_masks = np.asarray(val_masks)
 
@@ -180,8 +179,7 @@ def main(args):
 
     # Use model to predict masks for each validation image
 
-    with strategy.scope():
-        test_imgs, test_preds = test_predict(load_path, args.backbone, test_paths, out_path, args.hpf)
+    test_imgs, test_preds = test_predict(load_path, args.backbone, test_paths, out_path, args.hpf)
 
     # Display test images and their predicted masks from the model in 2D slices
 
