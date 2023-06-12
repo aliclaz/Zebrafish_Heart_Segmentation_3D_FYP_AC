@@ -38,10 +38,8 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes, hp
     
     slices = np.random.randint(len(imgs), size=(3))
     colours = np.unique(gts.ravel())
-    if len(colours) > 1:
-        colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
-    else:
-        colours_normalized = np.array([0])
+    colours = colours[colours != 0]
+    colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
     c = np.stack([colours_normalized]*3, axis=-1)
 
     fig, ax = plt.subplots(len(imgs)*3, 3, figsize=(24, 12*len(imgs)))
@@ -54,12 +52,12 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes, hp
 
             ax[k,1].set_title('Ground Truth Mask {}, Slice {}'.format((i+1), slice))
             ax[k,1].imshow(gts[i,:,:,slice], cmap='gray')
-            patches = [mpatches.Patch(ec='k', fc=c[i], label=classes[i]) for i in range(len(classes))]
+            patches = [mpatches.Patch(ec='k', fc=c[i-1] if i != 0 else 'k', label=classes[i]) for i in range(len(classes))]
             ax[k,1].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
             ax[k,2].set_title('Predicted Mask {}, Slice {} by\n{}with {} Backbone'.format((i+1), slice, model_name, backbone))
             ax[k,2].imshow(preds[i,:,:,slice], cmap='gray')
-            patches = [mpatches.Patch(ec='k', fc=c[i], label=classes[i]) for i in range(len(classes))]
+            patches = [mpatches.Patch(ec='k', fc=c[i-1] if i != 0 else 'k', label=classes[i]) for i in range(len(classes))]
             ax[k,2].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             
             k += 1
@@ -72,6 +70,7 @@ def show_pred_masks(model_name, backbone, imgs, preds, out_path, classes, hpf):
 
     slices = np.random.randint(len(imgs), size=(3))
     colours = np.unique(preds.ravel())
+    colours = colours[colours != 0]
     colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
     c = np.stack([colours_normalized]*3, axis=-1)
 
@@ -85,7 +84,7 @@ def show_pred_masks(model_name, backbone, imgs, preds, out_path, classes, hpf):
         
             ax[k,1].set_title('Predicted Mask {}, Slice {} by\n{} with {} Backbone'.format((i+1), slice, model_name, backbone))
             ax[k,1].imshow(preds[i,:,:,slice], cmap='gray')
-            patches = [mpatches.Patch(ec='k', fc=c[i], label=classes[i]) for i in range(len(classes))]
+            patches = [mpatches.Patch(ec='k', fc=c[i-1] if i != 0 else 'k', label=classes[i]) for i in range(len(classes))]
             ax[k,1].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
             k += 1
@@ -97,7 +96,6 @@ def disp_3D_val(val_masks, val_preds, model_name, backbone, classes, out_path, h
     # Plot the validation actual masks and their predicted masks for each patch in the validation set, predictions from all models
 
     fig = plt.figure(figsize=(8, 4*len(val_masks)))
-    fig.patch.set_facecolor('darkblue')
     cube_size = 1
 
     for i in range(len(val_masks)):
@@ -132,7 +130,6 @@ def disp_3D_pred(preds, model_name, backbone, out_path, classes, hpf):
     # Plot the predicted masks for each patch in the validation set, predictions from all models
 
     fig = plt.figure(figsize=(4, 4*len(preds)))
-    fig.patch.set_facecolor('darkblue')
     cube_size = 1
 
     for i in range(len(preds)):
