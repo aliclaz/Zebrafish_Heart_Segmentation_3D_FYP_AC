@@ -17,7 +17,7 @@ def val_predict(load_path, strategy, loss, imgs, patch_size):
     
     """
     with strategy.scope():
-        model = load_model(load_path, custom_objects={'dice_plus_focal_loss': loss})
+        model = load_model(load_path, compile=False)
 
     val_preds = []
 
@@ -41,7 +41,7 @@ def test_predict(load_path, strategy, loss, backbone, in_paths, out_path, hpf):
     """
 
     with strategy.scope():
-        model = load_model(load_path, custom_objects={'dice_plus_focal_loss': loss})
+        model = load_model(load_path, compile=False)
 
     # Read each image in the directory, convert it into patches and add the patches to an array
 
@@ -117,7 +117,7 @@ def predict(model_path, strategy, loss, backbone, in_paths, out_path, hpf):
     """
 
     with strategy.scope():
-        model = load_model(model_path, custom_objects={'dice_foca_plus_focal_loss': loss})
+        model = load_model(model_path, compile=False)
 
     mod_hpf = get_hpf(hpf)
 

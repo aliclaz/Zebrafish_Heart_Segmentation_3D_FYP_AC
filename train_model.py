@@ -79,12 +79,9 @@ def main(args):
 
         opt = Adam(args.learning_rate)
 
-        def dice_plus_focal_loss(gt, pr):
-            dice_loss = l.DiceLoss()
-            cat_focal_loss = l.CategoricalFocalLoss()
-            total_loss = dice_loss + cat_focal_loss
-        
-            return total_loss
+        dice_loss = l.DiceLoss()
+        cat_focal_loss = l.CategoricalFocalLoss()
+        total_loss = dice_loss + cat_focal_loss
 
         metrics = [m.IOUScore(threshold=0.5), m.FScore(threshold=0.5)]
 
@@ -111,7 +108,7 @@ def main(args):
                             input_shape=(patch_size, patch_size, patch_size, channels), 
                             encoder_weights=encoder_weights, activation=activation)
 
-    model.compile(optimizer=opt, loss=dice_plus_focal_loss, metrics=metrics)
+    model.compile(optimizer=opt, loss=total_loss, metrics=metrics)
 
     # Summarise the model architecture
 
