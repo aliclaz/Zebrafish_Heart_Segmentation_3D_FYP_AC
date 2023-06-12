@@ -125,8 +125,8 @@ def healthy_df_calcs(masks, classes, scales, hpf, out_path):
     # Save the regular results (for future analysis) in the input path so they can be accessed again and the display results in the
     # output path so the user can access them - as CSV files
 
-    stats.to_csv(out_path+'{}HPF_stat_analysis.csv'.format(out_path))
-    stats_disp.to_csv(out_path+'{}HPF_stat_results.csv'.format(out_path))
+    stats.to_csv(out_path+'{}HPF_stat_analysis.csv'.format(hpf))
+    stats_disp.to_csv(out_path+'{}HPF_stat_results.csv'.format(hpf))
 
     # Create a dataframe of the number of samples for each gm at each stage of development and save it as a csv file
 
