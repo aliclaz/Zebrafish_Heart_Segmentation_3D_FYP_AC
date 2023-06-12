@@ -32,7 +32,7 @@ def main(args):
     stats_path = path + '/Stats/'
     if args.hpf == 48:
         n_classes = 6
-        classes = ['Background', 'AVC', 'Endocardium' 'Noise', 'Atrium', 'Ventricle']
+        classes = ['Background', 'AVC', 'Endocardium', 'Noise', 'Atrium', 'Ventricle']
         n_imgs = 5
     elif args.hpf == 36:
         n_classes = 5
