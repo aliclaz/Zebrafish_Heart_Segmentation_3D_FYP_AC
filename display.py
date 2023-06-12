@@ -97,6 +97,10 @@ def disp_3D_val(val_masks, val_preds, model_name, backbone, classes, out_path, h
 
     fig = plt.figure(figsize=(8, 4*len(val_masks)))
     cube_size = 1
+    all_colours = np.unique(val_preds.ravel())
+    all_colours = all_colours[all_colours != 0]
+    all_colours_normalized = all_colours / np.max(all_colours)
+    fc = np.stack([all_colours_normalized]*3, axis=-1)
 
     for i in range(len(val_masks)):
         ax = fig.add_subplot(len(val_masks), 2, (2*i)+1, projection='3d')
@@ -104,11 +108,11 @@ def disp_3D_val(val_masks, val_preds, model_name, backbone, classes, out_path, h
         val_mask = val_masks[i].reshape(val_masks[i].shape[0], val_masks[i].shape[1], val_masks[i].shape[2])
         y, x, z = np.where(val_mask != 0)
         colours = val_mask[y, x, z]
-        colours_normalized = colours / np.max(colours)
+        colours_normalized = colours / np.max(all_colours)
         greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
         ax.scatter(x, y, z, c=greyscale_colours, marker='s', s=cube_size**2)
         c = np.unique(greyscale_colours.ravel())
-        patches = [mpatches.Patch(ec='k', fc=c[i], label=classes[i]) for i in range(len(classes))]
+        patches = [mpatches.Patch(ec='k', fc=fc[i-1] if i != 0 else 'k', label=classes[i]) for i in range(len(classes))]
         ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
         ax = fig.add_subplot(len(val_masks), 2, (2*i)+2, projection='3d')
@@ -116,11 +120,11 @@ def disp_3D_val(val_masks, val_preds, model_name, backbone, classes, out_path, h
         val_pred = val_preds[i].reshape(val_preds[i].shape[0], val_preds[i].shape[1], val_preds[i].shape[2])
         y, x, z = np.where(val_pred != 0)
         colours = val_pred[y, x, z]
-        colours_normalized = colours / np.max(colours)
+        colours_normalized = colours / np.max(all_colours)
         greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
         ax.scatter(x, y, z, c=greyscale_colours, markers='s', s=cube_size**2)
         c = np.unique(greyscale_colours.ravel())
-        patches = [mpatches.Patch(ec='k', fc=c[i], label=classes[i]) for i in range(len(classes))]
+        patches = [mpatches.Patch(ec='k', fc=fc[i-1] if i != 0 else 'k', label=classes[i]) for i in range(len(classes))]
         ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.savefig(out_path+'{}HPF_{}_{}_val_masks_and_preds3D.jpg'.format(hpf, backbone, model_name))
     plt.show()
@@ -131,6 +135,10 @@ def disp_3D_pred(preds, model_name, backbone, out_path, classes, hpf):
 
     fig = plt.figure(figsize=(4, 4*len(preds)))
     cube_size = 1
+    all_colours = np.unique(preds.ravel())
+    all_colours = all_colours[all_colours != 0]
+    all_colours_normalized = all_colours / np.max(all_colours)
+    fc = np.stack([all_colours_normalized]*3, axis=-1)
 
     for i in range(len(preds)):
         ax = fig.add_subplot(len(preds), 1, i+1, projection='3d')
@@ -138,11 +146,11 @@ def disp_3D_pred(preds, model_name, backbone, out_path, classes, hpf):
         pred = preds[i].reshape(preds[i].shape[0], preds[i].shape[1], preds[i].shape[2])
         y, x, z = np.where(pred != 0)
         colours = pred[y, x, z]
-        colours_normalized = colours / np.max(colours)
+        colours_normalized = colours / np.max(all_colours)
         greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
         ax.scatter(x, y, z, c=greyscale_colours, markers='s', s=cube_size**2)
         c = np.unique(greyscale_colours.ravel())
-        patches = [mpatches.Patch(ec='k', fc=c[i], label=classes[i]) for i in range(len(classes))]
+        patches = [mpatches.Patch(ec='k', fc=fc[i-1] if i != 0 else 'k', label=classes[i]) for i in range(len(classes))]
         ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.savefig(out_path+'{}HPF_{}_{}_test_preds3D.jpg'.format(hpf, backbone, model_name))
     plt.show()
