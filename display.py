@@ -97,7 +97,7 @@ def disp_3D_val(val_masks, val_preds, model_name, backbone, classes, out_path, h
 
     fig = plt.figure(figsize=(8, 4*len(val_masks)))
     cube_size = 1
-    all_colours = np.unique(val_preds.ravel())
+    all_colours = np.unique(val_masks.ravel())
     all_colours = all_colours[all_colours != 0]
     all_colours_normalized = all_colours / np.max(all_colours)
     fc = np.stack([all_colours_normalized]*3, axis=-1)
