@@ -37,7 +37,9 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes):
     # Plot the validation images, and their actual and predicted masks for each patch from each model at 3 random slices
     
     slices = np.random.randint(len(imgs), size=(3))
-    c = np.unique(gts.ravel())
+    colours = np.unique(gts.ravel())
+    colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
+    c = np.stack([colours_normalized]*3, axis=-1)
 
     fig, ax = plt.subplots(len(imgs)*3, 3, figsize=(15, 12*len(imgs)))
 
@@ -68,7 +70,9 @@ def show_pred_masks(model_name, backbone, imgs, preds, out_path, classes):
     # Plot images from the test set and their predicted masks from each model at 3 random slices 
 
     slices = np.random.randint(len(imgs), size=(3))
-    c = np.unique(preds.ravel())
+    colours = np.unique(preds.ravel())
+    colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
+    c = np.stack([colours_normalized]*3, axis=-1)
 
     fig, ax = plt.subplots(3*len(imgs), 2, figsize=(10, 12*len(imgs)))
 
@@ -101,7 +105,7 @@ def disp_3D_val(val_masks, val_preds, model_name, backbone, classes, out_path):
         val_mask = val_masks[i].reshape(val_masks[i].shape[0], val_masks[i].shape[1], val_masks[i].shape[2])
         y, x, z = np.where(val_mask != 0)
         colours = val_mask[x, y, z]
-        colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
+        colours_normalized = (colours - np.min(colours)) / ((np.max(colours)) - np.min(colours))
         greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
         ax.scatter(x, y, z, c=greyscale_colours, marker='s', s=cube_size**2)
         c = np.unique(greyscale_colours.ravel())
