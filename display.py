@@ -40,7 +40,6 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes):
     values = np.unique(gts.ravel())
 
     fig, ax = plt.subplots(len(imgs)*3, 3, figsize=(15, 12*len(imgs)))
-    print(imgs.shape)
 
     k = 0
     for i in range(3*len(imgs)):
@@ -49,11 +48,10 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes):
         for j in range(3):
             if j == 0:
                 ax[i,j].set_title('Validation Image')
-                print(imgs[i,:,:,slices[k],0].shape)
-                ax[i,j].imshow(imgs[i,:,:,slices[k],0])
+                ax[i,j].imshow(imgs[i,:,:,slices[k]])
             elif j == 1:
                 ax[i,j].set_title('Ground Truth Mask')
-                ax[i,j].imshow(gts[i,:,:,slices[k],0], cmap='gray')
+                ax[i,j].imshow(gts[i,:,:,slices[k]], cmap='gray')
                 c = [ax[i,j].cmap(ax[i,j].norm(value)) for value in values]
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
                 ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
