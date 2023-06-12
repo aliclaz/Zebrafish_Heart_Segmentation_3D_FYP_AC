@@ -9,7 +9,7 @@ if __name__ == '__main__':
 import os
 import numpy as np
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, CSVLogger, EarlyStopping
+from tensorflow.keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping
 import pandas as pd
 
 from imgPreprocessing import load_process_imgs
