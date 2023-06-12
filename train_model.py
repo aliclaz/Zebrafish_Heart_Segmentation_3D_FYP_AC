@@ -171,7 +171,7 @@ def main(args):
 
     # Display validation images, their actual masks and their predicted masks by the model in 2D slices
 
-    show_val_masks(args.model_name, x_val, val_masks, val_preds, out_path, classes)
+    show_val_masks(args.model_name, args.backbone, x_val, val_masks, val_preds, out_path, classes)
 
     # Display the the actual masks and predicted masks in 3D
 
