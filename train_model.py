@@ -11,6 +11,7 @@ import numpy as np
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping
 import pandas as pd
+from patchify import unpatchify
 
 from imgPreprocessing import load_process_imgs
 from seg_models import Unet, AttentionUnet, AttentionResUnet, defAttentionResUnet, defAttentionUnet, defUnet, get_preprocessing
@@ -184,14 +185,17 @@ def main(args):
     # Collect train and validation original masks and test predictions into healthy dataset
     # with a list of their scales
 
+    train_val_masks = np.concatenate((train_masks, val_masks), axis=0)
+    train_val_masks_reshaped = train_val_masks.reshape(4, 4, 4, patch_size, patch_size, patch_size)
+    recon_train_val_masks = unpatchify(train_val_masks_reshaped, (256, 256, 256))
+    train_val_masks = np.expand_dims(recon_train_val_masks, axis=0)
+    healthy_masks = np.concatenate((train_val_masks, test_preds), axis=0)
+
     if args.hpf == 48:
-        healthy_masks = np.concatenate((train_masks, val_masks, test_preds), axis=0)
         healthy_scales = [295.53, 233.31, 233.31, 246.27, 246.27]
     elif args.hpf == 36:
-        healthy_masks = np.concatenate((train_masks, val_masks, test_preds), axis=0)
         healthy_scales = [221.65, 221.65, 221.65, 221.65, 221.65, 221.65]
     elif args.hpf == 30:
-        healthy_masks = np.concatenate((train_masks, val_masks, test_preds), axis=0)
         healthy_scales = [221.65, 221.65]
 
     # Calculate the means, standard deviations and confidence intervals of the volume of each class
