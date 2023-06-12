@@ -36,7 +36,7 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes):
 
     # Plot the validation images, and their actual and predicted masks for each patch from each model at 3 random slices
     
-    slices = np.random.randint(64, size=(3))
+    slices = np.random.randint(len(imgs), size=(3))
     values = np.unique(gts.ravel())
 
     fig, ax = plt.subplots(len(imgs)*3, 3, figsize=(15, 12*len(imgs)))
@@ -69,7 +69,7 @@ def show_pred_masks(model_name, backbone, imgs, preds, out_path, classes):
 
     # Plot images from the test set and their predicted masks from each model at 3 random slices 
 
-    slices = np.random.randint(256, size=(3))
+    slices = np.random.randint(len(imgs), size=(3))
     values = np.unique(preds.ravel())
 
     fig, ax = plt.subplots(3*len(imgs), 2, figsize=(10, 12*len(imgs)))
