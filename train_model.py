@@ -79,9 +79,12 @@ def main(args):
 
         opt = Adam(args.learning_rate)
 
-        dice_loss = l.DiceLoss()
-        cat_focal_loss = l.CategoricalFocalLoss()
-        total_loss = dice_loss + cat_focal_loss
+        def dice_plus_focal_loss():
+            dice_loss = l.DiceLoss()
+            cat_focal_loss = l.CategoricalFocalLoss()
+            total_loss = dice_loss + cat_focal_loss
+        
+            return total_loss
 
         metrics = [m.IOUScore(threshold=0.5), m.FScore(threshold=0.5)]
 
@@ -108,7 +111,7 @@ def main(args):
                             input_shape=(patch_size, patch_size, patch_size, channels), 
                             encoder_weights=encoder_weights, activation=activation)
 
-    model.compile(optimizer=opt, loss=total_loss, metrics=metrics)
+    model.compile(optimizer=opt, loss=dice_plus_focal_loss, metrics=metrics)
 
     # Summarise the model architecture
 
@@ -139,7 +142,7 @@ def main(args):
     # Use model to predict masks for each validation image
 
     val_preds_list = []
-    val_preds = val_predict(mod_path + '{}HPF_{}_{}_{}_epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), strategy, total_loss, x_val, patch_size)
+    val_preds = val_predict(mod_path + '{}HPF_{}_{}_{}_epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), strategy, dice_plus_focal_loss, x_val, patch_size)
     val_preds_list.append(val_preds)
     val_preds = np.array(val_preds_list)
 
@@ -168,7 +171,7 @@ def main(args):
     # Use model to predict masks for each validation image
 
     test_preds_list = []
-    test_imgs, test_preds = test_predict(mod_path + '{}HPF_{}_{}_{}_epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), strategy, total_loss, args.backbone, test_paths, out_path, args.hpf)
+    test_imgs, test_preds = test_predict(mod_path + '{}HPF_{}_{}_{}_epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), strategy, dice_plus_focal_loss, args.backbone, test_paths, out_path, args.hpf)
     test_preds_list.append(test_preds)
     test_preds = np.array(val_preds_list)
 
