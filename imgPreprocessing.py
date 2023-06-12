@@ -42,7 +42,7 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
 
     labelencoder = LabelEncoder()
     n, h, w, d = masks_reshaped.shape
-    masks_flat = masks_reshaped.reshape(-1, 1)
+    masks_flat = masks_reshaped.reshape(-1,)
     encoded_masks = labelencoder.fit_transform(masks_flat)
     encoded_masks_reshaped = encoded_masks.reshape(n, h, w, d)
     train_masks = np.expand_dims(encoded_masks_reshaped, axis=4).astype(np.float32)
