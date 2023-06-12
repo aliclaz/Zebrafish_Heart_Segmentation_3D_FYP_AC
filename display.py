@@ -8,7 +8,7 @@ def show_history(history, model_name, backbone, out_path):
     # Plot training and validation loss and accuracy at each epoch for certain model
     # Model and backbone are the names of the model and backbone used
 
-    fig, ax = plt.subplots(1, 2, figsize=(14, 5))
+    fig, ax = plt.subplots(1, 2, figsize=(16, 5))
 
     loss = history.history['loss']
     val_loss = history.history['val_loss']
