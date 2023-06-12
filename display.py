@@ -46,10 +46,10 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes, hp
     k = 0
     for i in range(len(imgs)):
         for slice in slices:
-            ax[k,0].set_title('Validation Image {}, Slice {}'.format{(i+1), slice})
+            ax[k,0].set_title('Validation Image {}, Slice {}'.format((i+1), slice))
             ax[k,0].imshow(imgs[i,:,:,slice])
 
-            ax[k,1].set_title('Ground Truth Mask {}, Slice {}'.format{(i+1), slice})
+            ax[k,1].set_title('Ground Truth Mask {}, Slice {}'.format((i+1), slice))
             ax[k,1].imshow(gts[i,:,:,slice], cmap='gray')
             patches = [mpatches.Patch(ec='k', fc=c[i], label=classes[i]) for i in range(len(classes))]
             ax[k,1].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
