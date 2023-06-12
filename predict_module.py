@@ -24,7 +24,6 @@ def val_predict(load_path, imgs, patch_size):
         val_img = np.expand_dims(img, axis=0)
         pred = model.predict(val_img)
         pred = (pred > 0.5).astype(np.uint8)
-        print(pred.shape)
         pred = np.argmax(pred, axis=4)
         val_preds.append(pred)
     val_preds = np.asarray(val_preds, dtype=np.ndarray)

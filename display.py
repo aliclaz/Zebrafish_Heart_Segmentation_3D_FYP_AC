@@ -57,7 +57,7 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes):
                 ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             else:
                 ax[i,j].set_title('Predicted Mask by {} with {} backbone'.format(model_name, backbone))
-                ax[i,j].imshow(preds[i,:,:,slices[k],0], cmap='gray')
+                ax[i,j].imshow(preds[i,:,:,slices[k]], cmap='gray')
                 c = [ax[i,j].cmap(ax[i,j].norm(value)) for value in values]
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
                 ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
