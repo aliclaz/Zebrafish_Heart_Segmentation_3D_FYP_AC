@@ -82,6 +82,8 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
         preds[i] = np.asarray(preds[i], dtype=np.ndarray)
     preds = np.asarray(preds, dtype=np.ndarray)
 
+    print(preds.shape)
+
     # Reshape patches to shape just after patchifying
 
     preds_reshaped = np.reshape(preds, (imgs.shape[0], imgs.shape[1],
