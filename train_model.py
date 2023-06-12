@@ -103,7 +103,7 @@ def main(args):
                             input_shape=(patch_size, patch_size, patch_size, channels), 
                             encoder_weights=encoder_weights, activation=activation)
             
-        elif args.model_name == 'Default AttentionResUnet':
+        elif args.model_name == 'DefaultAttentionResUnet':
             model = defAttentionResUnet(n_classes, input_shape=(patch_size, patch_size, patch_size, 3),
                                         dropout=args.dropout, use_batchnorm=True)
 
@@ -112,7 +112,7 @@ def main(args):
                             input_shape=(patch_size, patch_size, patch_size, channels), 
                             encoder_weights=encoder_weights, activation=activation)
         
-        elif args.model_name == 'Default AttentionUnet':
+        elif args.model_name == 'DefaultAttentionUnet':
             model = defAttentionUnet(n_classes, input_shape=(patch_size, patch_size, patch_size, 3),
                                      dropout=args.dropout, use_batchnorm=True)
 
@@ -121,7 +121,7 @@ def main(args):
                             input_shape=(patch_size, patch_size, patch_size, channels), 
                             encoder_weights=encoder_weights, activation=activation)
             
-        elif args.model_name == 'Default Unet':
+        elif args.model_name == 'DefaultUnet':
             model = defUnet(n_classes, input_shape=(patch_size, patch_size, patch_size, 3),
                             dropout=args.dropout, use_batchnorm=True)
 
@@ -157,17 +157,9 @@ def main(args):
 
     # Convert train and validation masks back from categorical
 
-    train_masks = []
-    for i in range(len(y_train)):
-        train_mask = np.argmax(y_train[i], axis=3)
-        train_masks.append(train_mask)
-    train_masks = np.asarray(train_masks)
+    train_masks = np.argmax(y_train, axis=4)
 
-    val_masks = []
-    for i in range(len(y_val)):
-        val_mask = np.argmax(y_val[i], axis=3)
-        val_masks.append(val_mask)
-    val_masks = np.asarray(val_masks)
+    val_masks = np.argmax(y_val, axis=4)
 
     # Display validation images, their actual masks and their predicted masks by the model in 2D slices
 
