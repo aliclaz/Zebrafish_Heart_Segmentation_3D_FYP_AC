@@ -43,20 +43,18 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
 
     # Read each image in the directory, convert it into patches and add the patches to an array
 
-    img_patches = []
-    imgs_full_size = []
     imgs = []
+    imgs_full_size = []
 
     for in_path in in_paths:
         img = io.imread(in_path)
         imgs_full_size.append(img)
         patches = patchify(img, (64, 64, 64), step=64)
-        img_patches.append(patches)
-        imgs.append(img_patches)
+        print(patches.shape)
+        imgs.append(patches)
     imgs_full_size = np.asarray(imgs_full_size, dtype=np.ndarray)
-    for i in range(len(imgs)):
-        imgs[i] = np.asarray(imgs[i], dtype=np.ndarray)
     imgs = np.asarray(imgs, dtype=np.ndarray)
+    print(imgs.shape)
 
     # Convert full sized image to have 3 channels for display purposes
 
@@ -78,13 +76,16 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
                     single_patch_3ch_size5 = np.expand_dims(single_patch_3ch, axis=0).astype(np.float32)
                     single_patch_3ch_input = preprocess_input(single_patch_3ch_size5)
                     single_patch_pred = model.predict(single_patch_3ch_input)
+                    print(single_patch_pred.shape)
                     single_patch_pred_argmax = np.argmax(single_patch_pred,
                                                         axis=4)[0,:,:,:]
+                    print(single_patch_pred_argmax.shape)
                     pred_patches.append(single_patch_pred_argmax)
         preds.append(pred_patches)
     for i in range(len(preds)):
         preds[i] = np.asarray(preds[i], dtype=np.ndarray)
     preds = np.asarray(preds, dtype=np.ndarray)
+    print(preds.shape)
 
     # Reshape patches to shape just after patchifying
 
