@@ -60,21 +60,19 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
 
     imgs_full_size_3ch = np.stack((imgs_full_size,)*3, axis=-1).astype(np.uint8)
 
-    # Use model to predict mask for each 3D patch and add the patches to an array of shape 
-    # (n_images, n_patches, height, width, depth, classes)
-
-    pred_patches = []
-    preds = []
-    preprocess_input = get_preprocessing(backbone)
-
     # Reshape array for patches for each image so that the element for each array contains an 
     # element for each patch
 
     imgs_reshaped = imgs.reshape(imgs.shape[0], -1, imgs.shape[4], imgs.shape[5], imgs.shape[6])
 
-    # Make predictions for each patch of each image
+    # Use model to predict mask for each 3D patch and add the patches to an array of shape 
+    # (n_images, n_patches, height, width, depth, classes)
+
+    preds = []
+    preprocess_input = get_preprocessing(backbone)
 
     for img_patches in imgs_reshaped:
+        pred_patches = []
         for patch in img_patches:
             patch_3ch = np.stack([patch]*3, axis=-1)
             patch_3ch_add_axis = np.expand_dims(patch_3ch, axis=0).astype(np.float32)
