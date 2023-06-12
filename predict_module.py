@@ -88,6 +88,8 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
                                 imgs.shape[2], imgs.shape[3],
                                 imgs.shape[4], imgs.shape[5],
                                 imgs.shape[6]))
+    
+    print(preds_reshaped)
 
     # Repatch the patches to the volume of the original images
 
