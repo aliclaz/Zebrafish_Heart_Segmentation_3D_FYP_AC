@@ -41,7 +41,7 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes):
     colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
     c = np.stack([colours_normalized]*3, axis=-1)
 
-    fig, ax = plt.subplots(len(imgs)*3, 3, figsize=(15, 12*len(imgs)))
+    fig, ax = plt.subplots(len(imgs)*3, 3, figsize=(24, 20*len(imgs)))
 
     for i in range(len(imgs)):
         for slice in slices:
@@ -69,7 +69,7 @@ def show_pred_masks(model_name, backbone, imgs, preds, out_path, classes):
     colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
     c = np.stack([colours_normalized]*3, axis=-1)
 
-    fig, ax = plt.subplots(3*len(imgs), 2, figsize=(10, 12*len(imgs)))
+    fig, ax = plt.subplots(3*len(imgs), 2, figsize=(16, 20*len(imgs)))
 
     for i in range(len(imgs)):
         for slice in slices:
