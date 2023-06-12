@@ -84,12 +84,9 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
 
     # Reshape patches to shape just after patchifying
 
-    preds_reshaped = np.reshape(preds, (imgs.shape[0], imgs.shape[1],
-                                imgs.shape[2], imgs.shape[3],
-                                imgs.shape[4], imgs.shape[5],
-                                imgs.shape[6]))
+    preds_reshaped = np.reshape(preds, imgs.shape)
     
-    print(preds_reshaped)
+    print(preds_reshaped.shape)
 
     # Repatch the patches to the volume of the original images
 
