@@ -38,7 +38,10 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes, hp
     
     slices = np.random.randint(len(imgs), size=(3))
     colours = np.unique(gts.ravel())
-    colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
+    if len(colours) > 1:
+        colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
+    else:
+        colours_normalized = np.array([0])
     c = np.stack([colours_normalized]*3, axis=-1)
 
     fig, ax = plt.subplots(len(imgs)*3, 3, figsize=(24, 12*len(imgs)))
