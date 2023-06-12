@@ -171,7 +171,7 @@ def main(args):
 
     # Use model to predict masks for each validation image
 
-    test_imgs, test_preds = test_predict(load_path, args.backbone, test_paths, out_path, args.hpf)
+    test_imgs, test_preds = test_predict(load_path, args.model_name, args.backbone, test_paths, out_path, args.hpf)
 
     # Display test images and their predicted masks from the model in 2D slices
 

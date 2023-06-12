@@ -32,7 +32,7 @@ def val_predict(load_path, imgs, patch_size):
 
     return val_preds
 
-def test_predict(load_path, backbone, in_paths, out_path, hpf):
+def test_predict(load_path, model_name, backbone, in_paths, out_path, hpf):
 
     """ 
     Loading of images and preprocessing followed by predictions of the masks by the entered model for each image
@@ -102,11 +102,11 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
     # Save masks as segmented volumes
 
     for reconstructed_pred in reconstructed_preds:
-        imsave(out_path+'{}HPF_test_pred.tif'.format(hpf), reconstructed_pred)
+        imsave(out_path+'{}HPF_test_pred_{}_{}.tif'.format(hpf, backbone, model_name), reconstructed_pred)
 
     return imgs_full_size_3ch, reconstructed_preds
 
-def predict(load_path, backbone, in_paths, out_path, hpf, GM):
+def predict(load_path, model_name, backbone, in_paths, out_path, hpf, GM):
 
     """ 
     Loading of images and preprocessing followed by predictions of the masks by the entered model for each image
@@ -182,6 +182,6 @@ def predict(load_path, backbone, in_paths, out_path, hpf, GM):
     # Save masks as segmented volumes
 
     for reconstructed_pred in reconstructed_preds:
-        imsave(out_path+'{}HPF_{}_predicted_mask.tif'.format(hpf, GM), reconstructed_pred)
+        imsave(out_path+'{}HPF_{}_predicted_mask_{}_{}.tif'.format(hpf, GM, backbone, model_name), reconstructed_pred)
 
     return imgs_256x256x256_3ch, reconstructed_preds

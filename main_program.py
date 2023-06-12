@@ -39,7 +39,7 @@ def main(args):
     # Import images, preprocess, load_model, make predictions and save the predicted masks
 
     with strategy.scope():
-        imgs, preds = predict(MOD_PATH+'{}HPF_{}_{}_{}epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), strategy, args.backbone, in_files, args.out_path, args.entered_hpf, GM=args.gm)
+        imgs, preds = predict(MOD_PATH+'{}HPF_{}_{}_{}epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), args.model_name, args.backbone, in_files, args.out_path, args.entered_hpf, GM=args.gm)
 
     # Get the class labels for each stage of development
 
