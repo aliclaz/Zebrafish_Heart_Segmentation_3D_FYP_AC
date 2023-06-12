@@ -32,50 +32,20 @@ def show_history(history, model_name, backbone, out_path):
     plt.savefig(out_path+'{}_{}_history_plts.jpg'.format(backbone, model_name))
     plt.show()
 
-def show_all_historys(historys, model_names, backbones, out_path):
-
-    # Plot training and validation loss and accuracy at each epoch for each model
-    # historys, models and backbones are lists of the history, model name and backbone name of each model
-
-    fig, ax = plt.subplots(len(historys), 2, figsize=(10, 5*len(historys)))
-
-    for i in range(len(historys)):
-        loss = historys[i].history['loss']
-        val_loss = historys[i].history['val_loss']
-        epochs = range(1, len(loss) + 1)
-        ax[i,0].plot(epochs, loss, 'y', label='Training Loss')
-        ax[i,0].plot(epochs, val_loss, 'r', label='Validation Loss')
-        ax[i,0].set_title('Training and Validation Loss for {} with {} backbone'.format(model_names[i], backbones[i]))
-        ax[i,0].set_xlabel('Epochs')
-        ax[i,0].setylabel('Loss')
-        ax[i,0].legend()
-
-        acc = historys[i].history['iou_score']
-        val_acc = historys[i].history['val_iou_score']
-        ax[i,1].plot(epochs, acc, 'y', label='Training IOU')
-        ax[i,1].plot(epochs, val_acc, 'r', label='Validation IOU ')
-        ax[i,1].set_title('Training and Validation IOU for {} with {} backbone'.format(model_names[i], backbones[i]))
-        ax[i,1].set_xlabel('Epochs')
-        ax[i,1].set_ylabel('IOU')
-        ax[i,1].legend()
-    plt.savefig(out_path+'all_model_history_plots.jpg')
-
-def show_val_masks(model_names, backbones, imgs, gts, preds, out_path, classes):
+def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes):
 
     # Plot the validation images, and their actual and predicted masks for each patch from each model at 3 random slices
-    # Models is an array of each model name and preds is an array containing arrays of the predicted masks from each model 
     
     slices = np.random.randint(64, size=(len(imgs), 3))
     n_rows = len(imgs) * 3
-    n_cols = len(model_names) + 2
     values = np.unique(gts.ravel())
 
-    fig, ax = plt.subplots(n_rows, n_cols, figsize=(5*n_cols, 5*n_rows))
+    fig, ax = plt.subplots(n_rows, 3, figsize=(15, 5*n_rows))
     k = 0
     for i in range(n_rows):
         if i % 3 == 0 and k != 0:
             k += 1
-        for j in range(n_cols):
+        for j in range(3):
             if j == 0:
                 ax[i,j].set_title('Validation Image')
                 ax[i,j].imshow(imgs[slices[k],:,:,:,0])
@@ -86,7 +56,7 @@ def show_val_masks(model_names, backbones, imgs, gts, preds, out_path, classes):
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
                 ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             else:
-                ax[i,j].set_title('Predicted Mask by {} with {} backbone'.format(model_names[j - 2], backbones[j - 2]))
+                ax[i,j].set_title('Predicted Mask by {} with {} backbone'.format(model_name, backbone))
                 ax[i,j].imshow(preds[j-2,slices[k],:,:,:,0], cmap='gray')
                 c = [ax[i,j].cmap(ax[i,j].norm(value)) for value in values]
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
@@ -94,75 +64,43 @@ def show_val_masks(model_names, backbones, imgs, gts, preds, out_path, classes):
     plt.savefig(out_path+'val_imgs_and_masks.jpg')
     plt.show()
 
-def show_test_masks(model_names, backbones, imgs, preds, out_path, classes):
+def show_pred_masks(model_name, backbone, imgs, preds, out_path, classes):
 
-    # Plot images from the test set and their predicted masks from each model at 3 random slices
-    # Models is an array of each model name and preds is an array containing arrays of the predicted masks from each model 
+    # Plot images from the test set and their predicted masks from each model at 3 random slices 
 
     slices = np.random.randint(256, size=(len(imgs), 3))
     n_rows = len(imgs) * 3
-    n_cols = len(model_names) + 2
     values = np.unique(preds.ravel())
 
-    fig, ax = plt.subplots(n_rows, n_cols, figsize=(5*n_cols, 5*n_rows))
+    fig, ax = plt.subplots(n_rows, 2, figsize=(10, 5*n_rows))
     k = 0
     for i in range(n_rows):
         if i % 3 == 0 and k != 0:
             k += 1
-        for j in range(n_cols):
-            if j == 0:
-                ax[i,j].set_title('Test Image')
-                ax[i,j].imshow(imgs[slices[k],:,:,:,0])
-                c = [ax[i,j].cmap(ax[i,j].norm(value)) for value in values]
-                patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
-                ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-            else:
-                ax[i,j].set_title('Predicted Mask by {} with {} backbone'.format(model_names[j - 1], backbones[j - 2]))
-                ax[i,j].imshow(preds[j-1,slices[k],:,:,:,0], cmap='gray')
-                c = [ax[i,j].cmap(ax[i,j].norm(value)) for value in values]
-                patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
-                ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+            ax[i,0].set_title('Test Image')
+            ax[i,0].imshow(imgs[slices[k],:,:,:,0])
+            c = [ax[i,0].cmap(ax[i,0].norm(value)) for value in values]
+            patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
+            ax[i,0].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        
+            ax[i,1].set_title('Predicted Mask by {} with {} backbone'.format(model_name, backbone))
+            ax[i,1].imshow(preds[0,slices[k],:,:,:,0], cmap='gray')
+            c = [ax[i,1].cmap(ax[i,1].norm(value)) for value in values]
+            patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
+            ax[i,1].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.savefig(out_path+'test_imgs_and_masks.jpg')
     plt.show()
 
-def show_pred_masks(imgs, preds, out_path, classes):
-    
-    # Plot images from the test set and their predicted masks at 3 random slices
-    # Here preds is an array of predicted masks for each image, only 1 model used
-
-    slices = np
-    slices = np.random.randint(256, size=(len(imgs), 3))
-    n_rows = len(imgs) * 3
-    values = np.unique(preds.ravel())
-
-    fig, ax = plt.subplots(n_rows, 2, figsize=(8, 4*n_rows))
-    k = 0
-    for i in range(n_rows):
-        if i % 3 == 0 and k != 0:
-            k += 1
-        for j in range(2):
-            if j == 0:
-                ax[i,j].set_title('Test Image')
-                ax[i,j].imshow(imgs[slices[k],:,:,:,0])
-            else:
-                ax[i,j].set_title('Predicted Mask')
-                ax[i,j].imshow(preds[slices[k],:,:,:,0], cmap='gray')
-                c = [ax[i,j].cmap(ax[i,j].norm(value)) for value in values]
-                patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
-                ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    plt.savefig(out_path+'pred_imgs_and_masks.jpg')
-    plt.show()
-
-def disp_3D_val(val_masks, all_val_preds, model_names, backbones, classes, out_path):
+def disp_3D_val(val_masks, val_preds, model_name, backbone, classes, out_path):
 
     # Plot the validation actual masks and their predicted masks for each patch in the validation set, predictions from all models
 
-    fig = plt.figure(figsize=(4*(len(all_val_preds)+1), 4*len(val_masks)))
+    fig = plt.figure(figsize=(8, 4*len(val_masks)))
     fig.patch.set_facecolor('darkblue')
     cube_size = 1
 
     for i in range(len(val_masks)):
-        ax = fig.add_subplot(len(val_masks), len(all_val_preds)+1, ((len(all_val_preds)+1)*i)+1, projection='3d')
+        ax = fig.add_subplot(len(val_masks), 2, (2*i)+1, projection='3d')
         ax.set_title('Actual Mask')
         val_mask = val_masks[i].reshape(val_masks[i].shape[0], val_masks[i].shape[1], val_masks[i].shape[2])
         y, x, z = np.where(val_mask != 0)
@@ -174,46 +112,21 @@ def disp_3D_val(val_masks, all_val_preds, model_names, backbones, classes, out_p
         patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
         ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
-        for j in all_val_preds:
-            ax = fig.add_subplot(len(val_masks), len(all_val_preds)+1, ((len(all_val_preds)+1)*i)+j+2, projection='3d')
-            ax.set_title('Predicted Mask by {} with {} backbone'.format(model_names[j], backbones[j]))
-            val_pred = all_val_preds[j,i].reshape(all_val_preds[j,i].shape[0], all_val_preds[j,i].shape[1], all_val_preds[j,i].shape[2])
-            y, x, z = np.where(val_pred != 0)
-            colours = val_pred[y, x, z]
-            colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
-            greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
-            ax.scatter(x, y, z, c=greyscale_colours, markers='s', s=cube_size**2)
-            c = np.unique(greyscale_colours.ravel())
-            patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
-            ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        ax = fig.add_subplot(len(val_masks), 2, (2*i)+2, projection='3d')
+        ax.set_title('Predicted Mask by {} with {} backbone'.format(model_name, backbone))
+        val_pred = val_preds[i].reshape(val_preds[i].shape[0], val_preds[i].shape[1], val_preds[i].shape[2])
+        y, x, z = np.where(val_pred != 0)
+        colours = val_pred[y, x, z]
+        colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
+        greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
+        ax.scatter(x, y, z, c=greyscale_colours, markers='s', s=cube_size**2)
+        c = np.unique(greyscale_colours.ravel())
+        patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
+        ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.savefig(out_path+'val_masks_and_preds3D.jpg')
     plt.show()
 
-def disp_3D_test(all_test_preds, model_names, backbones, out_path, classes):
-
-    # Plot the predicted masks for each patch in the validation set, predictions from all models
-
-    fig = plt.figure(figsize=(4*len(all_test_preds), 4*len(all_test_preds[0])))
-    fig.patch.set_facecolor('darkblue')
-    cube_size = 1
-
-    for i in range(len(all_test_preds[0])):
-        for j in range(len(all_test_preds)):
-            ax = fig.add_subplot(len(all_test_preds[i]), len(all_test_preds), (len(all_test_preds)*i)+j+1, projection='3d')
-            ax.set_title('Predicted Mask by {} with {} backbone'.format(model_names[i], backbones[i]))
-            test_pred = all_test_preds[j,i].reshape(all_test_preds[j,i].shape[0], all_test_preds[j,i].shape[1], all_test_preds[j,i].shape[2])
-            y, x, z = np.where(test_pred != 0)
-            colours = test_pred[x, y, z]
-            colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
-            greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
-            ax.scatter(x, y, z, c=greyscale_colours, markers='s', s=cube_size**2)
-            c = np.unique(greyscale_colours.ravel())
-            patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
-            ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    plt.savefig(out_path+'test_preds3D.jpg')
-    plt.show()
-
-def disp_3D_test(preds, model_name, backbone, out_path, classes):
+def disp_3D_pred(preds, model_name, backbone, out_path, classes):
 
     # Plot the predicted masks for each patch in the validation set, predictions from all models
 
@@ -222,16 +135,16 @@ def disp_3D_test(preds, model_name, backbone, out_path, classes):
     cube_size = 1
 
     for i in range(len(preds)):
-            ax = fig.add_subplot(len(preds), 1, i+1, projection='3d')
-            ax.set_title('Predicted Mask by {} with {} backbone'.format(model_name, backbone))
-            pred = preds[i].reshape(preds[i].shape[0], preds[i].shape[1], preds[i].shape[2])
-            y, x, z = np.where(pred != 0)
-            colours = pred[x, y, z]
-            colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
-            greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
-            ax.scatter(x, y, z, c=greyscale_colours, markers='s', s=cube_size**2)
-            c = np.unique(greyscale_colours.ravel())
-            patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
-            ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    plt.savefig(out_path+'preds3D.jpg')
+        ax = fig.add_subplot(len(preds), 1, i+1, projection='3d')
+        ax.set_title('Predicted Mask by {} with {} backbone'.format(model_name, backbone))
+        pred = preds[i].reshape(preds[i].shape[0], preds[i].shape[1], preds[i].shape[2])
+        y, x, z = np.where(pred != 0)
+        colours = pred[x, y, z]
+        colours_normalized = (colours - np.min(colours)) / (np.max(colours) - np.min(colours))
+        greyscale_colours = np.stack([colours_normalized]*3, axis=-1)
+        ax.scatter(x, y, z, c=greyscale_colours, markers='s', s=cube_size**2)
+        c = np.unique(greyscale_colours.ravel())
+        patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
+        ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.savefig(out_path+'test_preds3D.jpg')
     plt.show()

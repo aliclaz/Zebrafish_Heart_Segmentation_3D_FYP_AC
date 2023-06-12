@@ -16,7 +16,7 @@ from imgPreprocessing import load_process_imgs
 from seg_models import Unet, AttentionUnet, AttentionResUnet, get_preprocessing
 from seg_models import losses as l
 from seg_models import metrics as m
-from display import show_history, show_all_historys, show_val_masks, show_test_masks, disp_3D_val, disp_3D_test
+from display import show_history, show_val_masks, show_test_masks, disp_3D_val, disp_3D_test
 from predict_module import val_predict, test_predict
 from statistical_analysis.df_manipulation import healthy_df_calcs
 
@@ -114,11 +114,6 @@ def main(args):
 
     model.summary()
 
-    model_names = []
-    backbones = []
-    model_names.append(args.model_name)
-    backbones.append(args.backbone)
-
     cbs = [
         ReduceLROnPlateau(monitor='val_iou_score', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='min'),
     ]
@@ -138,10 +133,7 @@ def main(args):
 
     # Use model to predict masks for each validation image
 
-    val_preds_list = []
-    val_preds = val_predict(mod_path + '{}HPF_{}_{}_{}_epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), strategy, dice_plus_focal_loss, x_val, patch_size)
-    val_preds_list.append(val_preds)
-    val_preds = np.array(val_preds_list)
+    val_preds = val_predict(mod_path + '{}HPF_{}_{}_{}_epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), strategy, x_val, patch_size)
 
     # Convert train and validation masks back from categorical
 
@@ -159,40 +151,35 @@ def main(args):
 
     # Display validation images, their actual masks and their predicted masks by the model in 2D slices
 
-    show_val_masks(model_names, x_val, val_masks, val_preds, out_path, classes)
+    show_val_masks(args.model_name, x_val, val_masks, val_preds, out_path, classes)
 
     # Display the the actual masks and predicted masks in 3D
 
-    disp_3D_val(val_masks, val_preds, model_names, backbones, classes, out_path)
+    disp_3D_val(val_masks, val_preds, args.model_name, args.backbone, classes, out_path)
 
     # Use model to predict masks for each validation image
 
-    test_preds_list = []
-    test_imgs, test_preds = test_predict(mod_path + '{}HPF_{}_{}_{}_epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), strategy, dice_plus_focal_loss, args.backbone, test_paths, out_path, args.hpf)
-    test_preds_list.append(test_preds)
-    test_preds = np.array(val_preds_list)
+    test_imgs, test_preds = test_predict(mod_path + '{}HPF_{}_{}_{}_epochs.h5'.format(args.hpf, args.backbone, args.model_name, args.epochs), strategy, args.backbone, test_paths, out_path, args.hpf)
 
     # Display test images and their predicted masks from the model in 2D slices
 
-    show_test_masks(model_names, backbones, test_imgs, test_preds, out_path, classes)
+    show_test_masks(args.model_name, args.backbone, test_imgs, test_preds, out_path, classes)
 
     # Display predicted masks from test images in 3D
 
-    disp_3D_test(test_preds, model_names, backbones, out_path, classes)
+    disp_3D_test(test_preds, args.model_name, args.backbone, out_path, classes)
 
     # Collect train and validation original masks and test predictions into healthy dataset
     # with a list of their scales
 
     if args.hpf == 48:
-        healthy_masks = np.concatenate((train_masks, val_masks, test_preds[0]), axis=0)
+        healthy_masks = np.concatenate((train_masks, val_masks, test_preds), axis=0)
         healthy_scales = [295.53, 233.31, 233.31, 246.27, 246.27]
     elif args.hpf == 36:
-        classes = ['Background', 'Endocardium', 'Atrium', 'Noise', 'Ventricle']
-        healthy_masks = np.concatenate((train_masks, val_masks, test_preds[0]), axis=0)
+        healthy_masks = np.concatenate((train_masks, val_masks, test_preds), axis=0)
         healthy_scales = [221.65, 221.65, 221.65, 221.65, 221.65, 221.65]
     elif args.hpf == 30:
-        classes = ['Background','Endocardium', 'Linear Heart Tube', 'Noise']
-        healthy_masks = np.concatenate((train_masks, val_masks, test_preds[0]), axis=0)
+        healthy_masks = np.concatenate((train_masks, val_masks, test_preds), axis=0)
         healthy_scales = [221.65, 221.65]
 
     # Calculate the means, standard deviations and confidence intervals of the volume of each class
