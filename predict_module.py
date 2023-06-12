@@ -43,15 +43,19 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
 
     # Read each image in the directory, convert it into patches and add the patches to an array
 
-    imgs = []
+    img_patches = []
     imgs_full_size = []
+    imgs
 
     for in_path in in_paths:
         img = io.imread(in_path)
         imgs_full_size.append(img)
         patches = patchify(img, (64, 64, 64), step=64)
-        imgs.append(patches)
+        img_patches.append(patches)
+        imgs.append(img_patches)
     imgs_full_size = np.asarray(imgs_full_size, dtype=np.ndarray)
+    for i in range(len(imgs)):
+        imgs[i] = np.asarray(imgs[i], dtype=np.ndarray)
     imgs = np.asarray(imgs, dtype=np.ndarray)
 
     # Convert full sized image to have 3 channels for display purposes
@@ -81,8 +85,6 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
     for i in range(len(preds)):
         preds[i] = np.asarray(preds[i], dtype=np.ndarray)
     preds = np.asarray(preds, dtype=np.ndarray)
-
-    print(preds.shape)
 
     # Reshape patches to shape just after patchifying
 
