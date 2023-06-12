@@ -15,7 +15,7 @@ def show_history(history, model_name, backbone, out_path, hpf):
     epochs = range(1, len(loss) + 1)
     ax[0].plot(epochs, loss, 'y', label='Training Loss')
     ax[0].plot(epochs, val_loss, 'r', label='Validation Loss')
-    ax[0].set_title('Training and Validation Loss for {} with {} backbone'.format(model_name, backbone))
+    ax[0].set_title('Training and Validation Loss for {} with {} Backbone'.format(model_name, backbone))
     ax[0].set_xlabel('Epochs')
     ax[0].set_ylabel('Loss')
     ax[0].legend()
@@ -24,7 +24,7 @@ def show_history(history, model_name, backbone, out_path, hpf):
     val_acc = history.history['val_iou_score']
     ax[1].plot(epochs, acc, 'y', label='Training IOU')
     ax[1].plot(epochs, val_acc, 'r', label='Validation IOU ')
-    ax[1].set_title('Training and Validation IOU for {} with {}'.format(model_name, backbone))
+    ax[1].set_title('Training and Validation IOU for {} with {} Backbone'.format(model_name, backbone))
     ax[1].set_xlabel('Epochs')
     ax[1].set_ylabel('IOU')
     ax[1].legend()

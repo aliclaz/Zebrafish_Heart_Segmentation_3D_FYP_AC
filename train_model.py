@@ -149,7 +149,7 @@ def main(args):
 
     # Plot the train and validation losses and IOU scores at each epoch for the model
     
-    show_history(history, args.model_name, args.backbone, out_path)
+    show_history(history, args.model_name, args.backbone, out_path, args.hpf)
 
     # Use model to predict masks for each validation image
 
@@ -163,11 +163,11 @@ def main(args):
 
     # Display validation images, their actual masks and their predicted masks by the model in 2D slices
 
-    show_val_masks(args.model_name, args.backbone, x_val, val_masks, val_preds, out_path, classes)
+    show_val_masks(args.model_name, args.backbone, x_val, val_masks, val_preds, out_path, classes, args.hpf)
 
     # Display the the actual masks and predicted masks in 3D
 
-    disp_3D_val(val_masks, val_preds, args.model_name, args.backbone, classes, out_path)
+    disp_3D_val(val_masks, val_preds, args.model_name, args.backbone, classes, out_path, args.hpf)
 
     # Use model to predict masks for each validation image
 
@@ -175,11 +175,11 @@ def main(args):
 
     # Display test images and their predicted masks from the model in 2D slices
 
-    show_pred_masks(args.model_name, args.backbone, test_imgs, test_preds, out_path, classes)
+    show_pred_masks(args.model_name, args.backbone, test_imgs, test_preds, out_path, classes, args.hpf)
 
     # Display predicted masks from test images in 3D
 
-    disp_3D_pred(test_preds, args.model_name, args.backbone, out_path, classes)
+    disp_3D_pred(test_preds, args.model_name, args.backbone, out_path, classes, args.hpf)
 
     # Collect train and validation original masks and test predictions into healthy dataset
     # with a list of their scales
