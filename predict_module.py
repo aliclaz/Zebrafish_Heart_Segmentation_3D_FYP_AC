@@ -72,7 +72,8 @@ def test_predict(load_path, backbone, in_paths, out_path, hpf):
                 for l in range(imgs.shape[3]):
                     single_patch = imgs[i,j,k,l,:,:,:]
                     single_patch_3ch = np.stack((single_patch,)*3, axis=-1)
-                    single_patch_3ch_input = preprocess_input(np.expand_dims(single_patch_3ch, axis=0))
+                    single_patch_3ch_size5 = np.expand_dims(single_patch_3ch, axis=0)
+                    single_patch_3ch_input = preprocess_input(single_patch_3ch_size5)
                     single_patch_pred = model.predict(single_patch_3ch_input)
                     single_patch_pred_argmax = np.argmax(single_patch_pred,
                                                         axis=4)[0,:,:,:]
