@@ -13,7 +13,7 @@ from tensorflow.keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStoppi
 import pandas as pd
 
 from imgPreprocessing import load_process_imgs
-from seg_models import Unet, AttentionUnet, AttentionResUnet, get_preprocessing
+from seg_models import Unet, AttentionUnet, AttentionResUnet, defAttentionResUnet, defAttentionUnet, defUnet, get_preprocessing
 from seg_models import losses as l
 from seg_models import metrics as m
 from display import show_history, show_val_masks, show_pred_masks, disp_3D_val, disp_3D_pred
@@ -85,28 +85,45 @@ def main(args):
 
         metrics = [m.IOUScore(threshold=0.5), m.FScore(threshold=0.5)]
 
-        # Preprocess input data with defined backbone
+        if args.backbone is not None:
+            # Preprocess input data with defined backbone if using pre-trained model
 
-        preprocess_input = get_preprocessing(args.backbone)
-        x_train_prep = preprocess_input(x_train)
-        x_val_prep = preprocess_input(x_val)
+            preprocess_input = get_preprocessing(args.backbone)
+            x_train_prep = preprocess_input(x_train)
+            x_val_prep = preprocess_input(x_val)
+        
+        else:
+            x_train_prep = x_train / 255
+            x_val_prep = x_val / 255
 
         # Define model depending on script argument
 
         if args.model_name == 'AttentionResUnet':
-            model = model = AttentionResUnet(args.backbone, classes=n_classes, dropout=args.dropout,
+            model = AttentionResUnet(args.backbone, classes=n_classes, dropout=args.dropout,
                             input_shape=(patch_size, patch_size, patch_size, channels), 
                             encoder_weights=encoder_weights, activation=activation)
+            
+        elif args.model_name == 'Default AttentionResUnet':
+            model = defAttentionResUnet(n_classes, input_shape=(patch_size, patch_size, patch_size, 3),
+                                        dropout=args.dropout, use_batchnorm=True)
 
         elif args.model_name == 'AttentionUnet':
             model = AttentionUnet(args.backbone, classes=n_classes, dropout=args.dropout,
                             input_shape=(patch_size, patch_size, patch_size, channels), 
                             encoder_weights=encoder_weights, activation=activation)
+        
+        elif args.model_name == 'Default AttentionUnet':
+            model = defAttentionUnet(n_classes, input_shape=(patch_size, patch_size, patch_size, 3),
+                                     dropout=args.dropout, use_batchnorm=True)
 
         elif args.model_name == 'Unet':
             model = Unet(args.backbone, classes=n_classes, dropout=args.dropout,
                             input_shape=(patch_size, patch_size, patch_size, channels), 
                             encoder_weights=encoder_weights, activation=activation)
+            
+        elif args.model_name == 'Default Unet':
+            model = defUnet(n_classes, input_shape=(patch_size, patch_size, patch_size, 3),
+                            dropout=args.dropout, use_batchnorm=True)
 
     model.compile(optimizer=opt, loss=total_loss, metrics=metrics)
 
@@ -198,7 +215,7 @@ if __name__ == '__main__':
     parser.add_argument('--hpf', type=int, help='stage of development fish at in train images', required=True)
     parser.add_argument('--train_val_split', type=float, help='determines size of validation set')
     parser.add_argument('--model_name', type=str, help='model to be trained', required=True)
-    parser.add_argument('--backbone', type=str, help='pretrained backbone for model', required=True)
+    parser.add_argument('--backbone', type=str, help='pretrained backbone for model, None if no backbone', required=True)
     parser.add_argument('--learning_rate', type=float, help='learning rate used in training of models', required=True)
     parser.add_argument('--batch_size', type=int, help='size of the batch used to train the model during an epoch', required=True)
     parser.add_argument('--epochs', type=int, help='number of epochs used in training', required=True)
