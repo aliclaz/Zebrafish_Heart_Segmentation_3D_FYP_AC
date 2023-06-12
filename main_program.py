@@ -10,7 +10,7 @@ if __name__ == '__main__':
 from imgPreprocessing import get_hpf
 from keras.models import load_model
 from predict_module import predict
-from display import show_pred_masks
+from display import show_pred_masks, disp_3D_pred
 from statistical_analysis.df_manipulation import gm_df_calcs, healthy_df_calcs, add_df_calcs, add_healthy_df_calcs
 
 # Define the input paths for the trained model and the csv files containing the data from previous statistical analysis
@@ -26,13 +26,20 @@ DEPTH = 512
 
 def main(args):
 
+    # Put the input file names into a list
+
+    in_files = args.in_files.split(' ')
+    in_files = [str(in_file) for in_file in in_files]
+
+    # Set up dstribution strategy for multi-gpu use
+
     devices = tf.config.list_physical_devices('GPU')
     strategy = tf.distribute.MirroredStrategy(['GPU:{}'.format(i) for i in range(len(devices))])
 
     # Import images, preprocess, load_model, make predictions and save the predicted masks
 
     with strategy.scope():
-        imgs, preds = predict(MOD_PATH+'{}HPF_{}_{}_{}epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), strategy, args.backbone, args.in_files, args.out_path, GM=args.gm)
+        imgs, preds = predict(MOD_PATH+'{}HPF_{}_{}_{}epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), strategy, args.backbone, in_files, args.out_path, args.entered_hpf, GM=args.gm)
 
     # Get the class labels for each stage of development
 
@@ -49,7 +56,7 @@ def main(args):
 
     # Show the 3D predicted mask for each image
 
-
+    disp_3D_pred(preds, args.model_name, args.backbone, args.out_path, classes)
 
     # Get one of the default hpf values (30, 36, 48) based on which the entered value is closest to
 
@@ -66,7 +73,7 @@ def main(args):
 
     # The results will be displayed in the terminal and saved as a CSV file in the user chose output path for access at a later date
 
-    if args.reuse == 'yes' or 'Yes' or 'YES' or 'y':
+    if args.reuse:
         if args.gm == 'healthy' or 'Healthy' or 'HEALTHY' or 'None' or 'none' or 'NONE':
             add_healthy_df_calcs(preds, classes, args.entered_hpf, scales, STAT_PATH, args.out_path)
         else:
@@ -83,7 +90,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--in_files', type=str, help='Enter filenames of the images being input (separated by space)', required=True)
     parser.add_argument('--out_path', type=str, help='What is the directory path you would like to save the results in?', required=True)
-    parser.add_argument('--reuse', action='store_true', default=False)
+    parser.add_argument('--reuse', action='store_true', help='Set to \'True\' if adding more images with a gm and hpf that have already been entered', default=False)
     parser.add_argument('--entered_hpf', type=int, help='What stage of development, in hours post-fertilisation (hpf), were the provided images taken in?', required=True)
     parser.add_argument('--gm', type=str, help='What genetic modification was applied to the zebrafish embryo prior to the image being taken?', default='Healthy')
     parser.add_argument('--scale', type=str, help='Enter the width dimension of each image in \u03bcm separated by a single space. Press ENTER when done.', required=True)
