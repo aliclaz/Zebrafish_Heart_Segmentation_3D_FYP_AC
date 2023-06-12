@@ -71,7 +71,7 @@ def show_pred_masks(model_name, backbone, imgs, preds, out_path, classes):
 
     fig, ax = plt.subplots(3*len(imgs), 2, figsize=(10, 12*len(imgs)))
 
-    for i in range(3*len(imgs)):
+    for i in range(len(imgs)):
         for slice in slices:
             ax[i,0].set_title('Test Image')
             ax[i,0].imshow(imgs[i,:,:,slice])
