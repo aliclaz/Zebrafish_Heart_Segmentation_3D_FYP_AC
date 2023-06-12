@@ -43,8 +43,8 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes):
 
     k = 0
     for i in range(3*len(imgs)):
-        if i % 2 == 0 and k != 0:
-            k += 1
+        if i % 2 == 0 and i != 0:
+            k = 0
         for j in range(3):
             if j == 0:
                 ax[i,j].set_title('Validation Image')
@@ -61,6 +61,7 @@ def show_val_masks(model_name, backbone, imgs, gts, preds, out_path, classes):
                 c = [ax[i,j].cmap(ax[i,j].norm(value)) for value in values]
                 patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
                 ax[i,j].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        k += 1
     plt.savefig(out_path+'val_imgs_and_masks.jpg')
     plt.show()
 
@@ -74,9 +75,9 @@ def show_pred_masks(model_name, backbone, imgs, preds, out_path, classes):
     fig, ax = plt.subplots(3*len(imgs), 2, figsize=(10, 12*len(imgs)))
 
     k = 0
-    for i in range(3):
-        if i % 2 == 0 and k != 0:
-            k += 1
+    for i in range(3*len(imgs)):
+        if i % 2 == 0 and i != 0:
+            k = 0
         ax[i,0].set_title('Test Image')
         ax[i,0].imshow(imgs[slices[k],:,:,:,0])
         c = [ax[i,0].cmap(ax[i,0].norm(value)) for value in values]
@@ -88,6 +89,7 @@ def show_pred_masks(model_name, backbone, imgs, preds, out_path, classes):
         c = [ax[i,1].cmap(ax[i,1].norm(value)) for value in values]
         patches = [mpatches.Patch(color=c[i], label=classes[i]) for i in range(len(classes))]
         ax[i,1].legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        k += 1
     plt.savefig(out_path+'test_imgs_and_masks.jpg')
     plt.show()
 
