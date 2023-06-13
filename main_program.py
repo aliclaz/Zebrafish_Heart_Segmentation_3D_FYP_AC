@@ -29,8 +29,7 @@ def main(args):
 
     # Put the input file names into a list
 
-    in_files = args.in_files.split(' ')
-    in_files = [str(in_file) for in_file in in_files]
+    in_files = args.in_files.split(',')
 
     # Import images, preprocess, load_model, make predictions and save the predicted masks
 
@@ -60,7 +59,7 @@ def main(args):
     # When setting the length scale variable in the bash script, each scale is separated by a space
     # This adds each scale to a list in the form float
 
-    scales = args.scale.split(' ')
+    scales = args.scale.split(',')
     scales = [float(scale) for scale in scales]
     
     # Complete calculations of the volumes of each class from the predicted masks and complete a statistical test as to whether the difference between
