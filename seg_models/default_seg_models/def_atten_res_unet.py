@@ -112,7 +112,7 @@ def defAttentionResUnet(n_classes, input_shape=(None, None, 3), use_batchnorm=Fa
     backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
 
     """ Define size of input layer """
-    inputs = layers.Input(input_shape)
+    inputs = layers.Input(shape=input_shape)
     x = inputs
 
     """ Define the number of steps and the number of filters in the first encoder block """
