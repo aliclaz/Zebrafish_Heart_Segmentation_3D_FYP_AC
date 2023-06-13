@@ -31,13 +31,13 @@ def main(args):
 
     in_files = args.in_files.split(',')
 
-    # Import images, preprocess, load_model, make predictions and save the predicted masks
-
-    imgs, preds = predict(MOD_PATH+'{}HPF_{}_{}_{}epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), args.model_name, args.backbone, in_files, OUT_PATH, args.entered_hpf, GM=args.gm)
-
     # Get one of the default hpf values (30, 36, 48) based on which the entered value is closest to
 
     mod_hpf = get_hpf(args.entered_hpf)
+
+    # Import images, preprocess, load_model, make predictions and save the predicted masks
+
+    imgs, preds = predict(MOD_PATH+'{}HPF_{}_{}_{}epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), args.model_name, args.backbone, in_files, OUT_PATH, args.entered_hpf, GM=args.gm)
 
     # Get the class labels for each stage of development
 
