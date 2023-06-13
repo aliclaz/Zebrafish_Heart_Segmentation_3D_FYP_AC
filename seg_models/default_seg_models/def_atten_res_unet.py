@@ -25,9 +25,9 @@ def ResConvBlock(filters, use_batchnorm, name=None):
     resconv_name = name + '_residual_block'
 
     def wrapper(input_tensor):
-        x = Conv3x3BnReLU(filters, use_batchnorm=use_batchnorm, name=resconv_name+'first')(input_tensor)
-        x = Conv3DBn(filters, (3, 3, 3), padding='same', kernel_initializer='he_normal', use_batchnorm=use_batchnorm, name=resconv_name+'second', **kwargs)(x)
-        shortcut = Conv3DBn(filters, (1, 1, 1), kernel_initializer='he_uniform', padding='same', use_batchnorm=use_batchnorm, name=resconv_name+'shorcut', **kwargs)(input_tensor)
+        x = Conv3x3BnReLU(filters, use_batchnorm=use_batchnorm, name=resconv_name+'_first')(input_tensor)
+        x = Conv3DBn(filters, (3, 3, 3), padding='same', kernel_initializer='he_normal', use_batchnorm=use_batchnorm, name=resconv_name+'_second', **kwargs)(x)
+        shortcut = Conv3DBn(filters, (1, 1, 1), kernel_initializer='he_uniform', padding='same', use_batchnorm=use_batchnorm, name=resconv_name+'_shorcut', **kwargs)(input_tensor)
         x = AddAct('relu', name=resconv_name, **kwargs)([shortcut, x])
 
         return x
