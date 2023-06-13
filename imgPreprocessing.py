@@ -75,9 +75,9 @@ def data_generator(x_train, y_train, batch_size):
                 print(x_batch.shape)
                 y_batch = tf.expand_dims(y, axis=3)
             else:
-                x_batch = tf.keras.layers.concatenate([x_batch, tf.expand_dims(x, axis=2)], axis=3, dtype=tf.float32)
+                x_batch = tf.keras.layers.concatenate([x_batch, tf.expand_dims(x, axis=3)], axis=3, dtype=tf.float32)
                 print(x_batch.shape)
-                y_batch = tf.keras.layers.concatenate([y_batch, tf.expand_dims(y, axis=2)], axis=3, dtype=tf.float32)
+                y_batch = tf.keras.layers.concatenate([y_batch, tf.expand_dims(y, axis=3)], axis=3, dtype=tf.float32)
 
         yield x_batch, y_batch
             
