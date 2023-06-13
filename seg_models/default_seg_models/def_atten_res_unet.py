@@ -22,13 +22,28 @@ def Conv3x3BnReLU(filters, use_batchnorm, name=None):
 def ResConvBlock(filters, use_batchnorm, name=None):
     kwargs = get_submodules()
 
-    def wrapper(input_tensor):
-        x = Conv3x3BnReLU(filters, use_batchnorm=use_batchnorm, name=name+'a')(input_tensor)
-        x = Conv3DBn(filters, (3, 3, 3), padding='same', kernel_initializer='he_normal', use_batchnorm=use_batchnorm, name=name+'a', **kwargs)(x)
-        shortcut = Conv3DBn(filters, (1, 1, 1), kernel_initializer='he_uniform', padding='same', use_batchnorm=use_batchnorm, name=name, **kwargs)(input_tensor)
-        x = AddAct('relu', name=name, **kwargs)([shortcut, x])
+    resconv_name = name + '_residual_block'
 
-        return x
+    def wrapper(input_tensor):
+        x = Conv3x3BnReLU(filters, use_batchnorm=use_batchnorm, name=resconv_name+'first')(input_tensor)
+        x = Conv3DBn(filters, (3, 3, 3), padding='same', kernel_initializer='he_normal', use_batchnorm=use_batchnorm, name=resconv_name+'second', **kwargs)(x)
+        shortcut = Conv3DBn(filters, (1, 1, 1), kernel_initializer='he_uniform', padding='same', use_batchnorm=use_batchnorm, name=resconv_name+'shorcut', **kwargs)(input_tensor)
+        x = AddAct('relu', name=resconv_name, **kwargs)([shortcut, x])
+    return wrapper
+
+def EncoderBlock(filters, max_pooling=True, use_batchnorm=False, name=None):
+    kwargs = get_submodules()
+
+    def wrapper(input_tensor):
+        x = ResConvBlock(filters, use_batchnorm, name=name)
+        if max_pooling:
+            out_tensor = MaxPool3D(pool_size=(2, 2, 2), strides=(2, 2, 2), name=name, **kwargs)(x)
+        else:
+            out_tensor = x
+        skip = x
+
+        return out_tensor, skip
+    
     return wrapper
 
 def RepeatElement(tensor, rep):
@@ -122,12 +137,12 @@ def defAttentionResUnet(n_classes, input_shape=None, use_batchnorm=False, dropou
 
     """ Encoder """
     for i in range(steps):
-        x = ResConvBlock(features, use_batchnorm=use_batchnorm, name='encoder_block{}'.format(i))(x)
-        skips.append(x)
+        x, y = EncoderBlock(features, max_pooling=True, use_batchnorm=use_batchnorm, name='encoder_block{}'.format(i))(x)
+        skips.append(y)
         features *= 2
 
     """ Centre block """
-    x = ResConvBlock(features, use_batchnorm=use_batchnorm, name='centre_block')(x)
+    x, _ = ResConvBlock(features, use_batchnorm=use_batchnorm, name='centre_block')(x)
 
     """ Decoder """
     for i in reversed(range(steps)):
