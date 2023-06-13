@@ -28,7 +28,7 @@ def ResConvBlock(filters, use_batchnorm, name=None):
         shortcut = Conv3DBn(filters, (1, 1, 1), kernel_initializer='he_uniform', padding='same', use_batchnorm=use_batchnorm, name=name, **kwargs)(input_tensor)
         x = AddAct('relu', name=name, **kwargs)([shortcut, x])
 
-        return x, shortcut
+        return x
     return wrapper
 
 def RepeatElement(tensor, rep):
@@ -122,12 +122,12 @@ def defAttentionResUnet(n_classes, input_shape=None, use_batchnorm=False, dropou
 
     """ Encoder """
     for i in range(steps):
-        x, y = ResConvBlock(features, use_batchnorm=use_batchnorm, name='encoder_block{}'.format(i))(x)
-        skips.append(y)
+        x = ResConvBlock(features, use_batchnorm=use_batchnorm, name='encoder_block{}'.format(i))(x)
+        skips.append(x)
         features *= 2
 
     """ Centre block """
-    x, _ = ResConvBlock(features, use_batchnorm=use_batchnorm, name='centre_block')(x)
+    x = ResConvBlock(features, use_batchnorm=use_batchnorm, name='centre_block')(x)
 
     """ Decoder """
     for i in reversed(range(steps)):
