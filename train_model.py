@@ -140,7 +140,7 @@ def main(args):
 
     # Train the model
 
-    history = model.fit(data_generator(x_train_prep, y_train, batch_size), epochs=args.epochs, verbose=1,
+    history = model.fit(x_train_prep, y_train, batch_size=batch_size, epochs=args.epochs, verbose=1,
                         validation_data=(x_val_prep, y_val), callbacks=cbs)
     
     # Save the model for use for predictions

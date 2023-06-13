@@ -57,27 +57,4 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
 
     return x_train, x_val, y_train, y_val
 
-def data_generator(x_train, y_train, batch_size):
-    data_gen_args = dict(width_shift_range = 0.2,
-                         height_shift_range = 0.2,
-                         rescale=0.1,
-                         zoom_range=0.2)
-    
-    generators = []
-    for i in range(x_train.shape[3]):
-        generators.append(ImageDataGenerator(**data_gen_args).flow(x_train[:,:,:,i,:], y_train[:,:,:,i,:], batch_size, seed=0))
-        
-    while True:
-        for i in range(x_train.shape[3]):
-            x, y = generators[i].next()
-            if i == 0:
-                x_batch = tf.expand_dims(x, axis=3)
-                print(x_batch.shape)
-                y_batch = tf.expand_dims(y, axis=3)
-            else:
-                x_batch = tf.keras.layers.concatenate([x_batch, tf.expand_dims(x, axis=3)], axis=3, dtype=tf.float32)
-                print(x_batch.shape)
-                y_batch = tf.keras.layers.concatenate([y_batch, tf.expand_dims(y, axis=3)], axis=3, dtype=tf.float32)
-
-        yield x_batch, y_batch
             
