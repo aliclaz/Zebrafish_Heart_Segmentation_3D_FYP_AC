@@ -62,7 +62,7 @@ def AttentionBlock(inter_shape, use_batchnorm, name=None):
         shape_x = backend.int_shape(skip_connection)
         shape_g = backend.int_shape(gating)
 
-        theta_x = Conv3DBn(inter_shape, kernel_size=(2, 2, 2), strides=(2, 2, 2), padding='same', kernel_initalizer='he_normal',
+        theta_x = Conv3DBn(inter_shape, kernel_size=(2, 2, 2), strides=(2, 2, 2), padding='same', kernel_initializer='he_normal',
                            use_batchnorm=use_batchnorm, name=conv1_name, **kwargs)(skip_connection)
         shape_theta_x = backend.int_shape(theta_x)
 
@@ -84,7 +84,7 @@ def AttentionBlock(inter_shape, use_batchnorm, name=None):
 
         y = Mult(**kwargs, name=name)([upsample_psi, skip_connection])
 
-        result = Conv3DBn(shape_x[4], (1, 1, 1), kernel_intitializer='he_normal', padding='same', use_batchnorm=True, 
+        result = Conv3DBn(shape_x[4], (1, 1, 1), kernel_initializer='he_normal', padding='same', use_batchnorm=True, 
                           name=conv4_name, **kwargs)(y)
         
         return result
