@@ -13,7 +13,7 @@ from tensorflow.keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStoppi
 import pandas as pd
 from patchify import unpatchify
 
-from imgPreprocessing import load_process_imgs
+from imgPreprocessing import load_process_imgs, data_generator
 from seg_models import Unet, AttentionUnet, AttentionResUnet, defAttentionResUnet, defAttentionUnet, defUnet, get_preprocessing
 from seg_models import losses as l
 from seg_models import metrics as m
@@ -133,14 +133,14 @@ def main(args):
     model.summary()
 
     cbs = [
-        ReduceLROnPlateau(monitor='val_loss', factor=0.95, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='min'),
+        ReduceLROnPlateau(monitor='val_loss', factor=0.9, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='min'),
         CSVLogger('history_{}_{}_lr_{}.csv'.format(args.backbone, args.model_name, args.learning_rate), append=True),
         EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='min')
     ]
 
     # Train the model
 
-    history = model.fit(x_train_prep, y_train, batch_size=batch_size, epochs=args.epochs, verbose=1,
+    history = model.fit(data_generator(x_train_prep, y_train, batch_size), epochs=args.epochs, verbose=1,
                         validation_data=(x_val_prep, y_val), callbacks=cbs)
     
     # Save the model for use for predictions

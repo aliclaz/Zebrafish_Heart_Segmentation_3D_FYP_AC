@@ -4,6 +4,7 @@ from patchify import patchify
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
+from keras.preprocessing.image import ImageDataGenerator
 
 def get_hpf(hpf):
     # If the hpf entered is not equal to one of the hpfs the models were trained on, find which it is closest
@@ -54,3 +55,13 @@ def load_process_imgs(img_path, mask_path, split, n_classes):
     x_train, x_val, y_train, y_val = train_test_split(train_imgs, train_masks_cat, test_size=split, random_state=0)
 
     return x_train, x_val, y_train, y_val
+
+def data_generator(x_train, y_train, batch_size):
+    data_gen_args = dict(width_shift_range = 0.2,
+                         height_shift_range = 0.2,
+                         rescale=0.1,
+                         zoom_range=0.2)
+    generator = ImageDataGenerator(**data_gen_args).flow(x_train, y_train, batch_size, seed=0)
+    while True:
+        x_batch, y_batch = generator.next()
+        yield x_batch, y_batch
