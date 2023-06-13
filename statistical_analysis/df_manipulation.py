@@ -127,7 +127,7 @@ def healthy_df_calcs(model_name, backbone, masks, classes, scales, hpf, out_path
     # output path so the user can access them - as CSV files
 
     stats.to_csv(out_path+'{}HPF_stat_analysis.csv'.format(hpf))
-    stats_disp.to_csv(out_path+'{}HPF_stat_results.csv'.format(hpf))
+    stats_disp.to_csv(out_path+'{}HPF_{}_{}_stat_results.csv'.format(hpf, backbone, model_name))
 
     # Create a dataframe of the number of samples for each gm at each stage of development and save it as a csv file
 

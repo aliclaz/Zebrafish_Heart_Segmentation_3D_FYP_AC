@@ -18,7 +18,7 @@ from seg_models import Unet, AttentionUnet, AttentionResUnet, defAttentionResUne
 from seg_models import losses as l
 from seg_models import metrics as m
 from display import show_history, show_val_masks, show_pred_masks, disp_3D_val, disp_3D_pred
-from predict_module import val_predict, test_predict
+from predict_module import val_predict, predict
 from statistical_analysis.df_manipulation import healthy_df_calcs
 
 def main(args):
@@ -172,7 +172,7 @@ def main(args):
 
     # Use model to predict masks for each validation image
 
-    test_imgs, test_preds = test_predict(load_path, args.model_name, args.backbone, test_paths, out_path, args.hpf)
+    test_imgs, test_preds = predict(load_path, args.model_name, args.backbone, test_paths, out_path, args.hpf)
 
     # Display test images and their predicted masks from the model in 2D slices
 

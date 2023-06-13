@@ -32,7 +32,7 @@ def val_predict(load_path, imgs, patch_size):
 
     return val_preds
 
-def test_predict(load_path, model_name, backbone, in_paths, out_path, hpf):
+def predict(load_path, model_name, backbone, in_paths, out_path, hpf):
 
     """ 
     Loading of images and preprocessing followed by predictions of the masks by the entered model for each image
@@ -74,7 +74,10 @@ def test_predict(load_path, model_name, backbone, in_paths, out_path, hpf):
         for patch in img_patches:
             patch_3ch = np.stack([patch]*3, axis=-1)
             patch_3ch_add_axis = np.expand_dims(patch_3ch, axis=0).astype(np.float32)
-            patch_3ch_input = preprocess_input(patch_3ch_add_axis)
+            if backbone is not None:
+                patch_3ch_input = preprocess_input(patch_3ch_add_axis)
+            else:
+                patch_3ch_input = patch_3ch_add_axis / 255
             patch_pred = model.predict(patch_3ch_input)
             patch_pred_argmax = np.argmax(patch_pred, axis=4)[0,:,:,:]
             pred_patches.append(patch_pred_argmax)
@@ -105,86 +108,3 @@ def test_predict(load_path, model_name, backbone, in_paths, out_path, hpf):
         imsave(out_path+'{}HPF_test_pred_{}_{}.tif'.format(hpf, backbone, model_name), reconstructed_pred)
 
     return imgs_full_size_3ch, reconstructed_preds
-
-def predict(load_path, model_name, backbone, in_paths, out_path, hpf, GM):
-
-    """ 
-    Loading of images and preprocessing followed by predictions of the masks by the entered model for each image
-    
-    """
-
-    model = load_model(load_path, compile=False)
-
-    mod_hpf = get_hpf(hpf)
-
-    # Read each image in the directory, convert it into patches and add the patches to an array
-
-    height = width = depth = 256
-    imgs = imgs_256x256x256 = []
-    lower = 1 if mod_hpf == 30 else 2
-
-    for in_path in in_paths:
-        img_full_size = io.imread(in_path)
-        img_256x256x256 = resize(img_full_size, (height, width, depth), order=1, mode='mean')
-        img_256x256x256 = rescale_intensity(img_256x256x256, in_range=(lower, 4))
-        imgs_256x256x256.append(img_256x256x256)
-        patches = patchify(img_256x256x256, (64, 64, 64), step=64)
-        imgs.append(patches)
-    imgs_256x256x256 = np.asarray(imgs_256x256x256, dtype=np.ndarray)
-    imgs = np.asarray(imgs, dtype=np.ndarray)
-
-    # Convert full sized image to have 3 channels for display purposes
-
-    imgs_256x256x256_3ch = np.stack((imgs_256x256x256,)*3, axis=-1).astype(np.uint8)
-
-    # Reshape array for patches for each image so that the element for each array contains an 
-    # element for each patch
-
-    imgs_reshaped = imgs.reshape(imgs.shape[0], -1, imgs.shape[4], imgs.shape[5], imgs.shape[6])
-
-    # Use model to predict mask for each 3D patch and add the patches to an array of shape 
-    # (n_images, n_patches, height, width, depth, classes)
-
-    pred_patches = []
-    preds = []
-    preprocess_input = get_preprocessing(backbone)
-
-    for img_patches in imgs_reshaped:
-        pred_patches = []
-        for patch in img_patches:
-            patch_3ch = np.stack([patch]*3, axis=-1)
-            patch_3ch_add_axis = np.expand_dims(patch_3ch, axis=0).astype(np.float32)
-            if backbone is not None:
-                patch_3ch_input = preprocess_input(patch_3ch_add_axis)
-            else:
-                patch_3ch_input = patch_3ch_add_axis / 255
-            patch_pred = model.predict(patch_3ch_input)
-            patch_pred_argmax = np.argmax(patch_pred, axis=4)[0,:,:,:]
-            pred_patches.append(patch_pred_argmax)
-        pred_patches = np.asarray(pred_patches, dtype=np.ndarray)
-        preds.append(pred_patches)
-    preds = np.asarray(preds, dtype=np.ndarray)
-
-    # Reshape patches to shape just after patchifying
-
-    preds_reshaped = np.reshape(preds, imgs.shape)
-
-    # Repatch the patches to the volume of the original images
-
-    reconstructed_preds = []
-
-    for pred_patches in preds_reshaped:
-        reconstructed_pred = unpatchify(pred_patches, img_256x256x256.shape)
-        reconstructed_preds.append(reconstructed_pred)
-    reconstructed_preds = np.asarray(reconstructed_preds, dtype=np.ndarray)
-
-    # Convert to uint8 for opening in image viewing software
-
-    reconstructed_preds = reconstructed_preds.astype(np.uint8)
-
-    # Save masks as segmented volumes
-
-    for reconstructed_pred in reconstructed_preds:
-        imsave(out_path+'{}HPF_{}_predicted_mask_{}_{}.tif'.format(hpf, GM, backbone, model_name), reconstructed_pred)
-
-    return imgs_256x256x256_3ch, reconstructed_preds
