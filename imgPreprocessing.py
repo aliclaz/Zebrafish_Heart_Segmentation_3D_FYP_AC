@@ -4,8 +4,6 @@ from patchify import patchify
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
-from keras.preprocessing.image import ImageDataGenerator
-import tensorflow as tf
 
 def get_hpf(hpf):
     # If the hpf entered is not equal to one of the hpfs the models were trained on, find which it is closest

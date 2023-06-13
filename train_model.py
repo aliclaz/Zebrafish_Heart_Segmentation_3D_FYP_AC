@@ -13,7 +13,7 @@ from tensorflow.keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStoppi
 import pandas as pd
 from patchify import unpatchify
 
-from imgPreprocessing import load_process_imgs, data_generator
+from imgPreprocessing import load_process_imgs
 from seg_models import Unet, AttentionUnet, AttentionResUnet, defAttentionResUnet, defAttentionUnet, defUnet, get_preprocessing
 from seg_models import losses as l
 from seg_models import metrics as m
