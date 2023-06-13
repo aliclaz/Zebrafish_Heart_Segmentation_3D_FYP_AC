@@ -28,7 +28,7 @@ def ResConvBlock(filters, use_batchnorm, name=None):
         shortcut = Conv3DBn(filters, (1, 1, 1), kernel_initializer='he_uniform', padding='same', use_batchnorm=use_batchnorm, name=name, **kwargs)(input_tensor)
         x = AddAct('relu', name=name, **kwargs)([shortcut, x])
 
-        return x
+        return x, shortcut
     return wrapper
 
 def RepeatElement(tensor, rep):
@@ -107,7 +107,9 @@ def DecoderBlock(filters, stage, use_batchnorm=False):
 
     return layer
 
-def build_def_atten_res_unet(n_classes, input_shape=None, use_batchnorm=False, dropout=False, **kwargs):
+def defAttenResUnet(n_classes, input_shape=None, use_batchnorm=False, dropout=False, **kwargs):
+    global backend, layers, models, keras_utils
+    backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
 
     """ Define size of input layer """
     inputs = layers.Input(shape=input_shape)
@@ -144,13 +146,5 @@ def build_def_atten_res_unet(n_classes, input_shape=None, use_batchnorm=False, d
     outputs = Conv3DBn(n_classes, (1, 1, 1), activation=activation, kernel_initializer='he_normal', use_batchnorm=False, name='final')(x)
 
     model = models.Model(inputs=[inputs], outputs=[outputs])
-
-    return model
-
-def defAttentionResUnet(n_classes, input_shape=(None, None, 3), use_batchnorm=True, dropout=False, **kwargs):
-    global backend, layers, models, keras_utils
-    backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
-
-    model = build_def_atten_res_unet(n_classes=n_classes, input_shape=input_shape, use_batchnorm=use_batchnorm, dropout=dropout,)
 
     return model
