@@ -146,7 +146,7 @@ def defAttentionResUnet(n_classes, input_shape=None, use_batchnorm=False, dropou
     """ Centre block """
     x, _ = EncoderBlock(features, max_pooling=True, use_batchnorm=use_batchnorm, name='centre_block')(x)
 
-    print(skips)
+    print(skips[3])
     """ Decoder """
     for i in reversed(range(steps)):
         features //= 2
