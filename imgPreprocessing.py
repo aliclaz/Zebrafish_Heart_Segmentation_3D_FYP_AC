@@ -70,14 +70,12 @@ def data_generator(x_train, y_train, batch_size):
     while True:
         for i in range(x_train.shape[3]):
             x, y = generators[i].next()
-            print(tf.keras.backend.int_shape(x))
             if i == 0:
-                x_batch = x
-                y_batch = y
+                x_batch = tf.expand_dims(x, axis=2)
+                y_batch = tf.expand_dims(y, axis=2)
             else:
-                x_batch = tf.keras.layers.concatenate([x_batch, x], axis=3, dtype=tf.float32)
-                print(tf.keras.backend.int_shape(x_batch))
-                y_batch = tf.keras.layers.concatenate([y_batch, y], axis=3, dtype=tf.float32)
+                x_batch = tf.keras.layers.concatenate([x_batch, tf.expand_dims(x, axis=2)], axis=3, dtype=tf.float32)
+                y_batch = tf.keras.layers.concatenate([y_batch, tf.expand_dims(y, axis=2)], axis=3, dtype=tf.float32)
 
         yield x_batch, y_batch
             
