@@ -112,8 +112,8 @@ def Mult(**kwargs):
     if block_name is not None:
         mult_name = block_name + '_multiply'
 
-    def wrapper(inputs):
-        x = layers.multiply(inputs, name=mult_name)
+    def wrapper(input1, input2):
+        x = layers.multiply([input1, input2], name=mult_name)
 
         return x
     
