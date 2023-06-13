@@ -17,6 +17,7 @@ from statistical_analysis.df_manipulation import gm_df_calcs, healthy_df_calcs, 
 
 STAT_PATH = '/Stats/'
 MOD_PATH = '/Models/'
+OUT_PATH = '/Results/'
 
 # Define the required size parameters of the image for the model and the backbone used in the model
 
@@ -33,7 +34,7 @@ def main(args):
 
     # Import images, preprocess, load_model, make predictions and save the predicted masks
 
-    imgs, preds = predict(MOD_PATH+'{}HPF_{}_{}_{}epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), args.model_name, args.backbone, in_files, args.out_path, args.entered_hpf, GM=args.gm)
+    imgs, preds = predict(MOD_PATH+'{}HPF_{}_{}_{}epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), args.model_name, args.backbone, in_files, OUT_PATH, args.entered_hpf, GM=args.gm)
 
     # Get one of the default hpf values (30, 36, 48) based on which the entered value is closest to
 
@@ -50,11 +51,11 @@ def main(args):
 
     # Plot the test images and their predicted masks at 3 random slice
     
-    show_pred_masks(args.model_name, args.backbone, imgs, preds, args.out_path, classes)
+    show_pred_masks(args.model_name, args.backbone, imgs, preds, OUT_PATH, classes)
 
     # Show the 3D predicted mask for each image
 
-    disp_3D_pred(preds, args.model_name, args.backbone, args.out_path, classes, args.entered_hpf)
+    disp_3D_pred(preds, args.model_name, args.backbone, OUT_PATH, classes, args.entered_hpf)
 
     # When setting the length scale variable in the bash script, each scale is separated by a space
     # This adds each scale to a list in the form float
@@ -69,21 +70,20 @@ def main(args):
 
     if args.reuse:
         if args.gm == 'healthy' or 'Healthy' or 'HEALTHY' or 'None' or 'none' or 'NONE':
-            add_healthy_df_calcs(preds, classes, args.entered_hpf, scales, STAT_PATH, args.out_path)
+            add_healthy_df_calcs(preds, classes, args.entered_hpf, scales, STAT_PATH, OUT_PATH)
         else:
-            add_df_calcs(preds, classes, args.entered_hpf, args.gm, scales, STAT_PATH, args.out_path)
+            add_df_calcs(preds, classes, args.entered_hpf, args.gm, scales, STAT_PATH, OUT_PATH)
 
     else:
         if args.gm == 'healthy' or 'Healthy' or 'HEALTHY' or 'None' or 'none' or 'NONE':
-            add_healthy_df_calcs(preds, classes, args.entered_hpf, scales, STAT_PATH, args.out_path)
+            add_healthy_df_calcs(preds, classes, args.entered_hpf, scales, STAT_PATH, OUT_PATH)
         else:
-            gm_df_calcs(preds, classes, args.entered_hpf, args.gm, scales, STAT_PATH, args.out_path)
+            gm_df_calcs(preds, classes, args.entered_hpf, args.gm, scales, STAT_PATH, OUT_PATH)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--in_files', type=str, help='Enter filenames of the images being input (separated by space)', required=True)
-    parser.add_argument('--out_path', type=str, help='What is the directory path you would like to save the results in?', required=True)
     parser.add_argument('--reuse', action='store_true', help='Set to \'True\' if adding more images with a gm and hpf that have already been entered', default=False)
     parser.add_argument('--entered_hpf', type=int, help='What stage of development, in hours post-fertilisation (hpf), were the provided images taken in?', required=True)
     parser.add_argument('--gm', type=str, help='What genetic modification was applied to the zebrafish embryo prior to the image being taken?', default='Healthy')
