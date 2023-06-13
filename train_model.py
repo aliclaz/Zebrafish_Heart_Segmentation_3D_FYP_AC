@@ -135,7 +135,7 @@ def main(args):
     cbs = [
         ReduceLROnPlateau(monitor='val_loss', factor=0.9, patience=3, min_lr=1e-9, min_delta=1e-8, verbose=1, mode='min'),
         CSVLogger('history_{}_{}_lr_{}.csv'.format(args.backbone, args.model_name, args.learning_rate), append=True),
-        EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='min')
+        EarlyStopping(monitor='val_loss', patience=15, verbose=0, mode='min')
     ]
 
     # Train the model
