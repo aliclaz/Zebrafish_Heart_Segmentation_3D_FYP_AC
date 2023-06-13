@@ -105,7 +105,7 @@ def main(args):
                             encoder_weights=encoder_weights, activation=activation)
             
         elif args.model_name == 'DefaultAttentionResUnet':
-            model = defAttentionResUnet(n_classes, input_shape=(patch_size, patch_size, patch_size, 3),
+            model = defAttentionResUnet(n_classes, input_shape=(patch_size, patch_size, patch_size, channels),
                                         dropout=args.dropout, use_batchnorm=True)
 
         elif args.model_name == 'AttentionUnet':
@@ -114,7 +114,7 @@ def main(args):
                             encoder_weights=encoder_weights, activation=activation)
         
         elif args.model_name == 'DefaultAttentionUnet':
-            model = defAttentionUnet(n_classes, input_shape=(patch_size, patch_size, patch_size, 3),
+            model = defAttentionUnet(n_classes, input_shape=(patch_size, patch_size, patch_size, channels),
                                      dropout=args.dropout, use_batchnorm=True)
 
         elif args.model_name == 'Unet':
@@ -123,7 +123,7 @@ def main(args):
                             encoder_weights=encoder_weights, activation=activation)
             
         elif args.model_name == 'DefaultUnet':
-            model = defUnet(n_classes, input_shape=(patch_size, patch_size, patch_size, 3),
+            model = defUnet(n_classes, input_shape=(patch_size, patch_size, patch_size, channels),
                             dropout=args.dropout, use_batchnorm=True)
 
     model.compile(optimizer=opt, loss=total_loss, metrics=metrics)

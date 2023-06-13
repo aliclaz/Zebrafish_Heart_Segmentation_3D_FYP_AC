@@ -64,18 +64,18 @@ def data_generator(x_train, y_train, batch_size):
                          zoom_range=0.2)
     
     generators = []
-    x_batch = []
-    y_batch = []
     for i in range(x_train.shape[3]):
         generators.append(ImageDataGenerator(**data_gen_args).flow(x_train[:,:,:,i,:], y_train[:,:,:,i,:], batch_size, seed=0))
         
     while True:
         for i in range(x_train.shape[3]):
             x, y = generators[i].next()
-            x_batch.append(x)
-            y_batch.append(y)
-        x_batch = tf.convert_to_tensor(x_batch, dtype=tf.float32)
-        y_batch = tf.convert_to_tensor(y_batch, tf.float32)
+            if i == 0:
+                x_batch = x
+                y_batch = y
+            else:
+                x_batch = tf.layers.concatenate([x_batch, x], axis=3, dtype=tf.float32)
+                y_batch = tf.layers.concatenate([y_batch, y], axis=3, dtype=tf.float32)
 
         yield x_batch, y_batch
             

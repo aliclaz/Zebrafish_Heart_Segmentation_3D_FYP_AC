@@ -98,15 +98,18 @@ from . import utils
 # wrap segmentation models with framework modules
 from .backbones.backbones_factory import Backbones
 from .pretrained_seg_models.unet import Unet as _Unet
-from .default_seg_models.def_unet import defUnet
+from .default_seg_models.def_unet import defUnet as _defUnet
 from .pretrained_seg_models.atten_unet import AttentionUnet as _AttentionUnet
-from .default_seg_models.def_atten_unet import defAttentionUnet
+from .default_seg_models.def_atten_unet import defAttentionUnet as _defAttentionUnet
 from .pretrained_seg_models.atten_res_unet import AttentionResUnet as _AttentionResUnet
-from .default_seg_models.def_atten_res_unet import defAttentionResUnet 
+from .default_seg_models.def_atten_res_unet import defAttentionResUnet as _defAttentionResUnet
 
 Unet = inject_global_submodules(_Unet)
+defUnet = inject_global_submodules(_defUnet)
 AttentionUnet = inject_global_submodules(_AttentionUnet)
+defAttentionUnet = inject_global_submodules(_defAttentionUnet)
 AttentionResUnet = inject_global_submodules(_AttentionResUnet)
+defAttentionResUnet = inject_global_submodules(_defAttentionResUnet)
 get_available_backbone_names = Backbones.models_names
 
 def get_preprocessing(name):
