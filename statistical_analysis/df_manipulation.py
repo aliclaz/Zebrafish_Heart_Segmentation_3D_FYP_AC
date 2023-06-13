@@ -120,7 +120,8 @@ def healthy_df_calcs(masks, classes, scales, hpf, out_path):
     # Remove unwanted classes for displaying the results
 
     stats_disp = stats.drop(['Endocardium', 'Background', 'Noise'])
-    print(stats_disp)
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        print(stats_disp)
 
     # Save the regular results (for future analysis) in the input path so they can be accessed again and the display results in the
     # output path so the user can access them - as CSV files
@@ -214,7 +215,8 @@ def add_df_calcs(new_masks, classes, hpf, gm, scales, in_path, out_path):
     # Remove unwanted classes for displaying the results
 
     stats_disp = stats.drop(['Endocardium', 'Background', 'Noise'])
-    print(stats_disp)
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        print(stats_disp)
 
     # Save the regular results (for future analysis) in the input path so they can be accessed again and the display results in the
     # output path so the user can access them - as CSV files
@@ -314,7 +316,8 @@ def add_healthy_df_calcs(new_healthy_masks, classes, hpf, scales, in_path, out_p
     # Remove unwanted classes for display purposes
 
     stats_disp = stats.drop(['Background', 'Endocardium', 'Noise'])
-    print(stats_disp)
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        print(stats_disp)
 
     # Save the regular results (for future analysis) in the input path so they can be accessed again and the display results in the
     # output path so the user can access them - as CSV files
