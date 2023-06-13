@@ -29,6 +29,8 @@ def ResConvBlock(filters, use_batchnorm, name=None):
         x = Conv3DBn(filters, (3, 3, 3), padding='same', kernel_initializer='he_normal', use_batchnorm=use_batchnorm, name=resconv_name+'second', **kwargs)(x)
         shortcut = Conv3DBn(filters, (1, 1, 1), kernel_initializer='he_uniform', padding='same', use_batchnorm=use_batchnorm, name=resconv_name+'shorcut', **kwargs)(input_tensor)
         x = AddAct('relu', name=resconv_name, **kwargs)([shortcut, x])
+
+        return x
     return wrapper
 
 def EncoderBlock(filters, max_pooling=True, use_batchnorm=False, name=None):
