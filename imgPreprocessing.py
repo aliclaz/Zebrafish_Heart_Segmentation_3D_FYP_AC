@@ -70,6 +70,7 @@ def data_generator(x_train, y_train, batch_size):
     while True:
         for i in range(x_train.shape[3]):
             x, y = generators[i].next()
+            print(tf.keras.backend.int_shape(x))
             if i == 0:
                 x_batch = x
                 y_batch = y
