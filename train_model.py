@@ -201,7 +201,7 @@ def main(args):
     # Calculate the means, standard deviations and confidence intervals of the volume of each class
     # Put these into a dataframe, display it and then save it as a CSV for access from the main program
 
-    healthy_df_calcs(healthy_masks, classes, healthy_scales, args.hpf, stats_path)
+    healthy_df_calcs(args.model_name, args.backbone, healthy_masks, classes, healthy_scales, args.hpf, stats_path)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

@@ -154,7 +154,10 @@ def predict(load_path, model_name, backbone, in_paths, out_path, hpf, GM):
         for patch in img_patches:
             patch_3ch = np.stack([patch]*3, axis=-1)
             patch_3ch_add_axis = np.expand_dims(patch_3ch, axis=0).astype(np.float32)
-            patch_3ch_input = preprocess_input(patch_3ch_add_axis)
+            if backbone is not None:
+                patch_3ch_input = preprocess_input(patch_3ch_add_axis)
+            else:
+                patch_3ch_input = patch_3ch_add_axis / 255
             patch_pred = model.predict(patch_3ch_input)
             patch_pred_argmax = np.argmax(patch_pred, axis=4)[0,:,:,:]
             pred_patches.append(patch_pred_argmax)

@@ -96,7 +96,7 @@ def gm_df_calcs(masks, classes, hpf, gm, scales, in_path, out_path):
 
     n_samples.to_csv(in_path+'n_samples.csv')
 
-def healthy_df_calcs(masks, classes, scales, hpf, out_path):
+def healthy_df_calcs(model_name, backbone, masks, classes, scales, hpf, out_path):
     
     # If the calculations for healthy volumes are being completed for the first time, the number of original samples will be 0
     # Calculate the mean and standard deviations of the volumes of the masks for each class
