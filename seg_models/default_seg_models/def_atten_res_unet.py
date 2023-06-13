@@ -107,9 +107,7 @@ def DecoderBlock(filters, stage, use_batchnorm=False):
 
     return layer
 
-def defAttentionResUnet(n_classes, input_shape=(None, None, 3), use_batchnorm=False, dropout=False, **kwargs):
-    global backend, layers, models, keras_utils
-    backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
+def build_def_atten_res_unet(n_classes, input_shape=None, use_batchnorm=False, dropout=False, **kwargs):
 
     """ Define size of input layer """
     inputs = layers.Input(shape=input_shape)
@@ -146,5 +144,13 @@ def defAttentionResUnet(n_classes, input_shape=(None, None, 3), use_batchnorm=Fa
     outputs = Conv3DBn(n_classes, (1, 1, 1), activation=activation, kernel_initializer='he_normal', use_batchnorm=False, name='final')(x)
 
     model = models.Model(inputs=[inputs], outputs=[outputs])
+
+    return model
+
+def defAttentionResUnet(n_classes, input_shape=(None, None, 3), use_batchnorm=True, dropout=False, **kwargs):
+    global backend, layers, models, keras_utils
+    backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
+
+    model = build_def_atten_res_unet(n_classes=n_classes, input_shape=input_shape, use_batchnorm=use_batchnorm, dropout=dropout,)
 
     return model
