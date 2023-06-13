@@ -5,6 +5,7 @@ from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from keras.preprocessing.image import ImageDataGenerator
+import tensorflow as tf
 
 def get_hpf(hpf):
     # If the hpf entered is not equal to one of the hpfs the models were trained on, find which it is closest
@@ -61,7 +62,20 @@ def data_generator(x_train, y_train, batch_size):
                          height_shift_range = 0.2,
                          rescale=0.1,
                          zoom_range=0.2)
-    generator = ImageDataGenerator(**data_gen_args).flow(x_train, y_train, batch_size, seed=0)
+    
+    generators = []
+    x_batch = []
+    y_batch = []
+    for i in range(x_train.shape[3]):
+        generators.append(ImageDataGenerator(**data_gen_args).flow(x_train[:,:,:,i,:], y_train[:,:,:,i,:], batch_size, seed=0))
+        
     while True:
-        x_batch, y_batch = generator.next()
+        for i in range(x_train.shape[3]):
+            x, y = generators[i].next()
+            x_batch.append(x)
+            y_batch.append(y)
+        x_batch = tf.convert_to_tensor(x_batch, dtype=tf.float32)
+        y_batch = tf.convert_to_tensor(y_batch, tf.float32)
+
         yield x_batch, y_batch
+            
