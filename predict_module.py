@@ -67,7 +67,8 @@ def predict(load_path, model_name, backbone, in_paths, out_path, hpf):
     # (n_images, n_patches, height, width, depth, classes)
 
     preds = []
-    preprocess_input = get_preprocessing(backbone)
+    if backbone is not None:
+        preprocess_input = get_preprocessing(backbone)
 
     for img_patches in imgs_reshaped:
         pred_patches = []
