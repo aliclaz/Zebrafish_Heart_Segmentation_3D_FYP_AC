@@ -35,7 +35,7 @@ def EncoderBlock(filters, max_pooling=True, use_batchnorm=False, name=None):
     kwargs = get_submodules()
 
     def wrapper(input_tensor):
-        x = ResConvBlock(filters, use_batchnorm, name=name)
+        x = ResConvBlock(filters, use_batchnorm, name=name)(input_tensor)
         if max_pooling:
             out_tensor = MaxPool3D(pool_size=(2, 2, 2), strides=(2, 2, 2), name=name, **kwargs)(x)
         else:
