@@ -31,15 +31,13 @@ def main(args):
     in_files = args.in_files.split(' ')
     in_files = [str(in_file) for in_file in in_files]
 
-    # Set up dstribution strategy for multi-gpu use
-
-    devices = tf.config.list_physical_devices('GPU')
-    strategy = tf.distribute.MirroredStrategy(['GPU:{}'.format(i) for i in range(len(devices))])
-
     # Import images, preprocess, load_model, make predictions and save the predicted masks
 
-    with strategy.scope():
-        imgs, preds = predict(MOD_PATH+'{}HPF_{}_{}_{}epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), args.model_name, args.backbone, in_files, args.out_path, args.entered_hpf, GM=args.gm)
+    imgs, preds = predict(MOD_PATH+'{}HPF_{}_{}_{}epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), args.model_name, args.backbone, in_files, args.out_path, args.entered_hpf, GM=args.gm)
+
+    # Get one of the default hpf values (30, 36, 48) based on which the entered value is closest to
+
+    mod_hpf = get_hpf(args.entered_hpf)
 
     # Get the class labels for each stage of development
 
@@ -56,11 +54,7 @@ def main(args):
 
     # Show the 3D predicted mask for each image
 
-    disp_3D_pred(preds, args.model_name, args.backbone, args.out_path, classes)
-
-    # Get one of the default hpf values (30, 36, 48) based on which the entered value is closest to
-
-    mod_hpf = get_hpf(args.entered_hpf)
+    disp_3D_pred(preds, args.model_name, args.backbone, args.out_path, classes, args.entered_hpf)
 
     # When setting the length scale variable in the bash script, each scale is separated by a space
     # This adds each scale to a list in the form float
