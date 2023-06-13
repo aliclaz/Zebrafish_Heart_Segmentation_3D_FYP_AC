@@ -209,7 +209,7 @@ if __name__ == '__main__':
     parser.add_argument('--hpf', type=int, help='stage of development fish at in train images', required=True)
     parser.add_argument('--train_val_split', type=float, help='determines size of validation set')
     parser.add_argument('--model_name', type=str, help='model to be trained', required=True)
-    parser.add_argument('--backbone', type=str, help='pretrained backbone for model, None if no backbone', required=True)
+    parser.add_argument('--backbone', type=str, help='pretrained backbone for model, None if no backbone', default=None)
     parser.add_argument('--learning_rate', type=float, help='learning rate used in training of models', required=True)
     parser.add_argument('--batch_size', type=int, help='size of the batch used to train the model during an epoch', required=True)
     parser.add_argument('--epochs', type=int, help='number of epochs used in training', required=True)
