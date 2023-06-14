@@ -32,7 +32,7 @@ def val_predict(load_path, imgs, patch_size):
 
     return val_preds
 
-def predict(load_path, model_name, backbone, in_paths, out_path, hpf):
+def predict(load_path, model_name, backbone, in_paths, out_path, hpf, GM=None):
 
     """ 
     Loading of images and preprocessing followed by predictions of the masks by the entered model for each image
