@@ -15,8 +15,6 @@ from statistical_analysis.df_manipulation import gm_df_calcs, healthy_df_calcs, 
 
 # Define the input paths for the trained model and the csv files containing the data from previous statistical analysis
 
-STAT_PATH = '/Stats/'
-MOD_PATH = '/Models/'
 OUT_PATH = '/Results/'
 
 # Define the required size parameters of the image for the model and the backbone used in the model
@@ -40,7 +38,7 @@ def main(args):
 
     # Import images, preprocess, load_model, make predictions and save the predicted masks
 
-    imgs, preds = predict(MOD_PATH+'{}HPF_{}_{}_{}_epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), args.model_name, args.backbone, in_files, OUT_PATH, args.entered_hpf, GM=args.gm)
+    imgs, preds = predict('{}HPF_{}_{}_{}_epochs.h5'.format(mod_hpf, args.backbone, args.model_name, args.epochs), args.model_name, args.backbone, in_files, OUT_PATH, args.entered_hpf, GM=args.gm)
 
     # Get the class labels for each stage of development
 
@@ -72,15 +70,15 @@ def main(args):
 
     if reuse:
         if args.gm == 'healthy' or 'Healthy' or 'HEALTHY' or 'None' or 'none' or 'NONE':
-            add_healthy_df_calcs(preds, classes, args.entered_hpf, scales, STAT_PATH, OUT_PATH)
+            add_healthy_df_calcs(preds, classes, args.entered_hpf, scales, '/', OUT_PATH)
         else:
-            add_df_calcs(preds, classes, args.entered_hpf, args.gm, scales, STAT_PATH, OUT_PATH)
+            add_df_calcs(preds, classes, args.entered_hpf, args.gm, scales, '/', OUT_PATH)
 
     else:
         if args.gm == 'healthy' or 'Healthy' or 'HEALTHY' or 'None' or 'none' or 'NONE':
-            add_healthy_df_calcs(preds, classes, args.entered_hpf, scales, STAT_PATH, OUT_PATH)
+            add_healthy_df_calcs(preds, classes, args.entered_hpf, scales, '/', OUT_PATH)
         else:
-            gm_df_calcs(preds, classes, args.entered_hpf, args.gm, scales, STAT_PATH, OUT_PATH)
+            gm_df_calcs(preds, classes, args.entered_hpf, args.gm, scales, '/', OUT_PATH)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
