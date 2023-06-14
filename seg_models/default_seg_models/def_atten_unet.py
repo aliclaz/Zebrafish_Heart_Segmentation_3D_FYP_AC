@@ -74,7 +74,7 @@ def AttentionBlock(inter_shape, use_batchnorm, name=None):
                                                                                  name=name, **kwargs)(phi_g)
         
         act_xg = AddAct('relu', name=name, **kwargs)([upsample_g, theta_x])
-        sigmoid_xg = Conv3DBn(1, kernel_size=(1, 1, 1), activation='softmaxcd ..', kernel_initializer='he_normal', padding='same',
+        sigmoid_xg = Conv3DBn(1, kernel_size=(1, 1, 1), activation='softmax', kernel_initializer='he_normal', padding='same',
                               use_batchnorm=use_batchnorm, name=conv3_name, **kwargs)(act_xg)
         shape_sigmoid = backend.int_shape(sigmoid_xg)
         upsample_psi = UpSamp3D(size=(shape_x[1] // shape_sigmoid[1], 
