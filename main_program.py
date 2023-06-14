@@ -87,8 +87,8 @@ if __name__ == '__main__':
     parser.add_argument('--entered_hpf', type=int, help='What stage of development, in hours post-fertilisation (hpf), were the provided images taken in?', required=True)
     parser.add_argument('--gm', type=str, help='What genetic modification was applied to the zebrafish embryo prior to the image being taken?', default='Healthy')
     parser.add_argument('--scale', type=str, help='Enter the width dimension of each image in \u03bcm separated by a single space. Press ENTER when done.', required=True)
-    parser.add_argument('--model_name', type=str, help='Model architecture to be used for predictions', default='AttentionResUnet')
-    parser.add_argument('--backbone', type=str, help='Pretrained backbone used in the model', default='resnet34')
+    parser.add_argument('--model_name', type=str, help='Model architecture to be used for predictions', default='AttentionUnet')
+    parser.add_argument('--backbone', type=str, help='Pretrained backbone used in the model', default='vgg16')
     parser.add_argument('--epochs', type=int, help='Number of epochs the model was trained on', default=100)
 
     args = parser.parse_args()
